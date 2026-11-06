@@ -1,0 +1,3641 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="light dark" />
+<title>Notes</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20x='5'%20y='7'%20width='22'%20height='21'%20rx='4.5'%20fill='%23FFCC00'/%3E%3Cpath%20d='M11%2015h10M11%2020h7'%20stroke='%231d1d1f'%20stroke-width='2.4'%20stroke-linecap='round'/%3E%3Cpath%20d='M12%203.5v5M20%203.5v5'%20stroke='%236e6e73'%20stroke-width='2.6'%20stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#f5f5f7;
+  --sidebar:#eeeef1;
+  --sidebar2:#e7e7ea;
+  --notes:#fafafa;
+  --editor:#fff;
+  --toolbar:rgba(255,255,255,.94);
+  --text:#1d1d1f;
+  --text2:#6e6e73;
+  --text3:#9a9aa0;
+  --line:rgba(60,60,67,.12);
+  --line2:rgba(60,60,67,.2);
+  --hover:rgba(0,0,0,.045);
+  --selected:rgba(255,214,10,.22);
+  --accent:#ffcc00;
+  --accentText:#9a7300;
+  --danger:#ff453a;
+  --code:#f5f5f7;
+  /* marca-texto: uma cor so, derivada do acento do tema */
+  --hl:color-mix(in srgb,var(--accent) 45%,transparent);
+  --hl-sk:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20120%2044'%20preserveAspectRatio='none'%3E%3Cpath%20d='M7%2011c24-7%2068-8%20106-4%206%201%208%206%206%2014-2%209-7%2015-14%2016-31%204-71%204-95%201-6-1-9-6-8-14%201-7%203-11%205-13z'%20fill='none'%20stroke='%23e0b400'%20stroke-width='3.2'%20stroke-linecap='round'%20stroke-opacity='.9'/%3E%3C/svg%3E");
+  --shadow:0 18px 55px rgba(0,0,0,.15);
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
+  --sidebar-w:244px;
+  --sidebar-collapsed:58px;
+  --notes-w:310px;
+  --toolbar-h:54px;
+  /* distancia da borda do editor ate a primeira letra (ajustavel nas configuracoes) */
+  --text-inset:32px;
+  --content-pad:6px;                                                   /* respiro interno do bloco */
+  --handle-w:min(24px,max(0px,calc(var(--text-inset) - var(--content-pad))));  /* alcinha de arrastar */
+  --doc-pad:max(0px,calc(var(--text-inset) - var(--handle-w) - var(--content-pad)));
+  --ease:cubic-bezier(.22,.8,.22,1);
+  --ease-panel:cubic-bezier(.32,.72,0,1);
+  --dur-panel:.38s;
+  --dur-fade:.18s;
+}
+/* --- temas escuros compartilham marca-texto, sombra e linhas --- */
+html[data-theme="dark"],
+html[data-theme="dracula"],
+html[data-theme="catppuccin"],
+html[data-theme="htb"],
+html[data-theme="nord"],
+html[data-theme="gruvbox"]{
+  color-scheme:dark;
+  --line:rgba(255,255,255,.09);
+  --line2:rgba(255,255,255,.16);
+  --hover:rgba(255,255,255,.06);
+  --hl:color-mix(in srgb,var(--accent) 32%,transparent);
+  --shadow:0 22px 70px rgba(0,0,0,.42);
+}
+html[data-theme="dracula"]{
+  --bg:#21222c;--sidebar:#282a36;--sidebar2:#343746;--notes:#282a36;--editor:#282a36;
+  --toolbar:rgba(40,42,54,.94);
+  --text:#f8f8f2;--text2:#bcc0d0;--text3:#6272a4;
+  --selected:rgba(189,147,249,.2);
+  --accent:#bd93f9;--accentText:#bd93f9;--danger:#ff5555;--code:#21222c;
+}
+html[data-theme="catppuccin"]{
+  --bg:#181825;--sidebar:#1e1e2e;--sidebar2:#313244;--notes:#1e1e2e;--editor:#1e1e2e;
+  --toolbar:rgba(30,30,46,.94);
+  --text:#cdd6f4;--text2:#a6adc8;--text3:#6c7086;
+  --selected:rgba(203,166,247,.18);
+  --accent:#cba6f7;--accentText:#cba6f7;--danger:#f38ba8;--code:#181825;
+}
+html[data-theme="htb"]{
+  --bg:#0b1120;--sidebar:#111927;--sidebar2:#1a2332;--notes:#111927;--editor:#111927;
+  --toolbar:rgba(17,25,39,.94);
+  --text:#dbe4f2;--text2:#a4b1cd;--text3:#6b7a99;
+  --selected:rgba(159,239,0,.16);
+  --accent:#9fef00;--accentText:#9fef00;--danger:#ff3e3e;--code:#0b1120;
+}
+html[data-theme="nord"]{
+  --bg:#2e3440;--sidebar:#3b4252;--sidebar2:#434c5e;--notes:#2e3440;--editor:#2e3440;
+  --toolbar:rgba(46,52,64,.94);
+  --text:#eceff4;--text2:#d8dee9;--text3:#7b88a1;
+  --selected:rgba(136,192,208,.2);
+  --accent:#88c0d0;--accentText:#88c0d0;--danger:#bf616a;--code:#3b4252;
+}
+html[data-theme="gruvbox"]{
+  --bg:#1d2021;--sidebar:#282828;--sidebar2:#3c3836;--notes:#282828;--editor:#282828;
+  --toolbar:rgba(40,40,40,.94);
+  --text:#ebdbb2;--text2:#d5c4a1;--text3:#928374;
+  --selected:rgba(250,189,47,.18);
+  --accent:#fabd2f;--accentText:#fabd2f;--danger:#fb4934;--code:#1d2021;
+}
+html[data-theme="solarized"]{
+  color-scheme:light;
+  --bg:#eee8d5;--sidebar:#eee8d5;--sidebar2:#e2dcc6;--notes:#fdf6e3;--editor:#fdf6e3;
+  --toolbar:rgba(253,246,227,.94);
+  --text:#073642;--text2:#657b83;--text3:#93a1a1;
+  --line:rgba(0,43,54,.13);--line2:rgba(0,43,54,.22);--hover:rgba(0,43,54,.05);
+  --selected:rgba(38,139,210,.14);
+  --accent:#268bd2;--accentText:#1c6ca8;--danger:#dc322f;--code:#eee8d5;
+  --shadow:0 18px 55px rgba(88,110,117,.22);
+}
+html[data-theme="github"]{
+  color-scheme:light;
+  --bg:#f6f8fa;--sidebar:#f6f8fa;--sidebar2:#eaeef2;--notes:#fff;--editor:#fff;
+  --toolbar:rgba(255,255,255,.94);
+  --text:#1f2328;--text2:#59636e;--text3:#818b98;
+  --line:rgba(31,35,40,.12);--line2:rgba(31,35,40,.22);--hover:rgba(31,35,40,.05);
+  --selected:rgba(9,105,218,.12);
+  --accent:#54aeff;--accentText:#0969da;--danger:#cf222e;--code:#f6f8fa;
+  --shadow:0 18px 55px rgba(31,35,40,.16);
+}
+html[data-theme="latte"]{
+  color-scheme:light;
+  --bg:#e6e9ef;--sidebar:#e6e9ef;--sidebar2:#dce0e8;--notes:#eff1f5;--editor:#eff1f5;
+  --toolbar:rgba(239,241,245,.94);
+  --text:#4c4f69;--text2:#6c6f85;--text3:#9ca0b0;
+  --line:rgba(76,79,105,.13);--line2:rgba(76,79,105,.22);--hover:rgba(76,79,105,.05);
+  --selected:rgba(136,57,239,.13);
+  --accent:#c6a0f6;--accentText:#8839ef;--danger:#d20f39;--code:#dce0e8;
+  --shadow:0 18px 55px rgba(76,79,105,.18);
+}
+html[data-theme="rosepine"]{
+  color-scheme:light;
+  --bg:#f2e9e1;--sidebar:#f2e9e1;--sidebar2:#e4dcd4;--notes:#fffaf3;--editor:#faf4ed;
+  --toolbar:rgba(250,244,237,.94);
+  --text:#575279;--text2:#797593;--text3:#9893a5;
+  --line:rgba(87,82,121,.13);--line2:rgba(87,82,121,.22);--hover:rgba(87,82,121,.05);
+  --selected:rgba(157,76,99,.14);
+  --accent:#e8b3af;--accentText:#9d4c63;--danger:#b4637a;--code:#f2e9e1;
+  --shadow:0 18px 55px rgba(87,82,121,.18);
+}
+html[data-theme="nordlight"]{
+  color-scheme:light;
+  --bg:#e5e9f0;--sidebar:#e5e9f0;--sidebar2:#d8dee9;--notes:#eceff4;--editor:#eceff4;
+  --toolbar:rgba(236,239,244,.94);
+  --text:#2e3440;--text2:#4c566a;--text3:#7b88a1;
+  --line:rgba(46,52,64,.12);--line2:rgba(46,52,64,.22);--hover:rgba(46,52,64,.05);
+  --selected:rgba(63,95,131,.15);
+  --accent:#88c0d0;--accentText:#3f5f83;--danger:#bf616a;--code:#e5e9f0;
+  --shadow:0 18px 55px rgba(46,52,64,.18);
+}
+html[data-theme="gruvboxlight"]{
+  color-scheme:light;
+  --bg:#f2e5bc;--sidebar:#f2e5bc;--sidebar2:#ebdbb2;--notes:#fbf1c7;--editor:#fbf1c7;
+  --toolbar:rgba(251,241,199,.94);
+  --text:#3c3836;--text2:#665c54;--text3:#928374;
+  --line:rgba(60,56,54,.13);--line2:rgba(60,56,54,.22);--hover:rgba(60,56,54,.05);
+  --selected:rgba(143,95,10,.15);
+  --accent:#fabd2f;--accentText:#8f5f0a;--danger:#9d0006;--code:#ebdbb2;
+  --shadow:0 18px 55px rgba(60,56,54,.18);
+}
+html[data-theme="dark"]{
+  --bg:#111113;
+  --sidebar:#1c1c1e;
+  --sidebar2:#252527;
+  --notes:#18181a;
+  --editor:#111113;
+  --toolbar:rgba(17,17,19,.94);
+  --text:#f5f5f7;
+  --text2:#a1a1a6;
+  --text3:#707076;
+  --line:rgba(255,255,255,.09);
+  --line2:rgba(255,255,255,.16);
+  --hover:rgba(255,255,255,.06);
+  --selected:rgba(255,214,10,.15);
+  --accent:#ffd60a;
+  --accentText:#ffd60a;
+  --code:#1d1d20;
+  --hl:color-mix(in srgb,var(--accent) 32%,transparent);
+  --shadow:0 22px 70px rgba(0,0,0,.42);
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{
+  overflow:hidden;
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+button,input,select{font:inherit}
+button{color:inherit}
+::selection{background:rgba(255,214,10,.32)}
+
+.app{
+  width:100vw;height:100vh;
+  display:grid;
+  grid-template-columns:var(--sidebar-w) var(--notes-w) minmax(0,1fr);
+  transition:grid-template-columns var(--dur-panel) var(--ease-panel);
+}
+.app.sidebar-collapsed{
+  grid-template-columns:var(--sidebar-collapsed) var(--notes-w) minmax(0,1fr);
+}
+.app.focus{
+  grid-template-columns:0 0 minmax(0,1fr);
+}
+.app.focus .sidebar,.app.focus .notes-pane{border-right-color:transparent}
+/* conteudo fixo na largura final: nada reflui durante a animacao */
+.notes-head,.notes-list{min-width:var(--notes-w)}
+/* voltando: o conteudo aparece depois que o painel ja abriu */
+.sidebar-inner,.notes-head,.notes-list{
+  transition:opacity var(--dur-fade) ease var(--dur-fade),
+             transform var(--dur-panel) var(--ease-panel);
+}
+/* saindo: some junto com o painel, sem espera */
+.app.focus .sidebar-inner,
+.app.focus .notes-head,
+.app.focus .notes-list{
+  opacity:0;transform:translateX(-16px);
+  transition:opacity var(--dur-fade) ease,
+             transform var(--dur-panel) var(--ease-panel);
+}
+.sidebar,.notes-pane{transition:border-right-color var(--dur-fade) ease}
+
+/* LEFT */
+.sidebar{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  background:var(--sidebar);
+  border-right:1px solid var(--line);
+}
+.sidebar-inner{
+  width:var(--sidebar-w);
+  height:100%;
+  display:flex;
+  flex-direction:column;
+}
+.sidebar-top{
+  height:58px;
+  display:flex;
+  align-items:center;
+  padding:8px 10px;
+  gap:8px;
+  flex:0 0 auto;
+}
+.icon-btn{
+  width:34px;height:34px;
+  border:0;border-radius:8px;
+  display:grid;place-items:center;
+  background:transparent;
+  cursor:pointer;
+  transition:background .14s ease,transform .14s ease;
+  flex:0 0 auto;
+}
+.icon-btn:hover{background:var(--hover)}
+.icon-btn:active{transform:scale(.94)}
+.icon-btn svg{width:18px;height:18px;stroke:currentColor}
+.collapse-btn{width:38px;height:38px}
+
+.nav-stack{padding:1px 8px 6px}
+.nav-row{
+  width:100%;
+  min-height:38px;
+  display:flex;align-items:center;gap:9px;
+  padding:0 9px;
+  border:0;border-radius:8px;
+  background:transparent;
+  cursor:pointer;text-align:left;
+}
+.nav-row:hover{background:var(--hover)}
+.nav-row.active{background:var(--selected)}
+.nav-icon{width:20px;height:20px;display:grid;place-items:center;flex:0 0 auto;color:var(--accentText)}
+.nav-icon svg{width:17px;height:17px}
+.nav-label{white-space:nowrap}
+.nav-count{margin-left:auto;color:var(--text3);font-size:11px}
+.nav-label,.nav-count,.folder-label,.folder-actions,.folder-tree{
+  transition:opacity var(--dur-fade) ease var(--dur-fade);
+}
+.sidebar-collapsed .nav-label,.sidebar-collapsed .nav-count,
+.sidebar-collapsed .folder-label,.sidebar-collapsed .folder-actions,
+.sidebar-collapsed .folder-tree{
+  transition:opacity var(--dur-fade) ease;
+}
+.sidebar-collapsed .nav-label,.sidebar-collapsed .nav-count{opacity:0;pointer-events:none}
+
+.sidebar-divider{height:1px;background:var(--line);margin:4px 10px 8px}
+.folder-head{
+  height:34px;
+  padding:0 10px 0 16px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.folder-label{
+  font-size:11px;font-weight:650;color:var(--text2);
+  text-transform:uppercase;letter-spacing:.05em;
+}
+.folder-actions{display:flex}
+.folder-actions .icon-btn{width:28px;height:28px}
+.folder-actions svg{width:15px;height:15px}
+.sidebar-collapsed .folder-label,.sidebar-collapsed .folder-actions{opacity:0;pointer-events:none}
+
+.folder-tree{
+  flex:1;min-height:0;overflow:auto;
+  padding:0 8px 14px;
+}
+.sidebar-collapsed .folder-tree{opacity:0;pointer-events:none}
+.folder-row{
+  height:36px;
+  display:flex;align-items:center;gap:7px;
+  padding-right:7px;
+  border-radius:8px;
+  cursor:pointer;
+  user-select:none;
+}
+.folder-row:hover{background:var(--hover)}
+.folder-row.active{background:var(--selected)}
+.twisty{
+  width:15px;height:15px;border:0;padding:0;background:transparent;
+  color:var(--text3);display:grid;place-items:center;cursor:pointer;
+}
+.twisty svg{width:11px;height:11px;transition:transform .16s}
+.folder-row.open .twisty svg{transform:rotate(90deg)}
+.folder-icon{color:var(--accentText);display:grid;place-items:center}
+.folder-icon svg{width:17px;height:17px;fill:currentColor;stroke:currentColor}
+.folder-name{font-size:13px;min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.folder-count{font-size:11px;color:var(--text3)}
+
+.sidebar-bottom{
+  min-height:52px;
+  border-top:1px solid var(--line);
+  display:flex;align-items:center;flex-wrap:wrap;
+  width:var(--sidebar-w);
+  padding:8px;
+  gap:2px;
+  overflow:hidden;
+  transition:width var(--dur-panel) var(--ease-panel);
+}
+.sidebar-collapsed .sidebar-bottom{width:var(--sidebar-collapsed)}
+
+/* NOTES */
+.notes-pane{
+  min-width:0;min-height:0;
+  overflow:hidden;
+  background:var(--notes);
+  border-right:1px solid var(--line);
+  display:flex;flex-direction:column;
+}
+.notes-head{
+  padding:12px 13px 10px;
+  border-bottom:1px solid var(--line);
+}
+.notes-title-row{
+  display:flex;align-items:center;
+  height:35px;gap:8px;
+}
+.notes-title{
+  font-size:20px;font-weight:720;letter-spacing:-.04em;
+  min-width:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.new-note-btn{color:var(--accentText)}
+.search-wrap{
+  margin-top:8px;height:34px;border-radius:9px;
+  background:var(--sidebar2);
+  display:flex;align-items:center;gap:7px;
+  padding:0 10px;color:var(--text3);
+}
+.search-wrap svg{width:15px;height:15px;flex:0 0 auto}
+.search-wrap input{
+  width:100%;border:0;outline:0;background:transparent;color:var(--text);
+  font-size:12.5px;
+}
+.search-wrap input::placeholder{color:var(--text3)}
+.notes-list{flex:1;min-height:0;overflow:auto;padding:7px}
+.note-card{
+  position:relative;
+  min-height:72px;
+  border-radius:9px;
+  padding:10px 12px;
+  cursor:pointer;
+}
+.note-card:hover{background:var(--hover)}
+.note-card.active{background:var(--selected)}
+.note-card + .note-card::before{
+  content:"";position:absolute;left:12px;right:12px;top:-3.5px;height:1px;background:var(--line)
+}
+.note-card.active + .note-card::before,.note-card.active::before{opacity:0}
+.note-card-title{
+  font-size:13.5px;font-weight:650;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.note-meta{
+  margin-top:5px;display:flex;gap:6px;
+  color:var(--text2);font-size:11.5px;min-width:0;
+}
+.note-date{flex:0 0 auto;color:var(--text3)}
+.note-preview{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.empty-list{
+  padding:48px 24px;text-align:center;color:var(--text3);
+  font-size:12.5px;line-height:1.5;
+}
+
+/* WORKSPACE */
+.workspace{
+  min-width:0;min-height:0;
+  display:flex;flex-direction:column;
+  background:var(--editor);
+  position:relative;
+}
+.formatbar{
+  height:var(--toolbar-h);
+  flex:0 0 var(--toolbar-h);
+  display:flex;align-items:center;gap:2px;
+  padding:7px 8px;
+  border-bottom:1px solid var(--line);
+  background:var(--toolbar);
+  backdrop-filter:blur(20px) saturate(170%);
+  -webkit-backdrop-filter:blur(20px) saturate(170%);
+  position:sticky;top:0;z-index:80;
+  overflow-x:auto;overflow-y:hidden;
+  scrollbar-width:none;
+}
+.formatbar::-webkit-scrollbar{display:none}
+.tool-group{display:flex;align-items:center;gap:1px;flex:0 0 auto}
+.tool-sep{width:1px;height:28px;background:var(--line);margin:0 2px;flex:0 0 auto}
+.tool-btn{
+  min-width:32px;height:34px;
+  border:0;border-radius:7px;
+  padding:0 7px;
+  background:transparent;
+  display:flex;align-items:center;justify-content:center;gap:4px;
+  cursor:pointer;flex:0 0 auto;
+}
+.tool-btn:hover{background:var(--hover)}
+.tool-btn[disabled]{opacity:.3;pointer-events:none}
+.tool-btn svg{width:18px;height:18px}
+.tool-btn.bold{font-weight:800;font-size:17px}
+.tool-btn.italic{font-family:Georgia,serif;font-size:18px;font-style:italic;font-weight:700}
+.tool-btn.underline{text-decoration:underline;font-size:16px;font-weight:650}
+.tool-btn.strike{text-decoration:line-through;font-size:16px;font-weight:650}
+.tool-select{
+  height:34px;border:0;outline:0;border-radius:7px;
+  background:transparent;color:var(--text);
+  padding:0 25px 0 9px;
+  cursor:pointer;
+}
+.tool-select:hover{background-color:var(--hover)}
+#blockStyle{width:98px}
+.toolbar-spacer{flex:1 0 24px}
+.tool-wide{gap:5px;padding:0 10px}
+.tool-text{font-size:12.5px;font-weight:600;letter-spacing:-.01em}
+.tool-caret{width:12px!important;height:12px!important;opacity:.6}
+.save-state{
+  /* largura fixa: sem isso a troca Salvo <-> Salvando empurra a barra a cada tecla */
+  flex:0 0 auto;min-width:74px;text-align:right;
+  font-size:10.5px;font-weight:650;letter-spacing:.04em;
+  color:var(--text3);
+  padding:0 9px;
+  white-space:nowrap;
+  transition:color .2s ease,opacity .2s ease;
+}
+.save-state[data-state="saving"]{opacity:.55}
+.save-state[data-state="error"]{color:var(--danger)}
+.format-menu{min-width:236px;padding:8px}
+.format-row{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  min-height:34px;padding:0 4px;font-size:12.5px;
+}
+.format-row .tool-select{width:126px;background:var(--bg);border:1px solid var(--line)}
+.format-row input[type=color]{
+  width:44px;height:26px;padding:0;cursor:pointer;
+  border:1px solid var(--line2);border-radius:7px;background:transparent;
+}
+
+.color-wrap{position:relative;width:34px;height:34px;flex:0 0 auto}
+.color-wrap input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.color-icon{font-size:17px;font-weight:750;position:relative}
+.color-icon::after{
+  content:"";position:absolute;left:-2px;right:-2px;bottom:-5px;height:3px;border-radius:2px;background:var(--accent)
+}
+.hl-btn{position:relative}
+.hl-btn::after{
+  content:"";position:absolute;left:7px;right:7px;bottom:5px;height:3px;border-radius:2px;background:var(--hl)
+}
+.hl-caret{min-width:17px;padding:0;color:var(--text3)}
+.hl-caret svg{width:11px;height:11px}
+.hl-menu{min-width:186px}
+.hl-section{
+  padding:2px 6px 5px;font-size:10px;font-weight:700;color:var(--text3);
+  text-transform:uppercase;letter-spacing:.05em;
+}
+.hl-styles{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:0 4px 4px}
+.hl-style{
+  display:flex;align-items:center;gap:7px;
+  border:1px solid transparent;border-radius:8px;
+  padding:5px 7px;background:transparent;cursor:pointer;text-align:left;
+  font-size:11.5px;color:var(--text);
+}
+.hl-style:hover{background:var(--hover)}
+.hl-style.active{border-color:var(--accentText)}
+.hl-demo{
+  flex:0 0 auto;font-size:11px;font-weight:650;line-height:1.1;
+  color:var(--text);pointer-events:none;
+}
+
+.find-bar{
+  flex:0 0 auto;
+  display:flex;align-items:center;gap:6px;
+  padding:7px 10px;
+  border-bottom:1px solid var(--line);
+  background:var(--toolbar);
+  backdrop-filter:blur(20px) saturate(170%);
+  -webkit-backdrop-filter:blur(20px) saturate(170%);
+}
+.find-bar svg{width:15px;height:15px;flex:0 0 auto;color:var(--text3)}
+.find-bar input{
+  flex:1;min-width:0;border:0;outline:0;background:transparent;color:var(--text);font-size:13px;
+}
+.find-bar input::placeholder{color:var(--text3)}
+.find-count{
+  flex:0 0 auto;font-size:11px;color:var(--text3);
+  font-variant-numeric:tabular-nums;padding:0 4px;white-space:nowrap;
+}
+.find-bar .icon-btn{width:28px;height:28px}
+.find-bar .icon-btn svg{width:14px;height:14px}
+.editor-scroll{flex:1;min-height:0;overflow:auto}
+.document{
+  width:min(920px,calc(100% - 24px));
+  margin:0;                 /* ancorado a esquerda, nao centralizado */
+  padding:44px 0 150px;
+}
+.doc-head{padding:0 calc(var(--doc-pad) + var(--handle-w) + var(--content-pad)) 25px}
+.doc-title{
+  width:100%;border:0;outline:0;background:transparent;color:var(--text);
+  font-size:clamp(30px,3vw,42px);
+  line-height:1.13;font-weight:740;letter-spacing:-.045em;
+  padding:0;
+}
+.doc-title::placeholder{color:color-mix(in srgb,var(--text3) 60%,transparent)}
+.block-editor{padding:0 var(--doc-pad);min-height:420px}
+.block-row{
+  position:relative;
+  display:grid;
+  grid-template-columns:var(--handle-w) minmax(0,1fr);
+  min-height:32px;
+  border-radius:6px;
+  margin-left:calc(var(--indent,0) * 26px);
+  transition:margin-left .16s var(--ease);
+}
+.block-handle{
+  width:calc(var(--handle-w) - 2px);height:30px;border:0;border-radius:6px;background:transparent;
+  display:grid;place-items:center;color:var(--text3);
+  opacity:0;cursor:grab;
+  transition:opacity .14s,background .14s;
+}
+.block-row:hover .block-handle{opacity:1}
+.block-handle:hover{background:var(--hover)}
+.block-handle:active{cursor:grabbing}
+.block-handle svg{width:15px;height:15px}
+.block-main{min-width:0;position:relative}
+.block-content{
+  min-height:30px;
+  outline:0;
+  padding:2px var(--content-pad);
+  border-radius:4px;
+  font-size:16.5px;
+  line-height:1.65;
+  letter-spacing:-.008em;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+}
+.block-content:empty::before{
+  content:attr(data-placeholder);
+  color:color-mix(in srgb,var(--text3) 58%,transparent);
+  pointer-events:none;
+}
+.block-row[data-type="h1"] .block-content{
+  font-size:31px;font-weight:730;letter-spacing:-.035em;line-height:1.24;
+  padding-top:10px;padding-bottom:5px;
+}
+.block-row[data-type="h2"] .block-content{
+  font-size:24px;font-weight:710;letter-spacing:-.026em;line-height:1.3;
+  padding-top:8px;padding-bottom:4px;
+}
+.block-row[data-type="h3"] .block-content{
+  font-size:19px;font-weight:690;letter-spacing:-.017em;line-height:1.38;
+  padding-top:6px;padding-bottom:3px;
+}
+.block-row[data-type="quote"] .block-main{
+  border-left:3px solid var(--line2);margin:4px 0;
+}
+.block-row[data-type="quote"] .block-content{
+  padding-left:14px;font-style:italic;color:color-mix(in srgb,var(--text) 88%,var(--text2))
+}
+.block-row[data-type="code"] .block-content{
+  font-family:var(--mono);font-size:13px;line-height:1.55;
+  background:var(--code);border:1px solid var(--line);
+  border-radius:9px;padding:12px 14px;margin:5px 0;tab-size:2;
+}
+.block-row[data-type="bullet"] .block-main,
+.block-row[data-type="numbered"] .block-main,
+.block-row[data-type="todo"] .block-main{
+  display:grid;grid-template-columns:25px minmax(0,1fr);align-items:start;
+}
+.block-marker{
+  display:none;color:var(--text);
+  user-select:none;text-align:center;padding-top:7px;font-size:14px;
+}
+.block-row[data-type="bullet"] .block-marker,
+.block-row[data-type="numbered"] .block-marker,
+.block-row[data-type="todo"] .block-marker{display:block}
+.block-row[data-type="bullet"] .block-marker::before{content:"•";font-size:18px}
+.block-row[data-type="numbered"] .block-marker::before{content:attr(data-num) ".";font-size:13px}
+.todo-box{
+  display:none;width:16px;height:16px;margin:7px 0 0 4px;accent-color:var(--accentText)
+}
+.block-row[data-type="todo"] .todo-box{display:block}
+.block-row[data-type="todo"] .block-marker::before{content:none}
+.block-row[data-type="todo"].checked .block-content{text-decoration:line-through;color:var(--text2)}
+/* destaque (callout) */
+.block-row[data-type="callout"] .block-main{
+  display:grid;grid-template-columns:34px minmax(0,1fr);align-items:start;
+  background:var(--code);border:1px solid var(--line);
+  border-radius:10px;padding:5px 10px 5px 3px;margin:5px 0;
+}
+.callout-icon::before{content:attr(data-icon)}
+.callout-icon{
+  display:none;width:28px;height:28px;margin-top:3px;
+  border:0;border-radius:7px;background:transparent;
+  font-size:16px;line-height:1;cursor:pointer;
+}
+.block-row[data-type="callout"] .callout-icon{display:block}
+.callout-icon:hover{background:var(--hover)}
+
+/* sanfona (toggle) */
+.block-row[data-type="toggle"] .block-main{
+  display:grid;grid-template-columns:22px minmax(0,1fr);align-items:start;
+}
+.toggle-arrow{
+  display:none;width:20px;height:28px;margin-top:2px;padding:0;
+  border:0;background:transparent;color:var(--text3);cursor:pointer;
+}
+.block-row[data-type="toggle"] .toggle-arrow{display:grid;place-items:center}
+.toggle-arrow:hover{color:var(--text)}
+.toggle-arrow svg{width:11px;height:11px;transition:transform .16s var(--ease)}
+.block-row[data-type="toggle"]:not(.collapsed) .toggle-arrow svg{transform:rotate(90deg)}
+.block-row[data-type="toggle"] .block-content{font-weight:600}
+.block-row.oculto{display:none}
+
+.icon-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:2px;padding:2px}
+.icon-grid button{
+  width:32px;height:32px;border:0;border-radius:7px;background:transparent;
+  font-size:16px;line-height:1;cursor:pointer;
+}
+.icon-grid button:hover{background:var(--hover)}
+
+.block-row[data-type="divider"]{align-items:center;min-height:30px}
+.block-row[data-type="divider"] .block-content{
+  min-height:1px;height:1px;padding:0;margin:14px 10px;background:var(--line);pointer-events:none
+}
+.block-row[data-type="divider"] .block-content::before{content:none}
+.block-row.dragging{opacity:.35}
+.block-row.drop-before::before{
+  content:"";position:absolute;left:var(--handle-w);right:0;top:-2px;height:2px;border-radius:2px;background:var(--accentText)
+}
+.block-content table{width:100%;border-collapse:collapse;font-size:13.5px;margin:6px 0}
+.block-content th,.block-content td{border:1px solid var(--line2);padding:8px 9px;min-width:90px;text-align:left}
+.block-content th{background:var(--code);font-weight:650}
+.block-content img{max-width:100%;border-radius:9px;display:block;margin:9px 0}
+.block-content video,.block-content iframe.embed{
+  display:block;width:100%;max-width:100%;
+  border:0;border-radius:9px;margin:9px 0;background:#000;
+}
+.block-content iframe.embed{aspect-ratio:16/9;height:auto}
+/* capa clicavel: o YouTube bloqueia embed com origem null (arquivo local),
+   entao mostramos a miniatura e so trocamos pelo player quando da. */
+.video-card{
+  position:relative;display:block;
+  width:100%;max-width:100%;aspect-ratio:16/9;
+  margin:4px 0;border-radius:9px;overflow:hidden;
+  background:#000;cursor:pointer;user-select:none;
+}
+.video-card img{
+  width:100%;height:100%;object-fit:cover;
+  display:block;margin:0;border-radius:0;
+}
+.video-play{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:62px;height:44px;border-radius:12px;
+  background:rgba(0,0,0,.72);display:grid;place-items:center;
+  transition:background .16s ease,transform .16s ease;
+}
+.video-play::before{
+  content:"";border-style:solid;border-width:9px 0 9px 15px;
+  border-color:transparent transparent transparent #fff;margin-left:3px;
+}
+.video-card:hover .video-play{background:#ff0000;transform:translate(-50%,-50%) scale(1.06)}
+.video-card::after{
+  content:attr(data-label);
+  position:absolute;right:8px;bottom:8px;
+  padding:2px 7px;border-radius:5px;
+  background:rgba(0,0,0,.66);color:#fff;
+  font-size:10.5px;letter-spacing:.02em;
+}
+/* bloco de midia: sem recuo interno, a midia manda no espacamento */
+.block-row[data-type="media"] .block-content{padding:2px 0;min-height:24px}
+.block-row[data-type="media"] .block-content img,
+.block-row[data-type="media"] .block-content video,
+.block-row[data-type="media"] .block-content iframe.embed{margin:4px 0}
+.block-content img,.block-content video,.block-content iframe.embed{
+  -webkit-user-drag:none;user-select:none;
+}
+
+/* selecao de blocos: cada bloco e um contenteditable proprio, entao a marcacao
+   de varios blocos e feita na mao (ver "selecao de blocos" no JS) */
+.block-row.block-selected .block-content{background:var(--selected);border-radius:6px}
+.block-row.block-selected .block-handle{opacity:1}
+/* enquanto arrasta por varios blocos, o texto para de ser selecionavel para
+   nao brigar com a selecao nativa do navegador */
+#blockEditor.selecionando-blocos .block-content{user-select:none}
+
+/* moldura de redimensionamento (fora do conteudo editavel, para nao sujar o HTML) */
+.media-resizer{
+  position:fixed;z-index:1250;display:none;
+  border:1.5px solid var(--accentText);border-radius:9px;
+  pointer-events:none;
+}
+.media-resizer.show{display:block}
+.mr-handle{
+  position:absolute;width:13px;height:13px;
+  background:var(--editor);border:1.5px solid var(--accentText);border-radius:4px;
+  pointer-events:auto;touch-action:none;
+}
+.mr-handle:hover{background:var(--accentText)}
+.mr-e{right:-7px;top:50%;transform:translateY(-50%);cursor:ew-resize}
+.mr-se{right:-7px;bottom:-7px;cursor:nwse-resize}
+.mr-sw{left:-7px;bottom:-7px;cursor:nesw-resize}
+.mr-reset{
+  position:absolute;right:-9px;top:-9px;
+  width:20px;height:20px;padding:0;
+  border:1px solid var(--line2);border-radius:6px;
+  background:var(--editor);color:var(--text2);
+  display:grid;place-items:center;cursor:pointer;pointer-events:auto;
+}
+.mr-reset:hover{color:var(--text);background:var(--hover)}
+.mr-reset svg{width:12px;height:12px}
+.mr-size{
+  position:absolute;left:50%;bottom:-27px;transform:translateX(-50%);
+  padding:2px 8px;border-radius:999px;
+  background:var(--text);color:var(--editor);
+  font-size:10.5px;font-variant-numeric:tabular-nums;white-space:nowrap;
+  opacity:0;transition:opacity .12s ease;
+}
+.media-resizer.dragging .mr-size{opacity:1}
+.block-content a{color:#007aff;text-decoration:none}
+.block-content code{font-family:var(--mono);background:var(--code);border-radius:5px;padding:2px 5px;font-size:.9em}
+.block-content mark,.hl-demo{
+  --c:var(--hl);
+  color:inherit;background:var(--c);
+  border-radius:3px;padding:.08em .18em;
+  box-decoration-break:clone;-webkit-box-decoration-break:clone;
+}
+
+/* traco de marcador: bordas tortas e pontas que desbotam */
+.block-content mark[data-hl-style="irregular"],.hl-demo[data-hl-style="irregular"]{
+  background:linear-gradient(104deg,transparent .4%,var(--c) 2.6%,var(--c) 96%,transparent 98.5%);
+  border-radius:.5em .18em .45em .14em;
+  padding:.12em .3em;
+}
+/* rabiscado: tracos por cima de uma lavagem leve */
+.block-content mark[data-hl-style="scribble"],.hl-demo[data-hl-style="scribble"]{
+  background-image:
+    repeating-linear-gradient(112deg,var(--c) 0 4px,transparent 4px 11px),
+    repeating-linear-gradient(64deg,color-mix(in srgb,var(--c) 70%,transparent) 0 3px,transparent 3px 12px),
+    linear-gradient(color-mix(in srgb,var(--c) 16%,transparent),color-mix(in srgb,var(--c) 16%,transparent));
+  border-radius:.28em;
+  padding:.1em .26em;
+}
+/* sketch: contorno desenhado a mao ao redor do texto. A cor vai embutida no
+   SVG (mask-image mascararia o texto junto), entao quem repinta e o applyTheme. */
+.block-content mark[data-hl-style="sketch"],.hl-demo[data-hl-style="sketch"]{
+  background:var(--hl-sk) no-repeat center/100% 100%;
+  border-radius:0;padding:.16em .42em;
+}
+
+
+/* SLASH */
+.slash-menu{
+  position:fixed;z-index:1100;
+  width:304px;max-height:390px;overflow:auto;
+  display:none;padding:7px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:color-mix(in srgb,var(--editor) 95%,transparent);
+  backdrop-filter:blur(22px) saturate(170%);
+  -webkit-backdrop-filter:blur(22px) saturate(170%);
+  box-shadow:var(--shadow);
+}
+.slash-menu.show{display:block;animation:pop .14s var(--ease)}
+@keyframes pop{from{opacity:0;transform:translateY(-4px) scale(.985)}to{opacity:1;transform:none}}
+.slash-caption{
+  padding:6px 8px;color:var(--text3);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em
+}
+.slash-item{
+  width:100%;min-height:49px;border:0;border-radius:8px;background:transparent;
+  display:grid;grid-template-columns:34px 1fr;gap:9px;align-items:center;
+  padding:6px 8px;text-align:left;cursor:pointer
+}
+.slash-item:hover,.slash-item.selected{background:var(--hover)}
+.slash-icon{
+  width:32px;height:32px;border:1px solid var(--line);border-radius:7px;
+  display:grid;place-items:center;background:var(--editor);font-size:13px;font-weight:700
+}
+.slash-name{font-size:12.5px;font-weight:650}
+.slash-desc{font-size:10.5px;color:var(--text3);margin-top:2px}
+
+/* MENUS / MODALS */
+.popover{
+  position:fixed;z-index:1200;display:none;
+  min-width:215px;padding:6px;
+  border:1px solid var(--line);border-radius:11px;
+  background:color-mix(in srgb,var(--editor) 96%,transparent);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  box-shadow:var(--shadow);
+}
+.popover.show{display:block;animation:pop .13s var(--ease)}
+.menu-item{
+  width:100%;height:34px;border:0;border-radius:7px;background:transparent;
+  display:flex;align-items:center;gap:8px;padding:0 9px;
+  cursor:pointer;text-align:left;font-size:12.5px;
+}
+.menu-item:hover{background:var(--hover)}
+.menu-item.danger{color:var(--danger)}
+.menu-item svg{width:15px;height:15px}
+.menu-sep{height:1px;background:var(--line);margin:5px 3px}
+
+.modal-backdrop{
+  position:fixed;inset:0;z-index:1500;
+  display:none;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.18);
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)
+}
+.modal-backdrop.show{display:flex}
+.modal{
+  width:min(390px,calc(100vw - 30px));
+  border:1px solid var(--line);border-radius:16px;
+  background:var(--editor);box-shadow:var(--shadow);
+  padding:18px;
+}
+.modal h3{margin:0 0 5px;font-size:17px;letter-spacing:-.02em}
+.modal p{margin:0 0 14px;font-size:12.5px;line-height:1.45;color:var(--text2)}
+.modal input{
+  width:100%;height:38px;border:1px solid var(--line2);border-radius:9px;
+  padding:0 10px;outline:0;background:var(--bg);color:var(--text)
+}
+.modal input:focus{border-color:#d4a900;box-shadow:0 0 0 3px rgba(255,204,0,.15)}
+.modal-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:15px}
+.btn{
+  height:34px;border:1px solid var(--line);border-radius:9px;
+  padding:0 13px;background:var(--editor);cursor:pointer
+}
+.btn.primary{background:var(--accent);border-color:transparent;color:#1d1d1f;font-weight:650}
+.btn.danger{background:var(--danger);border-color:transparent;color:white}
+
+.settings-modal{
+  width:min(470px,calc(100vw - 30px));padding:16px 18px 14px;
+  max-height:calc(100vh - 40px);overflow:auto;   /* 13 temas nao cabem em tela baixa */
+}
+.settings-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.settings-head h3{margin:0}
+.settings-section{
+  margin:14px 0 8px;font-size:10.5px;font-weight:700;color:var(--text3);
+  text-transform:uppercase;letter-spacing:.05em;
+}
+.theme-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.theme-card{
+  border:1px solid var(--line);border-radius:10px;
+  padding:7px 6px 6px;background:transparent;cursor:pointer;
+  display:flex;flex-direction:column;gap:5px;align-items:stretch;
+  font-size:10.5px;color:var(--text2);
+  transition:border-color .14s ease,background .14s ease;
+}
+.theme-card:hover{background:var(--hover)}
+.theme-card.active{border-color:var(--accentText);color:var(--text)}
+.theme-swatch{display:flex;height:22px;border-radius:6px;overflow:hidden;border:1px solid var(--line)}
+.theme-swatch i{flex:1}
+.theme-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
+.settings-row{display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:40px}
+.settings-label{display:flex;flex-direction:column;font-size:12.5px;color:var(--text)}
+.settings-label em{font-style:normal;font-size:10.5px;color:var(--text3);margin-top:2px}
+.settings-control{display:flex;align-items:center;gap:9px;flex:0 0 auto}
+.settings-control input[type=range]{width:150px;accent-color:var(--accentText);cursor:pointer}
+.settings-value{
+  font-size:11.5px;color:var(--text2);min-width:44px;text-align:right;
+  font-variant-numeric:tabular-nums;
+}
+.settings-actions{display:flex;justify-content:flex-end;margin-top:12px}
+
+.toast{
+  position:fixed;z-index:2000;left:50%;bottom:22px;
+  transform:translate(-50%,12px);opacity:0;pointer-events:none;
+  padding:9px 13px;border-radius:999px;
+  background:var(--text);color:var(--editor);
+  box-shadow:var(--shadow);font-size:11.5px;
+  transition:opacity .18s,transform .18s;
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+.tooltip{
+  position:fixed;z-index:3000;opacity:0;pointer-events:none;
+  padding:5px 7px;border-radius:6px;background:var(--text);color:var(--editor);
+  font-size:10.5px;transition:opacity .1s;
+}
+.tooltip.show{opacity:.95}
+
+.bubble-bar{
+  position:fixed;z-index:1300;
+  display:none;align-items:center;gap:2px;
+  padding:4px;
+  border:1px solid var(--line);border-radius:11px;
+  background:color-mix(in srgb,var(--editor) 96%,transparent);
+  backdrop-filter:blur(20px) saturate(170%);
+  -webkit-backdrop-filter:blur(20px) saturate(170%);
+  box-shadow:var(--shadow);
+}
+.bubble-bar.show{display:flex;animation:pop .12s var(--ease)}
+.bubble-bar .tool-btn{min-width:32px;height:32px;border-radius:8px}
+.bubble-sep{width:1px;height:20px;background:var(--line);margin:0 3px;flex:0 0 auto}
+
+.hidden{display:none!important}
+/* impressao / PDF: so a nota, sem interface */
+@media print{
+  @page{margin:18mm 16mm}
+  html,body{height:auto;overflow:visible;background:#fff}
+  .sidebar,.notes-pane,.formatbar,.find-bar,.bubble-bar,.media-resizer,
+  .popover,.toast,.tooltip,.modal-backdrop,.slash-menu,.block-handle{display:none!important}
+  .app{display:block;width:auto;height:auto}
+  .workspace{display:block;background:#fff}
+  .editor-scroll{overflow:visible;height:auto}
+  .document{width:100%;max-width:100%;margin:0;padding:0}
+  .doc-head{padding:0 0 12px}
+  .doc-title{font-size:26pt;color:#000}
+  .block-editor{padding:0;min-height:0}
+  .block-row{grid-template-columns:0 minmax(0,1fr);margin-left:calc(var(--indent,0) * 18px)}
+  .block-content{color:#000;font-size:11.5pt;line-height:1.5}
+  .block-content a{color:#0645ad;text-decoration:underline}
+  .block-row[data-type="code"] .block-content{background:#f4f4f4;border:1px solid #ddd}
+  .block-content iframe{display:none}
+  .block-row,.block-content{page-break-inside:avoid;break-inside:avoid}
+}
+@media(prefers-reduced-motion:reduce){
+  .app,.sidebar,.notes-pane,.sidebar-inner,.notes-head,.notes-list,.sidebar-bottom,
+  .nav-label,.nav-count,.folder-label,.folder-actions,.folder-tree{
+    transition-duration:.01ms;
+  }
+  .app.focus .sidebar-inner,.app.focus .notes-head,.app.focus .notes-list{transform:none}
+}
+@media(max-width:1050px){
+  :root{--notes-w:270px}
+  .document{width:min(820px,calc(100% - 16px))}
+}
+@media(max-width:780px){
+  :root{--notes-w:235px}
+  .app,.app.sidebar-collapsed{grid-template-columns:58px var(--notes-w) minmax(430px,1fr);width:max-content;min-width:100%}
+  .app.focus{grid-template-columns:0 0 minmax(430px,1fr)}
+  .workspace{min-width:430px}
+}
+</style>
+</head>
+<body>
+<div class="app sidebar-collapsed" id="app">
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+      <div class="sidebar-top">
+        <button class="icon-btn collapse-btn" id="collapseBtn" data-tip="Expandir pastas" aria-label="Expandir ou recolher menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><path d="M4 5.5h16v13H4z"/><path d="M9 5.5v13"/><path d="m6.3 10.5 1.5 1.5-1.5 1.5"/></svg>
+        </button>
+      </div>
+
+      <div class="nav-stack">
+        <button class="nav-row active" id="allNotesRow">
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5h16v14H4z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>
+          </span>
+          <span class="nav-label">Todas as notas</span>
+          <span class="nav-count" id="allCount">0</span>
+        </button>
+      </div>
+
+      <div class="sidebar-divider"></div>
+
+      <div class="folder-head">
+        <span class="folder-label">Pastas</span>
+        <div class="folder-actions">
+          <button class="icon-btn" id="newFolderBtn" data-tip="Nova pasta">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><path d="M3.5 6.5h6l2 2h9v10h-17z"/><path d="M12 11v5M9.5 13.5h5"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="folder-tree" id="folderTree"></div>
+
+      <div class="sidebar-bottom">
+        <button class="icon-btn" id="importQuickBtn" data-tip="Importar">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><path d="M12 3v12"/><path d="m8 11 4 4 4-4"/><path d="M4 19h16"/></svg>
+        </button>
+        <button class="icon-btn" id="exportProjectQuickBtn" data-tip="Exportar projeto">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><path d="M12 16V4"/><path d="m8 8 4-4 4 4"/><path d="M4 19h16"/></svg>
+        </button>
+        <button class="icon-btn" id="themeBtn" data-tip="Alternar tema">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><circle cx="12" cy="12" r="3.5"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M18.7 5.3l-1.4 1.4M6.7 17.3l-1.4 1.4"/></svg>
+        </button>
+        <button class="icon-btn" id="settingsBtn" data-tip="Configurações">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 9 19.4a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4.6 9a1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <section class="notes-pane">
+    <div class="notes-head">
+      <div class="notes-title-row">
+        <div class="notes-title" id="listTitle">Todas as notas</div>
+        <button class="icon-btn new-note-btn" id="newNoteBtn" data-tip="Nova nota">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><path d="M13.5 4.5H6a2 2 0 0 0-2 2V18a2 2 0 0 0 2 2h11.5a2 2 0 0 0 2-2v-7.5"/><path d="m12 12 7-7 2 2-7 7-3 1z"/></svg>
+        </button>
+      </div>
+      <label class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+        <input id="searchInput" type="search" placeholder="Buscar" autocomplete="off">
+      </label>
+    </div>
+    <div class="notes-list" id="notesList"></div>
+  </section>
+
+  <main class="workspace">
+    <nav class="formatbar" id="formatbar">
+      <button class="tool-btn" id="panelsBtn" data-tip="Ocultar painéis" aria-label="Mostrar ou ocultar painéis">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5.5h16v13H4z"/><path d="M9 5.5v13"/></svg>
+      </button>
+      <div class="tool-group">
+        <button class="tool-btn" data-action="undo" data-tip="Desfazer ⌘Z">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m9 7-5 5 5 5"/><path d="M5 12h8a6 6 0 0 1 6 6"/></svg>
+        </button>
+        <button class="tool-btn" data-action="redo" data-tip="Refazer ⇧⌘Z">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m15 7 5 5-5 5"/><path d="M19 12h-8a6 6 0 0 0-6 6"/></svg>
+        </button>
+      </div>
+      <span class="tool-sep"></span>
+
+      <select class="tool-select" id="blockStyle" data-tip="Estilo do bloco">
+        <option value="p">Texto</option>
+        <option value="h1">Título 1</option>
+        <option value="h2">Título 2</option>
+        <option value="h3">Título 3</option>
+        <option value="quote">Citação</option>
+        <option value="callout">Destaque</option>
+        <option value="toggle">Alternar</option>
+        <option value="code">Código</option>
+      </select>
+
+      <span class="tool-sep"></span>
+      <div class="tool-group">
+        <button class="tool-btn bold" data-action="bold" data-tip="Negrito ⌘B">B</button>
+        <button class="tool-btn italic" data-action="italic" data-tip="Itálico ⌘I">I</button>
+        <button class="tool-btn underline" data-action="underline" data-tip="Sublinhado ⌘U">U</button>
+        <button class="tool-btn strike" data-action="strikeThrough" data-tip="Tachado">S</button>
+        <button class="tool-btn hl-btn" id="highlightBtn" data-tip="Marca-texto ⌘⇧H" aria-label="Marca-texto">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m14.5 4.5 5 5-7.5 7.5H7v-5z"/><path d="M9.5 17 7 19.5"/></svg>
+        </button>
+        <button class="tool-btn hl-caret" id="highlightCaret" data-tip="Estilo do marca-texto" aria-label="Estilo do marca-texto">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m7 10 5 5 5-5"/></svg>
+        </button>
+      </div>
+
+      <span class="tool-sep"></span>
+      <div class="tool-group">
+        <button class="tool-btn" data-block="todo" data-tip="Checklist">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3.5" y="4" width="5" height="5" rx="1"/><path d="m4.8 6.5 1 1 1.8-2"/><path d="M11 6.5h9M11 12h9M11 17.5h9"/><rect x="3.5" y="10" width="5" height="5" rx="1"/><rect x="3.5" y="16" width="5" height="5" rx="1"/></svg>
+        </button>
+        <button class="tool-btn" data-block="code" data-tip="Código">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></svg>
+        </button>
+        <button class="tool-btn" data-insert="table" data-tip="Tabela">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 9h18M9 4v16M15 4v16"/></svg>
+        </button>
+        <button class="tool-btn" data-insert="image" data-tip="Imagem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m4 18 5-5 4 4 2-2 5 3"/></svg>
+        </button>
+        <button class="tool-btn" id="videoBtn" data-tip="Vídeo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2.5" y="5" width="13" height="14" rx="2"/><path d="m15.5 10.5 6-3.5v10l-6-3.5z"/></svg>
+        </button>
+      </div>
+
+      <span class="tool-sep"></span>
+      <div class="tool-group">
+        <button class="tool-btn" data-action="justifyLeft" data-tip="Alinhar à esquerda">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 10h11M4 14h16M4 18h9"/></svg>
+        </button>
+        <button class="tool-btn" data-action="justifyCenter" data-tip="Centralizar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M7 10h10M4 14h16M8 18h8"/></svg>
+        </button>
+        <button class="tool-btn" data-action="justifyRight" data-tip="Alinhar à direita">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M9 10h11M4 14h16M11 18h9"/></svg>
+        </button>
+      </div>
+
+      <span class="tool-sep"></span>
+      <button class="tool-btn tool-wide" id="insertBtn" data-tip="Inserir bloco">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg>
+        <span class="tool-text">Inserir</span>
+      </button>
+      <button class="tool-btn tool-wide" id="formatMoreBtn" data-tip="Fonte, tamanho, cor e alinhamento">
+        <span class="tool-text">Aa</span>
+        <svg class="tool-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m7 10 5 5 5-5"/></svg>
+      </button>
+
+      <span class="toolbar-spacer"></span>
+      <button class="tool-btn" id="exportBtn" data-tip="Exportar (.md, HTML, PDF)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 15V3"/><path d="m8 7 4-4 4 4"/><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>
+      </button>
+      <span class="save-state" id="saveState" data-tip="Suas notas salvam sozinhas neste navegador">Salvo</span>
+      <button class="tool-btn" id="moreBtn" data-tip="Mais">
+        <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>
+      </button>
+    </nav>
+
+    <div class="find-bar hidden" id="findBar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+      <input id="findInput" type="text" placeholder="Buscar nesta nota" autocomplete="off" spellcheck="false">
+      <span class="find-count" id="findCount"></span>
+      <button class="icon-btn" id="findPrev" data-tip="Anterior ⇧↵" aria-label="Ocorrência anterior">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 15 6-6 6 6"/></svg>
+      </button>
+      <button class="icon-btn" id="findNext" data-tip="Próxima ↵" aria-label="Próxima ocorrência">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      <button class="icon-btn" id="findClose" data-tip="Fechar Esc" aria-label="Fechar busca">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div class="editor-scroll" id="editorScroll">
+      <article class="document">
+        <header class="doc-head">
+          <input class="doc-title" id="docTitle" placeholder="Sem título" autocomplete="off">
+        </header>
+        <div class="block-editor" id="blockEditor"></div>
+      </article>
+    </div>
+  </main>
+</div>
+
+<div class="slash-menu" id="slashMenu"></div>
+
+<div class="media-resizer" id="mediaResizer">
+  <button class="mr-reset" id="mediaReset" data-tip="Largura total" aria-label="Voltar a largura total">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8V4h4M20 8V4h-4M4 16v4h4M20 16v4h-4"/></svg>
+  </button>
+  <span class="mr-handle mr-e" data-dir="e"></span>
+  <span class="mr-handle mr-se" data-dir="se"></span>
+  <span class="mr-handle mr-sw" data-dir="sw"></span>
+  <span class="mr-size" id="mediaSize"></span>
+</div>
+
+<div class="bubble-bar" id="bubbleBar">
+  <button class="tool-btn bold" data-action="bold" data-tip="Negrito ⌘B">B</button>
+  <button class="tool-btn italic" data-action="italic" data-tip="Itálico ⌘I">I</button>
+  <button class="tool-btn hl-btn" id="bubbleHl" data-tip="Marca-texto ⌘⇧H" aria-label="Marca-texto">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m14.5 4.5 5 5-7.5 7.5H7v-5z"/><path d="M9.5 17 7 19.5"/></svg>
+  </button>
+  <span class="bubble-sep"></span>
+  <button class="tool-btn" id="bubbleMoreBtn" data-tip="Mais opções" aria-label="Mais opções">
+    <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>
+  </button>
+</div>
+
+<div class="popover" id="bubbleMenu">
+  <button class="menu-item" data-action="underline">Sublinhado ⌘U</button>
+  <button class="menu-item" data-action="strikeThrough">Tachado</button>
+  <button class="menu-item" data-inline="code">Código</button>
+  <button class="menu-item" data-action="createLink">Link ⌘K</button>
+  <div class="menu-sep"></div>
+  <button class="menu-item" data-inline="hl-styles">Estilo do marca-texto…</button>
+  <button class="menu-item" data-inline="hl-clear">Remover marcação</button>
+  <div class="menu-sep"></div>
+  <button class="menu-item" data-action="removeFormat">Limpar formatação</button>
+</div>
+
+<div class="popover" id="moreMenu">
+  <button class="menu-item" data-menu="import-md">Importar Markdown</button>
+  <button class="menu-item" data-menu="import-folder">Importar pasta</button>
+  <button class="menu-item" data-menu="import-project">Importar projeto</button>
+  <div class="menu-sep"></div>
+  <button class="menu-item" data-menu="duplicate">Duplicar nota</button>
+  <div class="menu-sep"></div>
+  <button class="menu-item" data-menu="export-md">Exportar nota .md</button>
+  <button class="menu-item" data-menu="export-html">Exportar nota .html</button>
+  <button class="menu-item" data-menu="export-pdf">Exportar nota em PDF</button>
+  <button class="menu-item" data-menu="export-project">Exportar projeto</button>
+  <div class="menu-sep"></div>
+  <button class="menu-item" data-menu="theme">Alternar tema</button>
+  <div class="menu-sep"></div>
+  <button class="menu-item danger" data-menu="delete-note">Apagar nota</button>
+</div>
+
+<div class="popover" id="folderMenu">
+  <button class="menu-item" data-folder-action="subfolder">Nova subpasta</button>
+  <button class="menu-item" data-folder-action="rename">Renomear</button>
+  <div class="menu-sep"></div>
+  <button class="menu-item danger" data-folder-action="delete">Apagar pasta</button>
+</div>
+
+<div class="popover" id="iconMenu">
+  <div class="icon-grid">
+    <button data-icon="💡">💡</button><button data-icon="⚠️">⚠️</button><button data-icon="✅">✅</button>
+    <button data-icon="❌">❌</button><button data-icon="📌">📌</button><button data-icon="🔥">🔥</button>
+    <button data-icon="⭐">⭐</button><button data-icon="📝">📝</button><button data-icon="ℹ️">ℹ️</button>
+    <button data-icon="🎯">🎯</button><button data-icon="🚀">🚀</button><button data-icon="❓">❓</button>
+  </div>
+</div>
+
+<div class="popover" id="exportMenu">
+  <button class="menu-item" data-export="md">Markdown (.md)</button>
+  <button class="menu-item" data-export="html">Página HTML (.html)</button>
+  <button class="menu-item" data-export="pdf">PDF (imprimir)</button>
+  <div class="menu-sep"></div>
+  <button class="menu-item" data-export="project">Projeto inteiro (.json)</button>
+</div>
+
+<div class="popover" id="videoMenu">
+  <button class="menu-item" data-video="file">Arquivo do computador</button>
+  <button class="menu-item" data-video="link">Colar link (YouTube, Vimeo, MP4)</button>
+</div>
+
+<div class="popover" id="insertMenu">
+  <button class="menu-item" data-block="bullet">Lista</button>
+  <button class="menu-item" data-block="numbered">Lista numerada</button>
+  <button class="menu-item" data-block="quote">Citação</button>
+  <button class="menu-item" data-block="callout">Destaque</button>
+  <button class="menu-item" data-block="toggle">Alternar (sanfona)</button>
+  <div class="menu-sep"></div>
+  <button class="menu-item" data-action="createLink">Link ⌘K</button>
+  <button class="menu-item" data-insert="divider">Divisor</button>
+</div>
+
+<div class="popover format-menu" id="formatMenu">
+  <label class="format-row"><span>Fonte</span>
+    <select class="tool-select" id="fontFamily">
+      <option value="-apple-system">SF / System</option>
+      <option value="Helvetica Neue">Helvetica Neue</option>
+      <option value="Arial">Arial</option>
+      <option value="Georgia">Georgia</option>
+      <option value="SFMono-Regular">SF Mono</option>
+    </select>
+  </label>
+  <label class="format-row"><span>Tamanho</span>
+    <select class="tool-select" id="fontSize">
+      <option value="14">14</option>
+      <option value="16" selected>16</option>
+      <option value="18">18</option>
+      <option value="22">22</option>
+      <option value="28">28</option>
+      <option value="36">36</option>
+    </select>
+  </label>
+  <label class="format-row"><span>Cor do texto</span>
+    <input id="textColor" type="color" value="#c79400" aria-label="Cor do texto">
+  </label>
+</div>
+
+<div class="popover hl-menu" id="highlightMenu">
+  <div class="hl-section">Estilo</div>
+  <div class="hl-styles">
+    <button class="hl-style active" data-hl-style="regular"><span class="hl-demo" data-hl-style="regular">Aa</span>Regular</button>
+    <button class="hl-style" data-hl-style="irregular"><span class="hl-demo" data-hl-style="irregular">Aa</span>Irregular</button>
+    <button class="hl-style" data-hl-style="scribble"><span class="hl-demo" data-hl-style="scribble">Aa</span>Rabiscado</button>
+    <button class="hl-style" data-hl-style="sketch"><span class="hl-demo" data-hl-style="sketch">Aa</span>Sketch</button>
+  </div>
+  <div class="menu-sep"></div>
+  <button class="menu-item" data-hl-clear="1">Remover marcação</button>
+</div>
+
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal">
+    <h3 id="modalTitle"></h3>
+    <p id="modalDescription"></p>
+    <input id="modalInput" autocomplete="off">
+    <div class="modal-actions">
+      <button class="btn" id="modalCancel">Cancelar</button>
+      <button class="btn primary" id="modalConfirm">OK</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="settingsBackdrop">
+  <div class="modal settings-modal">
+    <div class="settings-head">
+      <h3>Configurações</h3>
+      <button class="icon-btn" id="settingsClose" aria-label="Fechar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+
+    <div class="settings-section">Tema</div>
+    <div class="theme-grid" id="themeGrid"></div>
+
+    <div class="settings-section">Editor</div>
+    <div class="settings-row">
+      <span class="settings-label">Margem do texto<em>distância da borda até a primeira letra</em></span>
+      <span class="settings-control">
+        <input type="range" id="insetRange" min="12" max="200" step="4" aria-label="Margem do texto">
+        <span class="settings-value" id="insetValue">32 px</span>
+      </span>
+    </div>
+    <div class="settings-actions">
+      <button class="btn" id="settingsReset">Restaurar padrão</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="tooltip" id="tooltip"></div>
+
+<input type="file" id="mdInput" class="hidden" accept=".md,.markdown,.txt,text/markdown,text/plain" multiple>
+<input type="file" id="folderInput" class="hidden" webkitdirectory directory multiple>
+<input type="file" id="projectInput" class="hidden" accept=".json,.mdnotes">
+<input type="file" id="imageInput" class="hidden" accept="image/*">
+<input type="file" id="videoInput" class="hidden" accept="video/*">
+
+<script>
+(() => {
+"use strict";
+
+const STORAGE_KEY = "minimal-markdown-notes-block-v3";
+const OLD_STORAGE_KEY = "minimal-markdown-notes-v1";
+const THEME_KEY = "minimal-markdown-notes-theme";
+const INSET_KEY = "minimal-markdown-notes-inset";
+const LAST_LIGHT_KEY = "minimal-markdown-notes-last-light";
+const LAST_DARK_KEY = "minimal-markdown-notes-last-dark";
+
+const TEMAS = {
+  light:      {nome:"Claro",        claro:true,  cores:["#f5f5f7","#ffffff","#1d1d1f","#ffcc00"]},
+  solarized:  {nome:"Solarized",    claro:true,  cores:["#eee8d5","#fdf6e3","#073642","#268bd2"]},
+  github:     {nome:"GitHub",       claro:true,  cores:["#f6f8fa","#ffffff","#1f2328","#54aeff"]},
+  latte:      {nome:"Latte",        claro:true,  cores:["#e6e9ef","#eff1f5","#4c4f69","#c6a0f6"]},
+  rosepine:   {nome:"Ros\u00e9 Pine",    claro:true,  cores:["#f2e9e1","#faf4ed","#575279","#e8b3af"]},
+  nordlight:  {nome:"Nord Claro",   claro:true,  cores:["#e5e9f0","#eceff4","#2e3440","#88c0d0"]},
+  gruvboxlight:{nome:"Gruvbox Claro",claro:true, cores:["#f2e5bc","#fbf1c7","#3c3836","#fabd2f"]},
+  dark:       {nome:"Escuro",       claro:false, cores:["#111113","#1c1c1e","#f5f5f7","#ffd60a"]},
+  dracula:    {nome:"Dracula",      claro:false, cores:["#21222c","#282a36","#f8f8f2","#bd93f9"]},
+  catppuccin: {nome:"Catppuccin",   claro:false, cores:["#181825","#1e1e2e","#cdd6f4","#cba6f7"]},
+  htb:        {nome:"Hack The Box", claro:false, cores:["#0b1120","#111927","#dbe4f2","#9fef00"]},
+  nord:       {nome:"Nord",         claro:false, cores:["#2e3440","#3b4252","#eceff4","#88c0d0"]},
+  gruvbox:    {nome:"Gruvbox",      claro:false, cores:["#1d2021","#282828","#ebdbb2","#fabd2f"]}
+};
+const INSET_PADRAO = 32;
+
+/* Storage robusto: alguns previews/sandboxes bloqueiam localStorage em HTML local.
+   O app continua funcionando com memória temporária e exportação manual. */
+const memoryStorage = new Map();
+function storageGet(key){
+  try { return window.localStorage.getItem(key); }
+  catch { return memoryStorage.has(key) ? memoryStorage.get(key) : null; }
+}
+function storageSet(key,value){
+  try { window.localStorage.setItem(key,value); return true; }
+  catch { memoryStorage.set(key,value); return false; }
+}
+const $ = (s,r=document) => r.querySelector(s);
+const $$ = (s,r=document) => Array.from(r.querySelectorAll(s));
+const uid = () => crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+const now = () => new Date().toISOString();
+const esc = (s="") => s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+const app = $("#app");
+const folderTree = $("#folderTree");
+const notesList = $("#notesList");
+const blockEditor = $("#blockEditor");
+const docTitle = $("#docTitle");
+const listTitle = $("#listTitle");
+const slashMenu = $("#slashMenu");
+const moreMenu = $("#moreMenu");
+const folderMenu = $("#folderMenu");
+const highlightMenu = $("#highlightMenu");
+const modalBackdrop = $("#modalBackdrop");
+const modalInput = $("#modalInput");
+const modalTitle = $("#modalTitle");
+const modalDescription = $("#modalDescription");
+const modalConfirm = $("#modalConfirm");
+const modalCancel = $("#modalCancel");
+const tooltip = $("#tooltip");
+const insertMenu = $("#insertMenu");
+const formatMenu = $("#formatMenu");
+const saveStateEl = $("#saveState");
+const findBar = $("#findBar");
+const findInput = $("#findInput");
+const findCount = $("#findCount");
+const bubbleBar = $("#bubbleBar");
+const bubbleMenu = $("#bubbleMenu");
+const videoMenu = $("#videoMenu");
+const exportMenu = $("#exportMenu");
+const iconMenu = $("#iconMenu");
+let calloutAlvo = null;
+const settingsBackdrop = $("#settingsBackdrop");
+const themeGrid = $("#themeGrid");
+const insetRange = $("#insetRange");
+const insetValue = $("#insetValue");
+const mediaResizer = $("#mediaResizer");
+const mediaSize = $("#mediaSize");
+
+let saveTimer = null;
+let toastTimer = null;
+let modalResolver = null;
+let savedRange = null;
+let contextFolderId = null;
+let draggedNoteId = null;
+let draggedBlock = null;
+let slash = {open:false,row:null,index:0,items:[]};
+let focusMode = false;
+let hist = {id:null,stack:[],i:-1,timer:null,lock:false};
+let find = {termo:"",hits:[],nodes:[],i:-1};
+let domNoteId = null;
+let mediaSel = null, mediaDrag = null, mediaHideTimer = null;
+let bubbleRaf = null;
+let hlStyle = "regular";
+
+const icons = {
+  dots:`<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="7" r="1.3"/><circle cx="15" cy="7" r="1.3"/><circle cx="9" cy="12" r="1.3"/><circle cx="15" cy="12" r="1.3"/><circle cx="9" cy="17" r="1.3"/><circle cx="15" cy="17" r="1.3"/></svg>`,
+  chev:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 6 6 6-6 6"/></svg>`,
+  folder:`<svg viewBox="0 0 24 24"><path d="M2.8 7A2.5 2.5 0 0 1 5.3 4.5h4.1l2 2h7.3a2.5 2.5 0 0 1 2.5 2.5v8.5a2.5 2.5 0 0 1-2.5 2.5H5.3a2.5 2.5 0 0 1-2.5-2.5z"/></svg>`
+};
+
+const commands = [
+  {id:"p",label:"Texto",desc:"Texto simples",icon:"T",keys:"texto paragraph",kind:"block"},
+  {id:"h1",label:"Título 1",desc:"Título grande",icon:"H1",keys:"titulo heading",kind:"block"},
+  {id:"h2",label:"Título 2",desc:"Título médio",icon:"H2",keys:"titulo heading",kind:"block"},
+  {id:"h3",label:"Título 3",desc:"Título pequeno",icon:"H3",keys:"titulo heading",kind:"block"},
+  {id:"bullet",label:"Lista",desc:"Lista com marcadores",icon:"•",keys:"lista bullet",kind:"block"},
+  {id:"numbered",label:"Lista numerada",desc:"Lista ordenada",icon:"1.",keys:"lista ordered",kind:"block"},
+  {id:"todo",label:"Checklist",desc:"Tarefa com checkbox",icon:"☑",keys:"tarefa todo checklist",kind:"block"},
+  {id:"quote",label:"Citação",desc:"Bloco de citação",icon:"❞",keys:"quote citacao",kind:"block"},
+  {id:"callout",label:"Destaque",desc:"Caixa com ícone",icon:"💡",keys:"callout destaque aviso nota",kind:"block"},
+  {id:"toggle",label:"Alternar",desc:"Lista sanfona (recolhe)",icon:"▸",keys:"toggle alternar sanfona recolher",kind:"block"},
+  {id:"code",label:"Código",desc:"Bloco monoespaçado",icon:"</>",keys:"code codigo",kind:"block"},
+  {id:"divider",label:"Divisor",desc:"Linha separadora",icon:"—",keys:"linha divider",kind:"insert"},
+  {id:"table",label:"Tabela",desc:"Tabela 3 × 3",icon:"▦",keys:"table tabela",kind:"insert"},
+  {id:"image",label:"Imagem",desc:"Imagem do computador",icon:"▧",keys:"foto image imagem",kind:"insert"},
+  {id:"video",label:"Vídeo",desc:"YouTube, Vimeo ou arquivo",icon:"▶",keys:"video youtube vimeo embed",kind:"insert"}
+];
+
+function blankBlock(type="p",html="",indent=0){
+  const b={id:uid(),type,html,checked:false,indent};
+  if(type==="callout")b.icon="💡";
+  if(type==="toggle")b.collapsed=false;
+  return b;
+}
+
+function demoState(){
+  const f1=uid(),f2=uid(),n1=uid(),n2=uid();
+  return {
+    version:3,
+    selectedFolderId:"all",
+    selectedNoteId:n1,
+    sort:"updated",
+    sidebarCollapsed:true,
+    openFolders:[f1,f2],
+    folders:[
+      {id:f1,name:"Notas",parentId:null,createdAt:now()},
+      {id:f2,name:"Ideias",parentId:null,createdAt:now()}
+    ],
+    notes:[
+      {
+        id:n1,folderId:f1,title:"Bem-vindo ao Notes",createdAt:now(),updatedAt:now(),pinned:true,
+        blocks:[
+          blankBlock("p","Este editor agora funciona em <strong>blocos</strong>, como no Notion."),
+          blankBlock("h2","Markdown em tempo real"),
+          blankBlock("p","Digite <strong>#</strong> e pressione espaço para transformar o bloco em Título 1."),
+          blankBlock("bullet","<strong>## + espaço</strong> → Título 2"),
+          blankBlock("bullet","<strong>- + espaço</strong> → Lista"),
+          blankBlock("bullet","<strong>&gt; + espaço</strong> → Citação"),
+          blankBlock("p","Digite <strong>/</strong> para abrir todos os comandos rápidos."),
+          {...blankBlock("todo","Experimentar o menu /"),checked:false}
+        ]
+      },
+      {
+        id:n2,folderId:f2,title:"Atalhos",createdAt:now(),updatedAt:new Date(Date.now()-3600000).toISOString(),pinned:false,
+        blocks:[
+          blankBlock("p","⌘ / Ctrl + N — nova nota"),
+          blankBlock("p","⌘ / Ctrl + S — salvar"),
+          blankBlock("p","⌘ / Ctrl + B — negrito"),
+          blankBlock("p","⌘ / Ctrl + I — itálico"),
+          blankBlock("p","⌘ / Ctrl + K — link")
+        ]
+      }
+    ]
+  };
+}
+
+function htmlToPlain(html=""){
+  const d=document.createElement("div"); d.innerHTML=html; return d.textContent||"";
+}
+
+function markdownInlineToHTML(src=""){
+  let s=esc(src);
+  s=s.replace(/!\[([^\]]*)\]\(([^)]+)\)/g,'<img alt="$1" src="$2">');
+  s=s.replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2">$1</a>');
+  s=s.replace(/`([^`]+)`/g,'<code>$1</code>');
+  s=s.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+  s=s.replace(/~~([^~]+)~~/g,'<s>$1</s>');
+  /* a classe hl-<cor> ainda aparece em .md exportado antes de o marca-texto virar cor unica */
+  s=s.replace(/&lt;mark class=&quot;(?:hl-\w+\s*)?(?:hls-(\w+))?&quot;&gt;([\s\S]*?)&lt;\/mark&gt;/g,
+    (_m,est,txt)=>`<mark data-hl-style="${est||"regular"}">${txt}</mark>`);
+  s=s.replace(/&lt;mark&gt;([\s\S]*?)&lt;\/mark&gt;/g,'<mark data-hl-style="regular">$1</mark>');
+  s=s.replace(/&lt;video src=&quot;([\s\S]*?)&quot;(?:\s+width=&quot;(\d+)&quot;)?[\s\S]*?&gt;(?:\s*&lt;\/video&gt;)?/g,
+    (_m,src,w)=>`<video src="${src}"${w?` style="width:${w}px"`:""} controls preload="metadata"></video>`);
+  s=s.replace(/&lt;iframe src=&quot;([\s\S]*?)&quot;(?:\s+width=&quot;(\d+)&quot;)?[\s\S]*?&gt;(?:\s*&lt;\/iframe&gt;)?/g,
+    (_m,src,w)=>videoHTML(src,w?`${w}px`:""));
+  s=s.replace(/&lt;img src=&quot;([\s\S]*?)&quot;(?:\s+alt=&quot;([\s\S]*?)&quot;)?(?:\s+width=&quot;(\d+)&quot;)?[\s\S]*?&gt;/g,
+    (_m,src,alt,w)=>`<img src="${src}" alt="${alt||"imagem"}"${w?` style="width:${w}px"`:""}>`);
+  s=s.replace(/==([^=]+)==/g,'<mark data-hl-style="regular">$1</mark>');
+  s=s.replace(/(^|[^\*])\*([^*]+)\*/g,'$1<em>$2</em>');
+  return s;
+}
+
+const indentOf=(espacos="")=>Math.max(0,Math.min(6,Math.floor(espacos.replace(/\t/g,"  ").length/2)));
+/* linha que so tem midia vira bloco de midia, nao paragrafo */
+function apenasMidia(html=""){
+  const d=document.createElement("div");d.innerHTML=html;
+  return !(d.textContent||"").trim() && !!d.querySelector("img,video,iframe,.video-card");
+}
+function embedHTML(url=""){
+  const u=String(url).trim();
+  const yt=u.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{6,})/);
+  const vm=u.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+  const src=yt?`https://www.youtube.com/embed/${yt[1]}`:vm?`https://player.vimeo.com/video/${vm[1]}`:u;
+  return videoHTML(src);
+}
+function markdownToNote(markdown,fileTitle="Nota importada"){
+  const lines=markdown.replace(/\r/g,"").split("\n");
+  let title=fileTitle, start=0;
+  for(let i=0;i<lines.length;i++){
+    if(lines[i].trim()){
+      const m=lines[i].match(/^#\s+(.+)$/);
+      if(m){title=m[1].trim();start=i+1}
+      break;
+    }
+  }
+  const blocks=[], code=[];
+  let inCode=false, sanfonaNivel=0;
+  for(let i=start;i<lines.length;i++){
+    const line=lines[i];
+    if(/^```/.test(line)){
+      if(!inCode){inCode=true;code.length=0}
+      else{blocks.push(blankBlock("code",esc(code.join("\n"))));inCode=false}
+      continue;
+    }
+    if(inCode){code.push(line);continue}
+
+    if(/^\|.+\|$/.test(line) && i+1<lines.length && /^\|(?:\s*:?-+:?\s*\|)+$/.test(lines[i+1])){
+      const rows=[];
+      const parse=v=>v.trim().replace(/^\||\|$/g,"").split("|").map(c=>c.trim());
+      rows.push(parse(line));
+      i+=2;
+      while(i<lines.length && /^\|.+\|$/.test(lines[i])){rows.push(parse(lines[i]));i++}
+      i--;
+      const head=rows[0]||[], body=rows.slice(1);
+      const table=`<table><thead><tr>${head.map(c=>`<th>${markdownInlineToHTML(c)}</th>`).join("")}</tr></thead><tbody>${body.map(r=>`<tr>${r.map(c=>`<td>${markdownInlineToHTML(c)}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+      blocks.push(blankBlock("table",table));continue;
+    }
+
+    let m;
+    if(/^\s*&lt;\/details&gt;\s*$/.test(esc(line))||/^\s*<\/details>\s*$/.test(line)){
+      if(sanfonaNivel>0)sanfonaNivel--;
+      continue;
+    }
+    if((m=line.match(/^\s*<details><summary>([\s\S]*?)<\/summary>\s*$/))){
+      blocks.push(blankBlock("toggle",markdownInlineToHTML(m[1]),sanfonaNivel));
+      sanfonaNivel=Math.min(6,sanfonaNivel+1);
+      continue;
+    }
+    if((m=line.match(/^>\s*(\p{Extended_Pictographic}\uFE0F?)\s+(.*)$/u))){
+      const bloco=blankBlock("callout",markdownInlineToHTML(m[2]),sanfonaNivel);
+      bloco.icon=m[1];
+      blocks.push(bloco);
+      continue;
+    }
+    if((m=line.match(/^###\s+(.+)$/))) blocks.push(blankBlock("h3",markdownInlineToHTML(m[1])));
+    else if((m=line.match(/^##\s+(.+)$/))) blocks.push(blankBlock("h2",markdownInlineToHTML(m[1])));
+    else if((m=line.match(/^#\s+(.+)$/))) blocks.push(blankBlock("h1",markdownInlineToHTML(m[1])));
+    else if((m=line.match(/^>\s?(.*)$/))) blocks.push(blankBlock("quote",markdownInlineToHTML(m[1])));
+    else if((m=line.match(/^(\s*)[-*]\s+\[([ xX])\]\s?(.*)$/))) blocks.push({...blankBlock("todo",markdownInlineToHTML(m[3]),indentOf(m[1])),checked:m[2].toLowerCase()==="x"});
+    else if((m=line.match(/^(\s*)[-*+]\s+(.+)$/))) blocks.push(blankBlock("bullet",markdownInlineToHTML(m[2]),indentOf(m[1])));
+    else if((m=line.match(/^(\s*)\d+\.\s+(.+)$/))) blocks.push(blankBlock("numbered",markdownInlineToHTML(m[2]),indentOf(m[1])));
+    else if(/^(---|\*\*\*)\s*$/.test(line)) blocks.push(blankBlock("divider",""));
+    else if((m=line.match(/^\s*\[V\u00eddeo\]\((\S+)\)\s*$/))) blocks.push(blankBlock("media",embedHTML(m[1])));
+    else if(line.trim()===""){
+      if(blocks.length && !(blocks.at(-1).type==="p" && !htmlToPlain(blocks.at(-1).html).trim())) blocks.push(blankBlock("p","",sanfonaNivel));
+    }else{
+      const html=markdownInlineToHTML(line);
+      blocks.push(blankBlock(apenasMidia(html)?"media":"p",html,sanfonaNivel));
+    }
+  }
+  if(inCode) blocks.push(blankBlock("code",esc(code.join("\n"))));
+  while(blocks.length>1 && blocks.at(-1).type==="p" && !htmlToPlain(blocks.at(-1).html).trim()) blocks.pop();
+  return {title,blocks:blocks.length?blocks:[blankBlock()]};
+}
+
+function migrateOld(old){
+  const migrated={
+    version:3,
+    selectedFolderId:old.selectedFolderId||"all",
+    selectedNoteId:old.selectedNoteId||null,
+    sort:old.sort||"updated",
+    sidebarCollapsed:true,
+    openFolders:[],
+    folders:Array.isArray(old.folders)?old.folders:[],
+    notes:[]
+  };
+  migrated.notes=(old.notes||[]).map(n=>{
+    const parsed=markdownToNote(n.content||"", "Nova nota");
+    return {
+      id:n.id||uid(),folderId:n.folderId,title:parsed.title,
+      createdAt:n.createdAt||now(),updatedAt:n.updatedAt||now(),pinned:!!n.pinned,
+      blocks:parsed.blocks
+    };
+  });
+  return migrated;
+}
+
+function loadState(){
+  try{
+    const current=storageGet(STORAGE_KEY);
+    if(current){
+      const x=JSON.parse(current);
+      if(Array.isArray(x.notes)&&Array.isArray(x.folders)) return x;
+    }
+    const old=storageGet(OLD_STORAGE_KEY);
+    if(old){
+      const x=JSON.parse(old);
+      if(Array.isArray(x.notes)&&Array.isArray(x.folders)){
+        const migrated=migrateOld(x);
+        storageSet(STORAGE_KEY,JSON.stringify(migrated));
+        return migrated;
+      }
+    }
+  }catch{}
+  return demoState();
+}
+
+let state=loadState();
+state.sidebarCollapsed = state.sidebarCollapsed !== false;
+state.openFolders ||= [];
+
+function selectedNote(){return state.notes.find(n=>n.id===state.selectedNoteId)||null}
+function childrenOf(pid){return state.folders.filter(f=>f.parentId===pid)}
+function descendants(id){
+  const out=[id];
+  const walk=pid=>childrenOf(pid).forEach(f=>{out.push(f.id);walk(f.id)});
+  walk(id);return out;
+}
+function folderName(id){return id==="all"?"Todas as notas":state.folders.find(f=>f.id===id)?.name||"Notas"}
+function folderCount(id){const ids=new Set(descendants(id));return state.notes.filter(n=>ids.has(n.folderId)).length}
+function notePlain(n){return (n.blocks||[]).map(b=>htmlToPlain(b.html||"")).join(" ").replace(/\s+/g," ").trim()}
+function formatDate(iso){
+  const d=new Date(iso),t=new Date();
+  if(d.toDateString()===t.toDateString())return d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+  return d.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"});
+}
+function sanitizeName(s="nota"){return (s||"nota").replace(/[\\/:*?"<>|]+/g,"-").trim().slice(0,90)||"nota"}
+
+function visibleNotes(){
+  const q=$("#searchInput").value.trim().toLowerCase();
+  let list=state.notes.slice();
+  if(state.selectedFolderId!=="all"){
+    const ids=new Set(descendants(state.selectedFolderId));
+    list=list.filter(n=>ids.has(n.folderId));
+  }
+  if(q) list=list.filter(n=>`${n.title} ${notePlain(n)}`.toLowerCase().includes(q));
+  list.sort((a,b)=>{
+    if(a.pinned!==b.pinned)return a.pinned?-1:1;
+    return new Date(b.updatedAt)-new Date(a.updatedAt);
+  });
+  return list;
+}
+
+function syncActiveNoteFromDOM(){
+  /* grava no dono do que esta renderizado, nunca no que acabou de ser selecionado */
+  const note=domNoteId?state.notes.find(n=>n.id===domNoteId):null;
+  if(!note||docTitle.disabled)return;
+  note.title=docTitle.value.trim()||"Sem título";
+  const rows=$$(".block-row[data-block-id]",blockEditor);
+  if(rows.length){
+    note.blocks=rows.map(row=>{
+      const type=row.dataset.type||"p";
+      return {
+        id:row.dataset.blockId,
+        type,
+        html:type==="divider"?"":$(".block-content",row).innerHTML,
+        checked:type==="todo"?!!$(".todo-box",row)?.checked:false,
+        indent:Number(row.dataset.indent)||0,
+        icon:type==="callout"?($(".callout-icon",row)?.dataset.icon||"💡"):undefined,
+        collapsed:type==="toggle"?row.classList.contains("collapsed"):undefined
+      };
+    });
+  }
+}
+
+let avisouArmazenamento=false;
+/* storageSet cai para memoria quando estoura a cota; sem checar o retorno
+   o app dizia "Salvo" e o conteudo sumia no recarregamento. */
+function persistState(notify=false){
+  let ok=false;
+  try{ ok=storageSet(STORAGE_KEY,JSON.stringify(state)) }catch{ ok=false }
+  if(ok){
+    avisouArmazenamento=false;
+    setSaveState("saved");
+    if(notify)toast("Salvo no navegador");
+    return true;
+  }
+  setSaveState("error");
+  if(notify||!avisouArmazenamento){
+    avisouArmazenamento=true;
+    toast("Sem espaço no navegador — exporte o projeto para não perder");
+  }
+  return false;
+}
+function setSaveState(estado){
+  if(!saveStateEl)return;
+  saveStateEl.dataset.state=estado;
+  saveStateEl.textContent=estado==="saving"?"Salvando…":estado==="error"?"Não salvo":"Salvo";
+}
+function saveState(immediate=false,notify=false){
+  const commit=()=>{
+    syncActiveNoteFromDOM();
+    persistState(notify);
+  };
+  clearTimeout(saveTimer);
+  if(immediate)commit();
+  else{setSaveState("saving");saveTimer=setTimeout(commit,180)}
+}
+
+/* Historico proprio: o execCommand('undo') do navegador tem pilha por bloco
+   contenteditable, entao trocar de bloco perdia o desfazer do anterior. */
+function histCaret(){
+  const rows=$$(".block-row",blockEditor);
+  const row=currentRow();
+  const i=row?rows.indexOf(row):0;
+  return i<0?0:i;
+}
+function histSnap(note){
+  return {
+    title:note.title||"",
+    blocks:JSON.parse(JSON.stringify(note.blocks||[])),
+    caret:histCaret()
+  };
+}
+function histReset(){
+  const note=selectedNote();
+  clearTimeout(hist.timer);
+  hist.id=note?note.id:null;
+  hist.stack=note?[histSnap(note)]:[];
+  hist.i=note?0:-1;
+  histSync();
+}
+function histSync(){
+  const u=$('[data-action="undo"]'), r=$('[data-action="redo"]');
+  if(u)u.disabled=hist.i<=0;
+  if(r)r.disabled=hist.i<0||hist.i>=hist.stack.length-1;
+}
+function histPush(immediate=false){
+  if(hist.lock)return;
+  clearTimeout(hist.timer);
+  const run=()=>{
+    const note=selectedNote();if(!note)return;
+    if(hist.id!==note.id){histReset();return}
+    syncActiveNoteFromDOM();
+    const snap=histSnap(note);
+    const atual=hist.stack[hist.i];
+    if(atual&&atual.title===snap.title&&JSON.stringify(atual.blocks)===JSON.stringify(snap.blocks))return;
+    hist.stack=hist.stack.slice(0,hist.i+1);
+    hist.stack.push(snap);
+    if(hist.stack.length>120)hist.stack.shift();
+    hist.i=hist.stack.length-1;
+    histSync();
+  };
+  if(immediate)run();else hist.timer=setTimeout(run,600);
+}
+function histApply(dir){
+  const note=selectedNote();if(!note)return;
+  if(hist.id!==note.id){histReset();return}
+  clearTimeout(hist.timer);
+  /* o que esta na tela e mais novo que o topo da pilha: registra antes de voltar */
+  if(dir<0)histPush(true);
+  const alvo=hist.i+dir;
+  if(alvo<0||alvo>=hist.stack.length){histSync();return}
+  hist.i=alvo;
+  const snap=hist.stack[alvo];
+  hist.lock=true;
+  note.title=snap.title;
+  note.blocks=JSON.parse(JSON.stringify(snap.blocks));
+  note.updatedAt=now();
+  renderEditor();renderNotes();
+  const rows=$$(".block-row",blockEditor);
+  const row=rows[Math.min(rows.length-1,Math.max(0,snap.caret||0))];
+  if(row)focusBlock(row,true);
+  hist.lock=false;
+  histSync();
+  persistState();
+}
+
+function touchNote(){
+  const note=selectedNote();if(!note)return;
+  note.updatedAt=now();
+  histPush();
+  saveState();
+}
+
+function renderFolders(){
+  $("#allCount").textContent=state.notes.length;
+  $("#allNotesRow").classList.toggle("active",state.selectedFolderId==="all");
+  const render=(pid,depth=0)=>childrenOf(pid)
+    .sort((a,b)=>a.name.localeCompare(b.name,"pt-BR"))
+    .map(f=>{
+      const kids=childrenOf(f.id),open=state.openFolders.includes(f.id);
+      return `<div>
+        <div class="folder-row ${state.selectedFolderId===f.id?"active":""} ${open?"open":""}" data-folder-id="${f.id}" style="padding-left:${6+depth*15}px">
+          <button class="twisty ${kids.length?"":"hidden"}" data-toggle-folder="${f.id}">${icons.chev}</button>
+          <span class="folder-icon">${icons.folder}</span>
+          <span class="folder-name">${esc(f.name)}</span>
+          <span class="folder-count">${folderCount(f.id)}</span>
+        </div>
+        ${kids.length&&open?render(f.id,depth+1):""}
+      </div>`;
+    }).join("");
+  folderTree.innerHTML=render(null);
+}
+
+function renderNotes(){
+  listTitle.textContent=folderName(state.selectedFolderId);
+  const list=visibleNotes();
+  if(!list.length){notesList.innerHTML=`<div class="empty-list">Nenhuma nota aqui.<br>Crie uma nova nota ou importe Markdown.</div>`;return}
+  notesList.innerHTML=list.map(n=>`
+    <div class="note-card ${n.id===state.selectedNoteId?"active":""}" data-note-id="${n.id}" draggable="true">
+      <div class="note-card-title">${n.pinned?"📌 ":""}${esc(n.title||"Sem título")}</div>
+      <div class="note-meta">
+        <span class="note-date">${formatDate(n.updatedAt)}</span>
+        <span class="note-preview">${esc(notePlain(n)||"Sem texto adicional")}</span>
+      </div>
+    </div>
+  `).join("");
+}
+
+function placeholder(type){
+  return ({
+    p:"",
+    h1:"Título 1",h2:"Título 2",h3:"Título 3",
+    quote:"Citação",code:"Código",
+    bullet:"Item da lista",numbered:"Item da lista",todo:"Tarefa",
+    table:"",divider:"",media:"",
+    callout:"Destaque",toggle:"Alternar"
+  })[type]??"";
+}
+
+function blockHTML(b){
+  const type=b.type||"p";
+  const table=`<table><thead><tr><th>Cabeçalho</th><th>Cabeçalho</th><th>Cabeçalho</th></tr></thead><tbody><tr><td>Texto</td><td>Texto</td><td>Texto</td></tr><tr><td>Texto</td><td>Texto</td><td>Texto</td></tr></tbody></table>`;
+  const indent=Math.max(0,Math.min(6,Number(b.indent)||0));
+  return `<div class="block-row ${b.checked?"checked":""} ${b.collapsed?"collapsed":""}" data-block-id="${b.id}" data-type="${type}" data-indent="${indent}" style="--indent:${indent}">
+    <button class="block-handle" contenteditable="false" draggable="true" aria-label="Mover bloco">${icons.dots}</button>
+    <div class="block-main">
+      <span class="block-marker" contenteditable="false" data-num="1"><input class="todo-box" type="checkbox" ${b.checked?"checked":""}></span>
+      <button class="toggle-arrow" contenteditable="false" tabindex="-1" aria-label="Abrir ou fechar">${icons.chev}</button>
+      <button class="callout-icon" contenteditable="false" tabindex="-1" aria-label="Trocar ícone" data-icon="${esc(b.icon||"💡")}"></button>
+      <div class="block-content" contenteditable="${type==="divider"?"false":"true"}" spellcheck="true" data-placeholder="${esc(placeholder(type))}">${type==="table"?(b.html||table):(b.html||"")}</div>
+    </div>
+  </div>`;
+}
+
+/* numeracao das listas: calculada no JS para respeitar niveis e reinicios */
+/* Sanfona: recolhe os blocos seguintes com indentacao maior que a do toggle. */
+function applyToggles(){
+  let ocultarAcimaDe=null;
+  $$(".block-row",blockEditor).forEach(row=>{
+    const ind=Number(row.dataset.indent)||0;
+    if(ocultarAcimaDe!==null){
+      if(ind>ocultarAcimaDe){row.classList.add("oculto");return}
+      ocultarAcimaDe=null;
+    }
+    row.classList.remove("oculto");
+    if(row.dataset.type==="toggle"&&row.classList.contains("collapsed"))ocultarAcimaDe=ind;
+  });
+}
+function renumberLists(){
+  const counters=[];
+  $$(".block-row",blockEditor).forEach(row=>{
+    if(row.dataset.type!=="numbered"){counters.length=0;return}
+    const lvl=Math.max(0,Math.min(6,Number(row.dataset.indent)||0));
+    counters[lvl]=(counters[lvl]||0)+1;
+    counters.length=lvl+1;
+    $(".block-marker",row)?.setAttribute("data-num",counters[lvl]);
+  });
+}
+function setIndent(row,delta){
+  const cur=Number(row.dataset.indent)||0;
+  const next=Math.max(0,Math.min(6,cur+delta));
+  if(next===cur)return false;
+  histPush(true);
+  row.dataset.indent=next;
+  row.style.setProperty("--indent",next);
+  renumberLists();applyToggles();touchNote();
+  return true;
+}
+function insertNewlineAtCaret(){
+  document.execCommand("insertLineBreak");
+}
+
+/* Em arquivo local o iframe do YouTube/Vimeo nunca renderiza (erro 153):
+   troca por capa clicavel. Servido por http o iframe fica como esta. */
+function normalizarVideos(){
+  if(location.protocol!=="file:")return;
+  $$("iframe.embed",blockEditor).forEach(f=>{
+    const src=f.getAttribute("src")||"";
+    if(!/youtube\.com\/embed\/|player\.vimeo\.com\/video\//.test(src))return;
+    const d=document.createElement("div");
+    d.innerHTML=videoHTML(src,f.style.width||"");
+    const novo=d.firstElementChild;
+    if(novo)f.replaceWith(novo);
+  });
+}
+
+function renderEditor(focus=false){
+  const note=selectedNote();
+  if(!note){
+    domNoteId=null;
+    docTitle.value="";docTitle.disabled=true;
+    blockEditor.innerHTML=`<div class="empty-list">Selecione ou crie uma nota.</div>`;
+    return;
+  }
+  domNoteId=note.id;
+  docTitle.disabled=false;
+  docTitle.value=note.title||"";
+  if(!note.blocks?.length)note.blocks=[blankBlock()];
+  hideResizer();
+  blockEditor.innerHTML=note.blocks.map(blockHTML).join("");
+  normalizarVideos();
+  renumberLists();applyToggles();
+  if(focus)requestAnimationFrame(()=>focusBlock($(".block-row",blockEditor),true));
+}
+
+function renderAll(){
+  document.documentElement.dataset.theme=temaAtual();
+  app.classList.toggle("sidebar-collapsed",!!state.sidebarCollapsed);
+  $("#collapseBtn").dataset.tip=state.sidebarCollapsed?"Expandir pastas":"Recolher pastas";
+  renderFolders();renderNotes();renderEditor();
+  if(hist.id!==state.selectedNoteId)histReset();
+}
+
+function selectFolder(id){
+  setFocus(false);
+  saveState(true);
+  state.selectedFolderId=id;
+  const list=visibleNotes();
+  if(list.length&&!list.some(n=>n.id===state.selectedNoteId))state.selectedNoteId=list[0].id;
+  renderAll();saveState();
+}
+function selectNote(id){
+  setFocus(true);
+  if(id===state.selectedNoteId)return;
+  saveState(true);
+  state.selectedNoteId=id;
+  renderNotes();renderEditor();histReset();
+  if(!findBar.classList.contains("hidden"))findRun(findInput.value);
+}
+/* percorre a lista visivel sem mudar o estado dos paineis */
+function stepNote(delta){
+  const lista=visibleNotes();
+  if(lista.length<2)return;
+  const atual=lista.findIndex(n=>n.id===state.selectedNoteId);
+  const i=Math.max(0,Math.min(lista.length-1,(atual<0?0:atual)+delta));
+  const alvo=lista[i];
+  if(!alvo||alvo.id===state.selectedNoteId)return;
+  const painelAberto=!focusMode;
+  selectNote(alvo.id);
+  if(painelAberto)setFocus(false);
+  $(`.note-card[data-note-id="${alvo.id}"]`)?.scrollIntoView({block:"nearest"});
+}
+
+function createNote(folderId=null){
+  setFocus(false);
+  saveState(true);
+  let target=folderId||state.selectedFolderId;
+  if(target==="all"||!state.folders.some(f=>f.id===target))target=state.folders[0]?.id;
+  if(!target){
+    target=uid();state.folders.push({id:target,name:"Notas",parentId:null,createdAt:now()});
+  }
+  const note={id:uid(),folderId:target,title:"Nova nota",createdAt:now(),updatedAt:now(),pinned:false,blocks:[blankBlock()]};
+  state.notes.unshift(note);state.selectedNoteId=note.id;state.selectedFolderId=target;
+  saveState(true);renderAll();histReset();
+  requestAnimationFrame(()=>{docTitle.focus();docTitle.select()});
+}
+
+function ask(title,desc,value="",confirm="OK",danger=false){
+  return new Promise(resolve=>{
+    modalResolver=resolve;
+    modalTitle.textContent=title;modalDescription.textContent=desc;
+    modalInput.style.display="block";modalInput.value=value;
+    modalConfirm.textContent=confirm;
+    modalConfirm.className=`btn ${danger?"danger":"primary"}`;
+    modalBackdrop.classList.add("show");
+    setTimeout(()=>{modalInput.focus();modalInput.select()},30);
+  });
+}
+function confirmDialog(title,desc,confirm="Confirmar"){
+  return new Promise(resolve=>{
+    modalResolver=resolve;
+    modalTitle.textContent=title;modalDescription.textContent=desc;
+    modalInput.style.display="none";
+    modalConfirm.textContent=confirm;modalConfirm.className="btn danger";
+    modalBackdrop.classList.add("show");
+  });
+}
+function closeModal(value){
+  modalBackdrop.classList.remove("show");
+  const r=modalResolver;modalResolver=null;if(r)r(value);
+}
+async function createFolder(parentId=undefined){
+  const parent=parentId===undefined?(state.selectedFolderId==="all"?null:state.selectedFolderId):parentId;
+  const name=await ask("Nova pasta",parent?"Criar uma subpasta dentro da pasta selecionada.":"Crie uma pasta para organizar suas notas.","","Criar");
+  if(!name?.trim())return;
+  const f={id:uid(),name:name.trim(),parentId:parent||null,createdAt:now()};
+  state.folders.push(f);
+  if(parent&&!state.openFolders.includes(parent))state.openFolders.push(parent);
+  state.selectedFolderId=f.id;saveState(true);renderAll();toast("Pasta criada");
+}
+async function renameFolder(id){
+  const f=state.folders.find(x=>x.id===id);if(!f)return;
+  const name=await ask("Renomear pasta","Escolha o novo nome.",f.name,"Renomear");
+  if(!name?.trim())return;
+  f.name=name.trim();saveState(true);renderAll();
+}
+async function deleteFolder(id){
+  const f=state.folders.find(x=>x.id===id);if(!f)return;
+  const ok=await confirmDialog(`Apagar “${f.name}”?`,"As subpastas serão removidas e as notas serão movidas para outra pasta.","Apagar");
+  if(!ok)return;
+  const ids=descendants(id);
+  state.folders=state.folders.filter(x=>!ids.includes(x.id));
+  let fallback=state.folders[0]?.id;
+  if(!fallback){fallback=uid();state.folders.push({id:fallback,name:"Notas",parentId:null,createdAt:now()})}
+  state.notes.forEach(n=>{if(ids.includes(n.folderId))n.folderId=fallback});
+  state.selectedFolderId="all";saveState(true);renderAll();
+}
+function duplicateNote(id){
+  saveState(true);
+  const n=state.notes.find(x=>x.id===(id||state.selectedNoteId));if(!n)return;
+  const copia=JSON.parse(JSON.stringify(n));
+  copia.id=uid();
+  copia.title=`${n.title||"Sem título"} (cópia)`;
+  copia.createdAt=now();copia.updatedAt=now();copia.pinned=false;
+  (copia.blocks||[]).forEach(b=>{b.id=uid()});
+  state.notes.splice(state.notes.findIndex(x=>x.id===n.id)+1,0,copia);
+  state.selectedNoteId=copia.id;
+  renderAll();histReset();
+  persistState();
+  toast("Nota duplicada");
+}
+async function deleteActiveNote(){
+  const note=selectedNote();if(!note)return;
+  const ok=await confirmDialog(`Apagar “${note.title}”?`,"Esta nota será removida do projeto.","Apagar");
+  if(!ok)return;
+  state.notes=state.notes.filter(n=>n.id!==note.id);
+  if(!state.notes.length){createNote();return}
+  state.selectedNoteId=state.notes[0].id;setFocus(false);saveState(true);renderAll();
+}
+
+function currentRow(){
+  const sel=getSelection();
+  if(sel?.rangeCount){
+    const n=sel.anchorNode?.nodeType===1?sel.anchorNode:sel.anchorNode?.parentElement;
+    const row=n?.closest?.(".block-row");
+    if(row&&blockEditor.contains(row))return row;
+  }
+  return $(".block-row",blockEditor);
+}
+/* --- navegacao vertical entre blocos -------------------------------
+   Cada bloco e um contenteditable separado, entao a seta do navegador
+   parava na borda. Aqui detectamos primeira/ultima linha visual e
+   pulamos para o bloco vizinho mantendo a coluna. */
+function caretRect(){
+  const sel=getSelection();
+  if(!sel||!sel.rangeCount)return null;
+  const r=sel.getRangeAt(0).cloneRange();
+  r.collapse(true);
+  let rect=r.getBoundingClientRect();
+  if(rect&&(rect.height||rect.width))return rect;
+  const no=r.startContainer,off=r.startOffset;
+  if(no&&no.nodeType===3){
+    if(off>0){
+      const q=document.createRange();q.setStart(no,off-1);q.setEnd(no,off);
+      const b=q.getBoundingClientRect();if(b.height)return b;
+    }
+    if(off<no.length){
+      const q=document.createRange();q.setStart(no,off);q.setEnd(no,off+1);
+      const b=q.getBoundingClientRect();if(b.height)return b;
+    }
+  }
+  return null;
+}
+function pontoParaRange(x,y){
+  if(document.caretRangeFromPoint)return document.caretRangeFromPoint(x,y);
+  if(document.caretPositionFromPoint){
+    const pos=document.caretPositionFromPoint(x,y);
+    if(!pos)return null;
+    const r=document.createRange();r.setStart(pos.offsetNode,pos.offset);r.collapse(true);return r;
+  }
+  return null;
+}
+function colocarCaretNaLinha(c,onde,x){
+  const r=c.getBoundingClientRect();
+  const lh=parseFloat(getComputedStyle(c).lineHeight)||22;
+  const y=onde==="fim"?r.bottom-Math.min(lh,r.height)/2:r.top+Math.min(lh,r.height)/2;
+  const px=Math.min(Math.max(x,r.left+1),Math.max(r.left+1,r.right-1));
+  let range=pontoParaRange(px,y);
+  if(!range||!c.contains(range.startContainer)){
+    range=document.createRange();range.selectNodeContents(c);range.collapse(onde!=="fim");
+  }
+  c.focus();
+  const sel=getSelection();sel.removeAllRanges();sel.addRange(range);
+  savedRange=range.cloneRange();
+}
+function irParaBlocoVizinho(row,dir,x){
+  let alvo=dir<0?row.previousElementSibling:row.nextElementSibling;
+  while(alvo){
+    const c=$(".block-content",alvo);
+    if(c&&c.contentEditable!=="false"){
+      colocarCaretNaLinha(c,dir<0?"fim":"inicio",x);
+      return true;
+    }
+    alvo=dir<0?alvo.previousElementSibling:alvo.nextElementSibling;
+  }
+  if(dir<0&&!docTitle.disabled){
+    docTitle.focus();
+    const n=docTitle.value.length;docTitle.setSelectionRange(n,n);
+    return true;
+  }
+  return false;
+}
+function moverEntreBlocos(row,c,dir){
+  const cr=c.getBoundingClientRect();
+  const lh=parseFloat(getComputedStyle(c).lineHeight)||22;
+  const rect=caretRect();
+  const x=rect?rect.left:cr.left+2;
+  const naBorda=!rect
+    ? true
+    : dir<0 ? (rect.top-cr.top)<lh*0.6 : (cr.bottom-rect.bottom)<lh*0.6;
+  if(!naBorda)return false;
+  return irParaBlocoVizinho(row,dir,x);
+}
+
+function focusBlock(row,end=true){
+  if(!row)return;
+  const c=$(".block-content",row);if(!c||c.contentEditable==="false")return;
+  c.focus();
+  const r=document.createRange();r.selectNodeContents(c);r.collapse(end);
+  const s=getSelection();s.removeAllRanges();s.addRange(r);savedRange=r.cloneRange();
+}
+function setBlockType(row,type,clear=false){
+  if(!row)return;
+  histPush(true);
+  row.dataset.type=type;row.classList.remove("checked");
+  const c=$(".block-content",row);
+  c.contentEditable=type==="divider"?"false":"true";
+  c.dataset.placeholder=placeholder(type);
+  if(clear)c.innerHTML="";
+  if(type==="todo")$(".todo-box",row).checked=false;
+  renumberLists();applyToggles();
+  touchNote();
+  if(type!=="divider")requestAnimationFrame(()=>focusBlock(row,true));
+  updateBlockStyle();
+}
+function insertAfter(row,type="p",html="",indent=0){
+  histPush(true);
+  const b=blankBlock(type,html,indent);
+  row.insertAdjacentHTML("afterend",blockHTML(b));
+  const next=row.nextElementSibling;renumberLists();applyToggles();touchNote();
+  if(type!=="divider")requestAnimationFrame(()=>focusBlock(next,true));
+  return next;
+}
+/* Video: arquivo pequeno vira data URL; link vira player embutido.
+   O limite existe porque tudo mora no localStorage do navegador. */
+const LIMITE_VIDEO=2*1024*1024;
+/* Midia entra como bloco proprio (como divisor/tabela): ganha alcinha de
+   arrastar, se apaga sozinha e nao fica presa dentro de um paragrafo. */
+function insertMediaBlock(html){
+  let row=currentRow()||$$(".block-row",blockEditor).at(-1);
+  if(!row){
+    blockEditor.insertAdjacentHTML("beforeend",blockHTML(blankBlock("p","")));
+    row=$$(".block-row",blockEditor).at(-1);
+  }
+  histPush(true);
+  const c=$(".block-content",row);
+  const vazio=c&&!(c.textContent||"").trim()&&!c.querySelector("img,video,iframe");
+  let alvo;
+  if(vazio&&["p","media"].includes(row.dataset.type)){
+    row.dataset.type="media";
+    c.dataset.placeholder="";
+    c.innerHTML=html;
+    alvo=row;
+  }else{
+    alvo=insertAfter(row,"media",html,Number(row.dataset.indent)||0);
+  }
+  /* sempre deixa um paragrafo depois, para continuar escrevendo */
+  if(!alvo.nextElementSibling)insertAfter(alvo,"p","");
+  renumberLists();touchNote();
+  requestAnimationFrame(()=>{
+    const seguinte=alvo.nextElementSibling;
+    if(seguinte)focusBlock(seguinte,true);
+  });
+  return alvo;
+}
+/* Fonte unica da marcacao de video, usada na insercao e na importacao. */
+function videoHTML(src,largura){
+  const w=largura?` style="width:${largura}"`:"";
+  const yt=String(src).match(/youtube\.com\/embed\/([\w-]+)/);
+  const vm=String(src).match(/player\.vimeo\.com\/video\/(\d+)/);
+  if(yt){
+    const capa=`https://img.youtube.com/vi/${yt[1]}/hqdefault.jpg`;
+    return `<span class="video-card" contenteditable="false" data-label="YouTube"`+
+      ` data-embed="${esc(src)}" data-watch="https://youtu.be/${yt[1]}"${w}>`+
+      `<img src="${capa}" alt="Capa do vídeo" draggable="false"><span class="video-play"></span></span>`;
+  }
+  if(vm){
+    return `<span class="video-card" contenteditable="false" data-label="Vimeo"`+
+      ` data-embed="${esc(src)}" data-watch="https://vimeo.com/${vm[1]}"${w}></span>`;
+  }
+  return `<iframe class="embed" src="${esc(src)}" allowfullscreen loading="lazy" contenteditable="false"${w}></iframe>`;
+}
+function embedVideo(url){
+  const u=String(url||"").trim();
+  if(!u)return;
+  const yt=u.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{6,})/);
+  const vm=u.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+  let html="";
+  if(yt)html=videoHTML(`https://www.youtube.com/embed/${yt[1]}`);
+  else if(vm)html=videoHTML(`https://player.vimeo.com/video/${vm[1]}`);
+  else if(/^https?:\/\//i.test(u))html=`<video src="${esc(u)}" controls preload="metadata"></video>`;
+  else{toast("Link de vídeo inválido");return}
+  insertMediaBlock(html);
+}
+async function askVideoLink(){
+  saveSelection();
+  const url=await ask("Inserir vídeo","Cole o link do YouTube, do Vimeo ou de um arquivo .mp4.","https://","Inserir");
+  if(url&&url.trim())embedVideo(url);
+}
+
+function insertSpecial(type){
+  const row=currentRow()||$$(".block-row",blockEditor).at(-1);if(!row)return;
+  if(type==="divider"){const d=insertAfter(row,"divider","");insertAfter(d,"p","");return}
+  if(type==="table"){insertAfter(row,"table","");return}
+  if(type==="image")$("#imageInput").click();
+  if(type==="video"){
+    const r=$(".block-content",row).getBoundingClientRect();
+    hideMenus("video");positionMenu(videoMenu,r.left,r.bottom+7);
+  }
+}
+function checkMarkdownShortcut(row){
+  const c=$(".block-content",row),t=c.textContent||"";
+  const map={"# ":"h1","## ":"h2","### ":"h3","> ":"quote","- ":"bullet","* ":"bullet","1. ":"numbered","[] ":"todo","[ ] ":"todo","``` ":"code"};
+  if(map[t]){setBlockType(row,map[t],true);return true}
+  return false;
+}
+
+function showSlash(row,query=""){
+  slash.open=true;slash.row=row;slash.index=0;
+  const q=query.toLowerCase();
+  slash.items=commands.filter(c=>`${c.label} ${c.keys}`.toLowerCase().includes(q));
+  renderSlash();
+  let rect=$(".block-content",row).getBoundingClientRect();
+  const sel=getSelection();
+  if(sel?.rangeCount){
+    const r=sel.getRangeAt(0).getBoundingClientRect();
+    if(r.width||r.height)rect=r;
+  }
+  const w=304;
+  let left=Math.max(10,Math.min(innerWidth-w-10,rect.left));
+  let top=rect.bottom+8;
+  if(top+390>innerHeight)top=Math.max(10,rect.top-400);
+  slashMenu.style.left=`${left}px`;slashMenu.style.top=`${top}px`;slashMenu.classList.add("show");
+  slashMenu.scrollTop=0;markSlashSelection();
+}
+function renderSlash(){
+  slashMenu.innerHTML=slash.items.length?`
+    <div class="slash-caption">Blocos básicos</div>
+    ${slash.items.map((c,i)=>`<button class="slash-item ${i===slash.index?"selected":""}" data-command="${c.id}">
+      <span class="slash-icon">${esc(c.icon)}</span>
+      <span><div class="slash-name">${esc(c.label)}</div><div class="slash-desc">${esc(c.desc)}</div></span>
+    </button>`).join("")}
+  `:`<div class="slash-caption">Nenhum comando</div>`;
+  markSlashSelection();
+}
+function markSlashSelection(){
+  const items=$$(".slash-item",slashMenu);
+  items.forEach((el,i)=>el.classList.toggle("selected",i===slash.index));
+  const el=items[slash.index];if(!el)return;
+  if(slash.index===0){slashMenu.scrollTop=0;return}
+  const topo=el.offsetTop-7, base=el.offsetTop+el.offsetHeight+7;
+  if(topo<slashMenu.scrollTop)slashMenu.scrollTop=topo;
+  else if(base>slashMenu.scrollTop+slashMenu.clientHeight)slashMenu.scrollTop=base-slashMenu.clientHeight;
+}
+function closeSlash(){slash.open=false;slash.row=null;slash.items=[];slashMenu.classList.remove("show")}
+function runSlash(cmd){
+  const row=slash.row;if(!row)return;
+  const c=$(".block-content",row);
+  if(/^\/\S*$/.test(c.textContent||""))c.innerHTML="";
+  closeSlash();
+  if(cmd.kind==="block")setBlockType(row,cmd.id,false);
+  else if(cmd.id==="image"){focusBlock(row,true);$("#imageInput").click()}
+  else insertSpecial(cmd.id);
+}
+
+/* Busca na nota: usa Range + selecao nativa, sem mexer no conteudo do bloco. */
+function findCollect(){
+  /* percorre so o texto dos blocos: controles auxiliares (icone do destaque,
+     seta da sanfona) nao podem entrar no indice nem deslocar os offsets */
+  const nodes=[];let texto="";
+  $$(".block-content",blockEditor).forEach(c=>{
+    const walker=document.createTreeWalker(c,NodeFilter.SHOW_TEXT);
+    let n;
+    while((n=walker.nextNode())){nodes.push({node:n,start:texto.length});texto+=n.nodeValue||""}
+    texto+=String.fromCharCode(10);
+  });
+  return {nodes,texto};
+}
+function findLocate(off){
+  for(let k=find.nodes.length-1;k>=0;k--){
+    const it=find.nodes[k];
+    if(off>=it.start)return{node:it.node,offset:off-it.start};
+  }
+  return null;
+}
+function findUpdateCount(){
+  if(!findCount)return;
+  findCount.textContent=!find.termo?"":find.hits.length?`${find.i+1} de ${find.hits.length}`:"nenhum";
+}
+function findGo(i){
+  if(!find.hits.length)return findUpdateCount();
+  find.i=(i+find.hits.length)%find.hits.length;
+  const hit=find.hits[find.i];
+  const a=findLocate(hit.start), b=findLocate(hit.end-1);
+  if(!a||!b)return findUpdateCount();
+  try{
+    const r=document.createRange();
+    r.setStart(a.node,Math.min(a.offset,(a.node.nodeValue||"").length));
+    r.setEnd(b.node,Math.min(b.offset+1,(b.node.nodeValue||"").length));
+    const sel=getSelection();sel.removeAllRanges();sel.addRange(r);
+    (a.node.parentElement||blockEditor).scrollIntoView({block:"center",behavior:"smooth"});
+  }catch{}
+  findUpdateCount();
+}
+function findRun(termo){
+  find.termo=termo||"";
+  find.hits=[];find.i=-1;
+  if(!find.termo){findUpdateCount();return}
+  const {nodes,texto}=findCollect();
+  find.nodes=nodes;
+  const alvo=texto.toLowerCase(), agulha=find.termo.toLowerCase();
+  let pos=alvo.indexOf(agulha);
+  while(pos>=0&&find.hits.length<2000){
+    find.hits.push({start:pos,end:pos+agulha.length});
+    pos=alvo.indexOf(agulha,pos+agulha.length);
+  }
+  if(find.hits.length)findGo(0);else findUpdateCount();
+}
+function findOpen(){
+  findBar.classList.remove("hidden");
+  const sel=getSelection();
+  const marcado=sel&&!sel.isCollapsed&&blockEditor.contains(sel.anchorNode?.parentElement||sel.anchorNode)
+    ? String(sel).trim() : "";
+  if(marcado&&marcado.length<80)findInput.value=marcado;
+  findInput.focus();findInput.select();
+  if(findInput.value)findRun(findInput.value);
+}
+function findClose(){
+  findBar.classList.add("hidden");
+  find.termo="";find.hits=[];find.nodes=[];find.i=-1;
+  findUpdateCount();
+  const row=currentRow();if(row)focusBlock(row,true);
+}
+
+/* Colar: mantem o basico e descarta estilos de fora (Word, web, etc). */
+const TAGS_COLAR=new Set(["B","STRONG","I","EM","U","S","STRIKE","DEL","CODE","A","MARK","BR","IMG"]);
+function cleanPastedHTML(html=""){
+  const d=document.createElement("div");
+  d.innerHTML=html;
+  d.querySelectorAll("*").forEach(el=>{
+    if(!TAGS_COLAR.has(el.tagName)){el.replaceWith(...el.childNodes);return}
+    const href=el.tagName==="A"?el.getAttribute("href"):null;
+    const est=el.tagName==="MARK"?el.getAttribute("data-hl-style"):null;
+    const imgSrc=el.tagName==="IMG"?el.getAttribute("src"):null;
+    const imgAlt=el.tagName==="IMG"?el.getAttribute("alt"):null;
+    Array.from(el.attributes).forEach(a=>el.removeAttribute(a.name));
+    if(el.tagName==="A"){
+      if(href&&/^(https?:|mailto:|#|\/)/i.test(href))el.setAttribute("href",href);
+      else el.replaceWith(...el.childNodes);
+    }
+    if(el.tagName==="MARK")el.setAttribute("data-hl-style",est||"regular");
+    if(el.tagName==="IMG"){
+      if(imgSrc&&/^(https?:|data:image\/)/i.test(imgSrc)){
+        el.setAttribute("src",imgSrc);
+        el.setAttribute("alt",imgAlt||"imagem");
+      }else el.remove();
+    }
+  });
+  return d.innerHTML;
+}
+
+function saveSelection(){
+  const s=getSelection();if(!s?.rangeCount)return;
+  const r=s.getRangeAt(0);
+  const n=r.commonAncestorContainer.nodeType===1?r.commonAncestorContainer:r.commonAncestorContainer.parentElement;
+  if(n&&blockEditor.contains(n))savedRange=r.cloneRange();
+}
+function restoreSelection(){
+  if(!savedRange)return false;
+  try{const s=getSelection();s.removeAllRanges();s.addRange(savedRange);return true}catch{return false}
+}
+const FORMATO_SEMANTICO=["bold","italic","underline","strikeThrough"];
+function execFormat(action,value=null){
+  restoreSelection();
+  /* tags de verdade (<b>,<i>,<u>,<strike>) para o Markdown conseguir exportar */
+  document.execCommand("styleWithCSS",false,!FORMATO_SEMANTICO.includes(action));
+  document.execCommand(action,false,value);
+  saveSelection();touchNote();
+}
+async function createLinkFlow(){
+  saveSelection();
+  const url=await ask("Inserir link","Cole o endereço do link.","https://","Inserir");
+  if(!url||!url.trim())return;
+  const href=url.trim();
+  restoreSelection();
+  const sel=getSelection();
+  document.execCommand("styleWithCSS",false,true);
+  if(!sel||sel.isCollapsed)document.execCommand("insertHTML",false,`<a href="${esc(href)}">${esc(href)}</a>`);
+  else document.execCommand("createLink",false,href);
+  saveSelection();touchNote();
+}
+function applyFontSize(px){
+  restoreSelection();
+  document.execCommand("styleWithCSS",false,false);
+  document.execCommand("fontSize",false,"7");
+  $$("font[size='7']",blockEditor).forEach(f=>{
+    const s=document.createElement("span");s.style.fontSize=`${px}px`;s.innerHTML=f.innerHTML;f.replaceWith(s)
+  });
+  saveSelection();touchNote();
+}
+/* marca-texto */
+const HL_SENTINEL="rgb(1,2,3)";
+const hlProbe=document.createElement("span");
+hlProbe.style.backgroundColor=HL_SENTINEL;
+const HL_SENTINEL_RGB=hlProbe.style.backgroundColor;
+
+function unwrap(el){el.replaceWith(...el.childNodes)}
+function cleanupMarks(){
+  $$("mark",blockEditor).forEach(m=>{
+    if(!m.isConnected)return;
+    if(!m.textContent&&!m.querySelector("img")){m.remove();return}
+    if(m.parentElement?.closest("mark"))unwrap(m);
+  });
+}
+function selectAcross(nodes){
+  if(!nodes.length)return;
+  const r=document.createRange();
+  r.setStartBefore(nodes[0]);r.setEndAfter(nodes.at(-1));
+  const s=getSelection();s.removeAllRanges();s.addRange(r);savedRange=r.cloneRange();
+}
+function marksInRange(range){
+  return $$("mark",blockEditor).filter(m=>{try{return range.intersectsNode(m)}catch{return false}});
+}
+function setHighlightStyle(id){
+  hlStyle=id;
+  $$(".hl-style",highlightMenu).forEach(b=>b.classList.toggle("active",b.dataset.hlStyle===id));
+}
+function applyHighlight(estilo=hlStyle){
+  restoreSelection();
+  const sel=getSelection();
+  if(!sel?.rangeCount||sel.isCollapsed){toast("Selecione um trecho para marcar");return}
+  document.execCommand("styleWithCSS",false,true);
+  document.execCommand("hiliteColor",false,HL_SENTINEL);
+  const tagged=$$("*",blockEditor).filter(el=>el.style?.backgroundColor===HL_SENTINEL_RGB);
+  if(!tagged.length){toast("Não foi possível marcar aqui");return}
+  /* tira marcacoes antigas que cruzam a selecao, para nao empilhar cores.
+     A propria marca alvo fica de fora: ela e reaproveitada logo abaixo. */
+  $$("mark",blockEditor).forEach(m=>{
+    if(tagged.includes(m))return;
+    if(tagged.some(el=>el.contains(m)||m.contains(el)))unwrap(m);
+  });
+  const created=tagged.map(el=>{
+    el.style.backgroundColor="";
+    if(!el.getAttribute("style"))el.removeAttribute("style");
+    /* selecao que cobre exatamente uma marca: o navegador estiliza a propria
+       <mark>, entao so trocamos o estilo em vez de recriar o elemento */
+    if(el.tagName==="MARK"){el.dataset.hlStyle=estilo;return el}
+    const m=document.createElement("mark");
+    m.dataset.hlStyle=estilo;
+    while(el.firstChild)m.appendChild(el.firstChild);
+    if(el.tagName==="SPAN"&&!el.getAttribute("style")&&!el.className)el.replaceWith(m);
+    else el.appendChild(m);
+    return m;
+  });
+  cleanupMarks();
+  selectAcross(created.filter(m=>m.isConnected));
+  touchNote();
+}
+function clearHighlight(){
+  restoreSelection();
+  const sel=getSelection();if(!sel?.rangeCount)return;
+  const hit=marksInRange(sel.getRangeAt(0));
+  if(!hit.length){toast("Nenhuma marcação na seleção");return}
+  hit.forEach(m=>unwrap(m));
+  saveSelection();touchNote();
+}
+function toggleHighlight(){
+  restoreSelection();
+  const sel=getSelection();
+  if(!sel?.rangeCount||sel.isCollapsed){toast("Selecione um trecho para marcar");return}
+  const n=sel.getRangeAt(0).commonAncestorContainer;
+  const el=n.nodeType===1?n:n.parentElement;
+  const inside=el?.closest?.("mark");
+  const mesmoEstilo=(inside?.dataset.hlStyle||"regular")===hlStyle;
+  if(inside&&blockEditor.contains(inside)&&mesmoEstilo){unwrap(inside);saveSelection();touchNote();return}
+  applyHighlight(hlStyle);
+}
+
+/* --- redimensionar midia ---------------------------------------------
+   A moldura vive fora do contenteditable e so escreve style.width no
+   elemento, entao o HTML salvo continua limpo. Embeds do YouTube engolem
+   cliques, por isso a moldura aparece no hover do bloco, nao no clique. */
+const MEDIA_SEL=".video-card,video,iframe.embed,img";
+/* dentro de um card, quem redimensiona e o card, nao a miniatura */
+const alvoDeResize=el=>el?(el.closest(".video-card")||el):el;
+function larguraMaxima(el){
+  const cont=el.closest(".block-content");
+  return Math.max(120,(cont?cont.clientWidth:blockEditor.clientWidth)-4);
+}
+function showResizer(){
+  if(!mediaSel||!mediaSel.isConnected)return hideResizer();
+  const r=mediaSel.getBoundingClientRect();
+  const area=$("#editorScroll").getBoundingClientRect();
+  if(!r.width||r.bottom<area.top+4||r.top>area.bottom-4){
+    mediaResizer.classList.remove("show");return;
+  }
+  mediaResizer.style.left=`${r.left}px`;
+  mediaResizer.style.top=`${r.top}px`;
+  mediaResizer.style.width=`${r.width}px`;
+  mediaResizer.style.height=`${r.height}px`;
+  mediaResizer.classList.add("show");
+}
+function selectMedia(el){
+  if(mediaDrag)return;
+  clearTimeout(mediaHideTimer);
+  mediaSel=el;showResizer();
+}
+function hideResizer(){
+  if(mediaDrag)return;
+  clearTimeout(mediaHideTimer);
+  mediaSel=null;mediaResizer.classList.remove("show","dragging");
+}
+function agendarEsconderResizer(){
+  clearTimeout(mediaHideTimer);
+  mediaHideTimer=setTimeout(hideResizer,220);
+}
+function aplicarLargura(el,w){
+  el.style.width=`${w}px`;
+  if(el.tagName!=="IFRAME")el.style.height="auto";
+}
+
+function toggleInlineCode(){
+  restoreSelection();
+  const sel=getSelection();
+  if(!sel?.rangeCount||sel.isCollapsed)return;
+  const n=sel.getRangeAt(0).commonAncestorContainer;
+  const el=n.nodeType===1?n:n.parentElement;
+  const dentro=el?.closest?.("code");
+  if(dentro&&blockEditor.contains(dentro)){unwrap(dentro);saveSelection();touchNote();return}
+  document.execCommand("insertHTML",false,`<code>${esc(String(sel))}</code>`);
+  saveSelection();touchNote();
+}
+
+/* Barra flutuante que acompanha a selecao de texto */
+function hideBubble(){
+  bubbleBar.classList.remove("show");
+  bubbleMenu.classList.remove("show");
+}
+function updateBubble(){
+  if(slash.open||!findBar.classList.contains("hidden")||modalBackdrop.classList.contains("show"))return hideBubble();
+  const sel=getSelection();
+  if(!sel||!sel.rangeCount||sel.isCollapsed)return hideBubble();
+  const n=sel.anchorNode?.nodeType===1?sel.anchorNode:sel.anchorNode?.parentElement;
+  if(!n||!blockEditor.contains(n))return hideBubble();
+  const r=sel.getRangeAt(0).getBoundingClientRect();
+  if(!r.width&&!r.height)return hideBubble();
+  bubbleBar.classList.add("show");
+  const bw=bubbleBar.offsetWidth||190, bh=bubbleBar.offsetHeight||40;
+  const left=Math.max(10,Math.min(innerWidth-bw-10,r.left+r.width/2-bw/2));
+  const limite=$("#formatbar").getBoundingClientRect().bottom+8;
+  let top=r.top-bh-10;
+  if(top<limite)top=r.bottom+10;                    /* nao cobre a barra de cima */
+  top=Math.min(top,innerHeight-bh-10);
+  bubbleBar.style.left=`${left}px`;bubbleBar.style.top=`${top}px`;
+}
+function scheduleBubble(){
+  cancelAnimationFrame(bubbleRaf);
+  bubbleRaf=requestAnimationFrame(updateBubble);
+}
+
+function updateBlockStyle(){
+  const row=currentRow();if(!row)return;
+  const t=row.dataset.type||"p";
+  $("#blockStyle").value=["p","h1","h2","h3","quote","code","callout","toggle"].includes(t)?t:"p";
+}
+
+function tableToMarkdown(table){
+  const rows=Array.from(table.querySelectorAll("tr")).map(tr=>Array.from(tr.querySelectorAll("th,td")).map(c=>(c.textContent||"").trim().replace(/\|/g,"\\|")));
+  if(!rows.length)return"";
+  const cols=Math.max(...rows.map(r=>r.length));
+  const nr=rows.map(r=>[...r,...Array(Math.max(0,cols-r.length)).fill("")]);
+  const head=nr[0],body=nr.slice(1);
+  return [`| ${head.join(" | ")} |`,`| ${head.map(()=> "---").join(" | ")} |`,...body.map(r=>`| ${r.join(" | ")} |`)].join("\n");
+}
+function inlineToMarkdown(html=""){
+  const root=document.createElement("div");root.innerHTML=html;
+  const walk=node=>{
+    if(node.nodeType===Node.TEXT_NODE)return node.nodeValue||"";
+    if(node.nodeType!==Node.ELEMENT_NODE)return"";
+    const tag=node.tagName.toLowerCase();
+    const child=Array.from(node.childNodes).map(walk).join("");
+    if(tag==="strong"||tag==="b")return`**${child}**`;
+    if(tag==="em"||tag==="i")return`*${child}*`;
+    if(tag==="s"||tag==="strike"||tag==="del")return`~~${child}~~`;
+    if(tag==="mark"){
+      const est=node.dataset.hlStyle||"regular";
+      return est==="regular"?`==${child}==`:`<mark class="hls-${est}">${child}</mark>`;
+    }
+    if(tag==="u")return`<u>${child}</u>`;
+    if(tag==="code")return`\`${child}\``;
+    if(tag==="a")return`[${child}](${node.getAttribute("href")||""})`;
+    if(node.classList&&node.classList.contains("video-card")){
+      const w=parseInt(node.style.width,10);
+      return`<iframe src="${node.dataset.embed||""}"${Number.isFinite(w)?` width="${w}"`:""}></iframe>`;
+    }
+    if(tag==="img"||tag==="video"||tag==="iframe"){
+      const src=node.getAttribute("src")||"";
+      const w=parseInt(node.style.width,10);
+      const larg=Number.isFinite(w)?` width="${w}"`:"";
+      if(tag==="img"){
+        const alt=node.getAttribute("alt")||"imagem";
+        /* sem largura customizada fica no Markdown limpo */
+        return larg?`<img src="${src}" alt="${alt}"${larg}>`:`![${alt}](${src})`;
+      }
+      if(tag==="video")return`<video src="${src}"${larg} controls></video>`;
+      return`<iframe src="${src}"${larg}></iframe>`;
+    }
+    if(tag==="br")return"\n";
+    if(tag==="span"||tag==="font"){
+      /* compatibilidade com o formato antigo, que marcava estilo no proprio span */
+      const st=node.style||{};
+      const peso=parseInt(st.fontWeight,10);
+      const deco=`${st.textDecorationLine||""} ${st.textDecoration||""}`;
+      let r=child;
+      if(!r.trim())return r;
+      if(st.fontWeight==="bold"||peso>=600)r=`**${r}**`;
+      if(st.fontStyle==="italic")r=`*${r}*`;
+      if(/line-through/.test(deco))r=`~~${r}~~`;
+      else if(/underline/.test(deco))r=`<u>${r}</u>`;
+      return r;
+    }
+    if(tag==="table")return tableToMarkdown(node);
+    return child;
+  };
+  return Array.from(root.childNodes).map(walk).join("").trimEnd();
+}
+const isListType=t=>["bullet","numbered","todo"].includes(t);
+/* o conteudo de um bloco de codigo precisa manter as quebras de linha */
+function codeToPlain(html=""){
+  const d=document.createElement("div");
+  d.innerHTML=String(html).replace(/<br\s*\/?>/gi,"\n").replace(/<\/(div|p)>/gi,"\n").replace(/<(div|p)[^>]*>/gi,"");
+  return (d.textContent||"").replace(/\n$/,"");
+}
+function noteToMarkdown(note){
+  const blocks=note.blocks||[];
+  const out=[`# ${note.title||"Sem título"}`,""];
+  const sanfonas=[];   /* indentacoes de toggles abertos, para fechar o <details> */
+  const fecharAte=ind=>{
+    while(sanfonas.length&&ind<=sanfonas[sanfonas.length-1]){sanfonas.pop();out.push("</details>","")}
+  };
+  blocks.forEach((b,i)=>{
+    const md=inlineToMarkdown(b.html||"");
+    const nivel=Math.max(0,Math.min(6,Number(b.indent)||0));
+    fecharAte(nivel);
+    if(b.type==="toggle"){
+      out.push(`<details><summary>${md}</summary>`);
+      sanfonas.push(nivel);
+      return;
+    }
+    const pad="  ".repeat(nivel);
+    /* itens de lista seguidos ficam colados: linha em branco quebraria o aninhamento */
+    const gap=(isListType(b.type)&&isListType(blocks[i+1]?.type))?[]:[""];
+    if(b.type==="h1")out.push(`# ${md}`,"");
+    else if(b.type==="h2")out.push(`## ${md}`,"");
+    else if(b.type==="h3")out.push(`### ${md}`,"");
+    else if(b.type==="bullet")out.push(`${pad}- ${md}`,...gap);
+    else if(b.type==="numbered")out.push(`${pad}1. ${md}`,...gap);
+    else if(b.type==="todo")out.push(`${pad}- [${b.checked?"x":" "}] ${md}`,...gap);
+    else if(b.type==="quote")out.push(`> ${md}`,"");
+    else if(b.type==="callout")out.push(`> ${b.icon||"💡"} ${md}`,"");
+    else if(b.type==="code")out.push("```",codeToPlain(b.html||""),"```","");
+    else if(b.type==="divider")out.push("---","");
+    else if(b.type==="media")out.push(md,"");
+    else if(b.type==="table"){
+      const d=document.createElement("div");d.innerHTML=b.html||"";
+      out.push(d.querySelector("table")?tableToMarkdown(d.querySelector("table")):md,"");
+    }else out.push(md,"");
+  });
+  fecharAte(-1);
+  return out.join("\n").replace(/\n{3,}/g,"\n\n").trim()+"\n";
+}
+function download(name,text,type="text/plain"){
+  const blob=new Blob([text],{type}),url=URL.createObjectURL(blob);
+  const a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function exportNote(){
+  saveState(true);
+  const n=selectedNote();if(!n)return toast("Selecione uma nota");
+  download(`${sanitizeName(n.title)}.md`,noteToMarkdown(n),"text/markdown;charset=utf-8");toast("Nota exportada")
+}
+/* HTML autossuficiente: estilo embutido, abre em qualquer navegador */
+/* O card de video vira link com capa: iframe do YouTube nao toca em arquivo
+   local (erro 153), e o link funciona onde quer que a pagina seja aberta. */
+function htmlParaExport(html=""){
+  const d=document.createElement("div");
+  d.innerHTML=html;
+  d.querySelectorAll(".video-card").forEach(card=>{
+    const a=document.createElement("a");
+    a.href=card.dataset.watch||card.dataset.embed||"#";
+    a.target="_blank";a.rel="noopener";a.className="video-link";
+    if(card.style.width)a.style.width=card.style.width;
+    const cap=card.querySelector("img");
+    if(cap){const im=document.createElement("img");im.src=cap.src;im.alt="Capa do video";a.appendChild(im)}
+    const rot=document.createElement("span");
+    rot.textContent=`▶ Assistir no ${card.dataset.label||"site"}`;
+    a.appendChild(rot);
+    card.replaceWith(a);
+  });
+  return d.innerHTML;
+}
+/* As tags de fechamento deste documento vao escapadas: <\/body> em vez da forma
+   crua. Servidor com live-reload (Live Server, browser-sync) injeta o proprio
+   script antes da primeira tag de fechamento de body do arquivo; sem o escape
+   ele cai aqui dentro, fecha o script do app no meio da string e nada roda.
+   Pelo mesmo motivo este comentario nao escreve nenhuma delas por extenso. */
+function noteToHTML(note){
+  const corpo=(note.blocks||[]).map(b=>{
+    const h=htmlParaExport(b.html||"");
+    const rec="  ".repeat(Math.max(0,Math.min(6,Number(b.indent)||0)));
+    const cls=(b.indent?` style="margin-left:${(Number(b.indent)||0)*26}px"`:"");
+    switch(b.type){
+      case "h1":return `<h1${cls}>${h}</h1>`;
+      case "h2":return `<h2${cls}>${h}</h2>`;
+      case "h3":return `<h3${cls}>${h}</h3>`;
+      case "quote":return `<blockquote${cls}>${h}</blockquote>`;
+      case "code":return `<pre${cls}><code>${esc(codeToPlain(h))}</code></pre>`;
+      case "bullet":return `<ul${cls}><li>${h}</li></ul>`;
+      case "numbered":return `<ol${cls}><li>${h}</li></ol>`;
+      case "todo":return `<p${cls}><input type="checkbox" disabled ${b.checked?"checked":""}> ${h}</p>`;
+      case "divider":return "<hr>";
+      case "table":case "media":return `<div${cls}>${h}</div>`;
+      default:return h.trim()?`<p${cls}>${h}</p>`:"";
+    }
+  }).filter(Boolean).join("\n");
+
+  return `<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${esc(note.title||"Sem título")}</title>
+<style>
+  :root{color-scheme:light dark}
+  body{max-width:820px;margin:40px auto;padding:0 20px;
+    font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    color:#1d1d1f;background:#fff}
+  @media (prefers-color-scheme:dark){body{color:#f5f5f7;background:#111113}}
+  h1,h2,h3{line-height:1.25;letter-spacing:-.02em}
+  img,video,iframe{max-width:100%;border-radius:9px;display:block;margin:10px 0;border:0}
+  iframe{width:100%;aspect-ratio:16/9;height:auto}
+  pre{background:#f5f5f7;padding:12px 14px;border-radius:9px;overflow:auto}
+  @media (prefers-color-scheme:dark){pre{background:#1d1d20}}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.92em}
+  blockquote{margin:6px 0;padding-left:14px;border-left:3px solid rgba(128,128,128,.4);font-style:italic}
+  table{border-collapse:collapse;width:100%}
+  th,td{border:1px solid rgba(128,128,128,.35);padding:8px 9px;text-align:left}
+  .video-link{position:relative;display:block;max-width:100%;border-radius:9px;overflow:hidden;
+    background:#000;text-decoration:none;margin:10px 0}
+  .video-link img{display:block;width:100%;margin:0;border-radius:0}
+  .video-link span{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    padding:8px 14px;border-radius:999px;background:rgba(0,0,0,.72);color:#fff;font-size:13px}
+  .video-link:hover span{background:#ff0000}
+  mark{border-radius:3px;padding:.08em .18em;background:${acentoRGBA(.45)};color:inherit}
+  hr{border:0;border-top:1px solid rgba(128,128,128,.3);margin:18px 0}
+<\/style><\/head>
+<body>
+<h1>${esc(note.title||"Sem título")}</h1>
+${corpo}
+<\/body><\/html>`;
+}
+function exportNoteHTML(){
+  saveState(true);
+  const n=selectedNote();if(!n)return toast("Selecione uma nota");
+  download(`${sanitizeName(n.title)}.html`,noteToHTML(n),"text/html;charset=utf-8");
+  toast("HTML exportado");
+}
+/* PDF sai pela impressao do navegador (sem servidor, o CSS de @media print
+   esconde a interface e deixa so a nota) */
+function exportNotePDF(){
+  saveState(true);
+  const n=selectedNote();if(!n)return toast("Selecione uma nota");
+  hideMenus();hideBubble();hideResizer();
+  const antes=document.title;
+  document.title=sanitizeName(n.title);
+  const voltar=()=>{document.title=antes;window.removeEventListener("afterprint",voltar)};
+  window.addEventListener("afterprint",voltar);
+  toast("Escolha “Salvar como PDF” na impressão");
+  setTimeout(()=>window.print(),120);
+}
+
+function exportProject(){
+  saveState(true);
+  download(`notes-project-${new Date().toISOString().slice(0,10)}.json`,JSON.stringify({app:"Notes Block Editor",version:3,exportedAt:now(),data:state},null,2),"application/json");
+  toast("Projeto exportado")
+}
+async function importMarkdownFiles(files,folderId=null){
+  const list=Array.from(files).filter(f=>/\.(md|markdown|txt)$/i.test(f.name));if(!list.length)return toast("Nenhum Markdown encontrado");
+  let target=folderId||state.selectedFolderId;
+  if(target==="all"||!state.folders.some(f=>f.id===target))target=state.folders[0]?.id;
+  if(!target){target=uid();state.folders.push({id:target,name:"Importados",parentId:null,createdAt:now()})}
+  for(const f of list){
+    const parsed=markdownToNote(await f.text(),f.name.replace(/\.(md|markdown|txt)$/i,""));
+    state.notes.push({id:uid(),folderId:target,title:parsed.title,createdAt:now(),updatedAt:now(),pinned:false,blocks:parsed.blocks});
+  }
+  state.selectedFolderId=target;state.selectedNoteId=state.notes.at(-1).id;setFocus(false);saveState(true);renderAll();toast(`${list.length} arquivo${list.length===1?"":"s"} importado${list.length===1?"":"s"}`)
+}
+async function importFolder(files){
+  const list=Array.from(files).filter(f=>/\.(md|markdown|txt)$/i.test(f.name));if(!list.length)return toast("Nenhum Markdown encontrado");
+  const cache=new Map();
+  const rootName=list[0].webkitRelativePath?.split("/")[0]||"Projeto importado";
+  const rootId=uid();state.folders.push({id:rootId,name:rootName,parentId:null,createdAt:now()});cache.set(rootName,rootId);
+  const ensure=parts=>{
+    let pid=rootId,path=rootName;
+    for(const p of parts.slice(1)){path+="/"+p;if(!cache.has(path)){const id=uid();state.folders.push({id,name:p,parentId:pid,createdAt:now()});cache.set(path,id)}pid=cache.get(path)}
+    return pid;
+  };
+  for(const f of list){
+    const parts=(f.webkitRelativePath||f.name).split("/");
+    const pid=ensure(parts.slice(0,-1));
+    const parsed=markdownToNote(await f.text(),f.name.replace(/\.(md|markdown|txt)$/i,""));
+    state.notes.push({id:uid(),folderId:pid,title:parsed.title,createdAt:now(),updatedAt:now(),pinned:false,blocks:parsed.blocks});
+  }
+  state.selectedFolderId=rootId;state.selectedNoteId=state.notes.at(-1).id;state.openFolders.push(rootId);setFocus(false);
+  saveState(true);renderAll();toast(`Pasta importada com ${list.length} notas`)
+}
+async function importProject(file){
+  try{
+    const parsed=JSON.parse(await file.text()),data=parsed.data||parsed;
+    if(!Array.isArray(data.notes)||!Array.isArray(data.folders))throw new Error();
+    const ok=await confirmDialog("Substituir projeto atual?","A importação vai substituir as notas e pastas atuais.","Importar");
+    if(!ok)return;
+    const needsMigration=data.notes.some(n=>typeof n.content==="string"&&!Array.isArray(n.blocks));
+    state=needsMigration?migrateOld(data):data;
+    state.sidebarCollapsed=true;state.openFolders||=[];
+    if(!state.notes.some(n=>n.id===state.selectedNoteId))state.selectedNoteId=state.notes[0]?.id||null;
+    setFocus(false);saveState(true);renderAll();toast("Projeto importado")
+  }catch{toast("Arquivo de projeto inválido")}
+}
+function toast(msg,ms=1600){
+  const t=$("#toast");t.textContent=msg;t.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove("show"),ms)
+}
+function hideMenus(except=""){
+  if(except!=="more")moreMenu.classList.remove("show");
+  if(except!=="folder")folderMenu.classList.remove("show");
+  if(except!=="highlight")highlightMenu.classList.remove("show");
+  if(except!=="insert")insertMenu.classList.remove("show");
+  if(except!=="format")formatMenu.classList.remove("show");
+  if(except!=="bubble")bubbleMenu.classList.remove("show");
+  if(except!=="video")videoMenu.classList.remove("show");
+  if(except!=="export")exportMenu.classList.remove("show");
+  if(except!=="icon")iconMenu.classList.remove("show");
+}
+function setFocus(on){
+  focusMode=!!on;
+  app.classList.toggle("focus",focusMode);
+  $("#panelsBtn").dataset.tip=focusMode?"Mostrar painéis":"Ocultar painéis";
+}
+function positionMenu(menu,x,y,right=false){
+  menu.classList.add("show");
+  const r=menu.getBoundingClientRect();
+  let left=right?x-r.width:x,top=y;
+  left=Math.max(8,Math.min(innerWidth-r.width-8,left));
+  top=Math.max(8,Math.min(innerHeight-r.height-8,top));
+  menu.style.left=`${left}px`;menu.style.top=`${top}px`;
+}
+function openMore(anchor){
+  const r=anchor.getBoundingClientRect();hideMenus("more");
+  if(moreMenu.classList.contains("show")){moreMenu.classList.remove("show");return}
+  positionMenu(moreMenu,r.right,r.bottom+7,true)
+}
+
+/* sidebar */
+$("#collapseBtn").addEventListener("click",()=>{
+  state.sidebarCollapsed=!app.classList.contains("sidebar-collapsed");
+  app.classList.toggle("sidebar-collapsed",state.sidebarCollapsed);
+  $("#collapseBtn").dataset.tip=state.sidebarCollapsed?"Expandir pastas":"Recolher pastas";
+  saveState()
+});
+$("#allNotesRow").addEventListener("click",()=>selectFolder("all"));
+$("#newFolderBtn").addEventListener("click",()=>createFolder());
+$("#newNoteBtn").addEventListener("click",()=>createNote());
+$("#searchInput").addEventListener("input",renderNotes);
+$("#searchInput").addEventListener("keydown",e=>{
+  if(e.key==="ArrowDown"){e.preventDefault();stepNote(1)}
+  else if(e.key==="ArrowUp"){e.preventDefault();stepNote(-1)}
+  else if(e.key==="Enter"){e.preventDefault();focusBlock($(".block-row",blockEditor),true)}
+  else if(e.key==="Escape"){e.target.value="";renderNotes()}
+});
+findInput.addEventListener("input",e=>findRun(e.target.value));
+findInput.addEventListener("keydown",e=>{
+  if(e.key==="Enter"){e.preventDefault();findGo(find.i+(e.shiftKey?-1:1))}
+  if(e.key==="Escape"){e.preventDefault();findClose()}
+});
+$("#findNext").addEventListener("click",()=>{findGo(find.i+1);findInput.focus()});
+$("#findPrev").addEventListener("click",()=>{findGo(find.i-1);findInput.focus()});
+$("#findClose").addEventListener("click",findClose);
+function temaAtual(){
+  const t=storageGet(THEME_KEY);
+  return TEMAS[t]?t:"light";
+}
+/* O marca-texto e o acento do tema. A cor solida sai daqui porque dois lugares
+   precisam dela em CSS cru: o traco do estilo sketch (cor embutida no SVG) e a
+   pagina .html exportada, que nao carrega os tokens do app. */
+function acentoRGBA(alfa){
+  const bruto=(getComputedStyle(document.documentElement).getPropertyValue("--accent").trim()||"").replace("#","");
+  const hex=bruto.length===3?bruto.split("").map(c=>c+c).join(""):bruto;
+  const [r,g,b]=[0,2,4].map(i=>parseInt(hex.slice(i,i+2),16));
+  return [r,g,b].every(Number.isFinite)?`rgba(${r},${g},${b},${alfa})`:`rgba(255,204,0,${alfa})`;
+}
+function tracoSketch(cor){
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 44" preserveAspectRatio="none"><path d="M7 11c24-7 68-8 106-4 6 1 8 6 6 14-2 9-7 15-14 16-31 4-71 4-95 1-6-1-9-6-8-14 1-7 3-11 5-13z" fill="none" stroke="${cor}" stroke-width="3.2" stroke-linecap="round" stroke-opacity=".9"/></svg>`;
+  return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+}
+function applyTheme(id){
+  const alvo=TEMAS[id]?id:"light";
+  document.documentElement.dataset.theme=alvo;
+  document.documentElement.style.setProperty("--hl-sk",tracoSketch(acentoRGBA(1)));
+  storageSet(THEME_KEY,alvo);
+  storageSet(TEMAS[alvo].claro?LAST_LIGHT_KEY:LAST_DARK_KEY,alvo);
+  $$(".theme-card",themeGrid).forEach(c=>c.classList.toggle("active",c.dataset.tema===alvo));
+}
+/* o botao alterna claro/escuro guardando o ultimo tema de cada lado,
+   para quem usa Dracula nao cair no escuro padrao ao voltar */
+function toggleTheme(){
+  const atual=temaAtual();
+  const alvo=TEMAS[atual].claro
+    ? (TEMAS[storageGet(LAST_DARK_KEY)]?storageGet(LAST_DARK_KEY):"dark")
+    : (TEMAS[storageGet(LAST_LIGHT_KEY)]?storageGet(LAST_LIGHT_KEY):"light");
+  applyTheme(alvo);
+}
+function insetAtual(){
+  const n=parseInt(storageGet(INSET_KEY),10);
+  return Number.isFinite(n)?Math.max(12,Math.min(200,n)):INSET_PADRAO;
+}
+function applyInset(px,persistir=true){
+  const n=Math.max(12,Math.min(200,Math.round(px)));
+  document.documentElement.style.setProperty("--text-inset",`${n}px`);
+  if(insetRange)insetRange.value=n;
+  if(insetValue)insetValue.textContent=`${n} px`;
+  if(persistir)storageSet(INSET_KEY,String(n));
+}
+function renderThemeGrid(){
+  themeGrid.innerHTML=Object.entries(TEMAS).map(([id,t])=>`
+    <button class="theme-card" data-tema="${id}" title="${esc(t.nome)}">
+      <span class="theme-swatch">${t.cores.map(c=>`<i style="background:${c}"></i>`).join("")}</span>
+      <span class="theme-name">${esc(t.nome)}</span>
+    </button>`).join("");
+}
+function openSettings(){
+  renderThemeGrid();
+  applyTheme(temaAtual());
+  applyInset(insetAtual(),false);
+  settingsBackdrop.classList.add("show");
+}
+function closeSettings(){settingsBackdrop.classList.remove("show")}
+
+$("#themeBtn").addEventListener("click",toggleTheme);
+$("#settingsBtn").addEventListener("click",openSettings);
+$("#settingsClose").addEventListener("click",closeSettings);
+settingsBackdrop.addEventListener("mousedown",e=>{if(e.target===settingsBackdrop)closeSettings()});
+themeGrid.addEventListener("click",e=>{
+  const c=e.target.closest("[data-tema]");if(!c)return;
+  applyTheme(c.dataset.tema);
+});
+insetRange.addEventListener("input",e=>applyInset(e.target.value));
+$("#settingsReset").addEventListener("click",()=>{
+  applyInset(INSET_PADRAO);applyTheme("light");toast("Padrão restaurado");
+});
+$("#importQuickBtn").addEventListener("click",e=>{e.stopPropagation();openMore($("#moreBtn"))});
+$("#exportProjectQuickBtn").addEventListener("click",exportProject);
+
+folderTree.addEventListener("click",e=>{
+  const tog=e.target.closest("[data-toggle-folder]");
+  if(tog){e.stopPropagation();const id=tog.dataset.toggleFolder;state.openFolders=state.openFolders.includes(id)?state.openFolders.filter(x=>x!==id):[...state.openFolders,id];saveState();renderFolders();return}
+  const row=e.target.closest(".folder-row");if(row)selectFolder(row.dataset.folderId)
+});
+folderTree.addEventListener("contextmenu",e=>{
+  const row=e.target.closest(".folder-row");if(!row)return;
+  e.preventDefault();contextFolderId=row.dataset.folderId;hideMenus("folder");positionMenu(folderMenu,e.clientX,e.clientY)
+});
+folderTree.addEventListener("dragover",e=>{if(draggedNoteId&&e.target.closest(".folder-row"))e.preventDefault()});
+folderTree.addEventListener("drop",e=>{
+  const row=e.target.closest(".folder-row");if(!row||!draggedNoteId)return;e.preventDefault();
+  const n=state.notes.find(x=>x.id===draggedNoteId);if(n){n.folderId=row.dataset.folderId;n.updatedAt=now();state.selectedFolderId=row.dataset.folderId;saveState(true);renderAll();toast("Nota movida")}draggedNoteId=null
+});
+folderMenu.addEventListener("click",e=>{
+  const b=e.target.closest("[data-folder-action]");if(!b||!contextFolderId)return;
+  hideMenus();
+  if(b.dataset.folderAction==="subfolder")createFolder(contextFolderId);
+  if(b.dataset.folderAction==="rename")renameFolder(contextFolderId);
+  if(b.dataset.folderAction==="delete")deleteFolder(contextFolderId)
+});
+
+/* notes */
+notesList.addEventListener("click",e=>{const c=e.target.closest(".note-card");if(c)selectNote(c.dataset.noteId)});
+notesList.addEventListener("dragstart",e=>{const c=e.target.closest(".note-card");if(!c)return;draggedNoteId=c.dataset.noteId;e.dataTransfer.effectAllowed="move"});
+notesList.addEventListener("contextmenu",e=>{
+  const c=e.target.closest(".note-card");if(!c)return;e.preventDefault();
+  const n=state.notes.find(x=>x.id===c.dataset.noteId);if(!n)return;
+  moreMenu.innerHTML=`
+    <button class="menu-item" data-note-action="pin">${n.pinned?"Desafixar":"Fixar no topo"}</button>
+    <button class="menu-item" data-note-action="duplicate">Duplicar</button>
+    <button class="menu-item" data-note-action="export">Exportar .md</button>
+    <div class="menu-sep"></div>
+    <button class="menu-item danger" data-note-action="delete">Apagar nota</button>`;
+  moreMenu.onclick=ev=>{
+    const a=ev.target.closest("[data-note-action]")?.dataset.noteAction;if(!a)return;hideMenus();
+    if(a==="pin"){n.pinned=!n.pinned;n.updatedAt=now();saveState(true);renderNotes()}
+    if(a==="duplicate")duplicateNote(n.id);
+    if(a==="export"){state.selectedNoteId=n.id;renderNotes();renderEditor();exportNote()}
+    if(a==="delete"){state.selectedNoteId=n.id;deleteActiveNote()}
+  };
+  positionMenu(moreMenu,e.clientX,e.clientY)
+});
+
+/* title */
+docTitle.addEventListener("input",()=>{
+  const n=selectedNote();if(!n)return;n.title=docTitle.value||"Sem título";n.updatedAt=now();renderNotes();histPush();saveState()
+});
+docTitle.addEventListener("keydown",e=>{
+  if(e.key==="Enter"){e.preventDefault();focusBlock($(".block-row",blockEditor),false);return}
+  if(e.key==="ArrowDown"){e.preventDefault();focusBlock($(".block-row",blockEditor),false)}
+});
+
+/* editor */
+blockEditor.addEventListener("input",e=>{
+  const row=e.target.closest(".block-row");if(!row||!e.target.matches(".block-content"))return;
+  if(checkMarkdownShortcut(row))return;
+  const text=e.target.textContent||"",m=text.match(/^\/([^\s]*)$/);
+  if(m)showSlash(row,m[1]);else closeSlash();
+  touchNote()
+});
+blockEditor.addEventListener("click",e=>{
+  const alca=e.target.closest(".block-handle");
+  if(alca){
+    e.preventDefault();
+    const row=alca.closest(".block-row");
+    if(e.shiftKey&&ancoraSel&&blockEditor.contains(ancoraSel))selecionarBlocos(ancoraSel,row);
+    else if(e.metaKey||e.ctrlKey){soltarCursor();row.classList.toggle("block-selected");ancoraSel=row}
+    else{limparSelecaoBlocos();selecionarBlocos(row);ancoraSel=row}
+    return;
+  }
+  const card=e.target.closest(".video-card");
+  if(card){
+    e.preventDefault();
+    const embed=card.dataset.embed||"", assistir=card.dataset.watch||embed;
+    if(location.protocol==="file:"){
+      /* origem null: o YouTube devolve erro 153 e nao renderiza o player */
+      window.open(assistir,"_blank","noopener");
+      toast("Aberto no YouTube — rode abrir.cmd para tocar aqui dentro",3400);
+      return;
+    }
+    histPush(true);
+    const ifr=document.createElement("iframe");
+    ifr.className="embed";
+    ifr.src=embed+(embed.includes("?")?"&":"?")+"autoplay=1&playsinline=1&rel=0&modestbranding=1";
+    ifr.setAttribute("allow","autoplay; fullscreen; encrypted-media; picture-in-picture");
+    ifr.setAttribute("allowfullscreen","");
+    ifr.setAttribute("contenteditable","false");
+    ifr.setAttribute("loading","lazy");
+    if(card.style.width)ifr.style.width=card.style.width;
+    card.replaceWith(ifr);
+    touchNote();
+    return;
+  }
+  const seta=e.target.closest(".toggle-arrow");
+  if(seta){
+    e.preventDefault();
+    const row=seta.closest(".block-row");
+    histPush(true);
+    row.classList.toggle("collapsed");
+    applyToggles();touchNote();
+    return;
+  }
+  const ico=e.target.closest(".callout-icon");
+  if(ico){
+    e.preventDefault();e.stopPropagation();
+    calloutAlvo=ico;
+    const r=ico.getBoundingClientRect();
+    hideMenus("icon");positionMenu(iconMenu,r.left,r.bottom+6);
+  }
+});
+blockEditor.addEventListener("change",e=>{
+  if(e.target.matches(".todo-box")){const row=e.target.closest(".block-row");row.classList.toggle("checked",e.target.checked);touchNote()}
+});
+blockEditor.addEventListener("keydown",e=>{
+  const c=e.target.closest(".block-content"),row=e.target.closest(".block-row");if(!c||!row)return;
+
+  if(slash.open){
+    if(e.key==="ArrowDown"){e.preventDefault();slash.index=Math.min(slash.items.length-1,slash.index+1);markSlashSelection();return}
+    if(e.key==="ArrowUp"){e.preventDefault();slash.index=Math.max(0,slash.index-1);markSlashSelection();return}
+    if(e.key==="Home"){e.preventDefault();slash.index=0;markSlashSelection();return}
+    if(e.key==="End"){e.preventDefault();slash.index=slash.items.length-1;markSlashSelection();return}
+    if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();const cmd=slash.items[slash.index];if(cmd)runSlash(cmd);return}
+    if(e.key==="Escape"){e.preventDefault();closeSlash();return}
+  }
+
+  const CONTINUA=["bullet","numbered","todo","quote"];
+  if(e.key==="Tab"&&!["table","divider"].includes(row.dataset.type)){
+    e.preventDefault();
+    if(row.dataset.type==="code"){document.execCommand("insertText",false,"  ");touchNote();return}
+    setIndent(row,e.shiftKey?-1:1);return;
+  }
+  if((e.key==="ArrowUp"||e.key==="ArrowDown")&&!e.shiftKey&&!e.altKey&&!e.metaKey&&!e.ctrlKey){
+    if(moverEntreBlocos(row,c,e.key==="ArrowUp"?-1:1)){e.preventDefault();return}
+  }
+  if(e.key==="Enter"&&!e.shiftKey&&row.dataset.type!=="table"){
+    e.preventDefault();
+    if(row.dataset.type==="code"){insertNewlineAtCaret();touchNote();return}
+    const text=(c.textContent||"").trim();
+    const nivel=Number(row.dataset.indent)||0;
+    if(!text&&CONTINUA.includes(row.dataset.type)){
+      /* lista vazia: primeiro volta um nivel, depois vira paragrafo */
+      if(nivel>0){setIndent(row,-1);return}
+      setBlockType(row,"p",true);return;
+    }
+    if(row.dataset.type==="toggle"){
+      /* como no Notion, Enter no toggle cria um filho dentro dele */
+      if(row.classList.contains("collapsed")){row.classList.remove("collapsed");applyToggles()}
+      insertAfter(row,"p","",Math.min(6,nivel+1));
+      return;
+    }
+    insertAfter(row,CONTINUA.includes(row.dataset.type)?row.dataset.type:"p","",nivel);
+    return;
+  }
+  if(e.key==="Backspace"&&!(c.textContent||"").length){
+    const prev=row.previousElementSibling;
+    if((Number(row.dataset.indent)||0)>0){e.preventDefault();setIndent(row,-1);return}
+    if(row.dataset.type!=="p"){e.preventDefault();setBlockType(row,"p",true);return}
+    if(prev){e.preventDefault();histPush(true);row.remove();renumberLists();focusBlock(prev,true);touchNote()}
+  }
+  const mod=e.metaKey||e.ctrlKey;
+  /* como no Notion: o primeiro Ctrl+A pega o texto do bloco, o segundo pega todos */
+  if(mod&&e.key.toLowerCase()==="a"&&!e.shiftKey&&selecaoCobreBloco(c)){
+    e.preventDefault();
+    const linhas=linhasDoEditor();
+    if(linhas.length){selecionarBlocos(linhas[0],linhas[linhas.length-1]);ancoraSel=linhas[0]}
+    return;
+  }
+  if(mod&&e.key.toLowerCase()==="z"){e.preventDefault();histApply(e.shiftKey?1:-1);return}
+  if(mod&&e.key.toLowerCase()==="y"){e.preventDefault();histApply(1);return}
+  if(mod&&e.key.toLowerCase()==="b"){e.preventDefault();execFormat("bold")}
+  if(mod&&e.key.toLowerCase()==="e"){e.preventDefault();toggleInlineCode()}
+  if(mod&&e.key.toLowerCase()==="i"){e.preventDefault();execFormat("italic")}
+  if(mod&&e.key.toLowerCase()==="u"){e.preventDefault();execFormat("underline")}
+  if(mod&&e.key.toLowerCase()==="k"){e.preventDefault();createLinkFlow()}
+  if(mod&&e.shiftKey&&e.key.toLowerCase()==="h"){e.preventDefault();toggleHighlight()}
+});
+blockEditor.addEventListener("paste",e=>{
+  const c=e.target.closest?.(".block-content");
+  const row=e.target.closest?.(".block-row");
+  if(!c||!row||!e.clipboardData)return;
+  const plain=e.clipboardData.getData("text/plain")||"";
+  const html=e.clipboardData.getData("text/html")||"";
+  e.preventDefault();
+  if(row.dataset.type==="code"){document.execCommand("insertText",false,plain);touchNote();return}
+  /* varias linhas: interpreta como Markdown e vira blocos de verdade */
+  if(/\n/.test(plain.trim())){
+    histPush(true);
+    const parsed=markdownToNote(plain,"");
+    const blocos=parsed.blocks.filter(b=>b.type!=="p"||htmlToPlain(b.html).trim());
+    if(!blocos.length)return;
+    const vazio=!(c.textContent||"").trim();
+    let ref=row;
+    blocos.forEach((b,i)=>{
+      if(i===0&&vazio){
+        row.dataset.type=b.type;row.dataset.indent=b.indent||0;
+        row.style.setProperty("--indent",b.indent||0);
+        c.innerHTML=b.html||"";
+        c.dataset.placeholder=placeholder(b.type);
+        if(b.type==="todo")$(".todo-box",row).checked=!!b.checked;
+        row.classList.toggle("checked",!!b.checked);
+        ref=row;return;
+      }
+      ref.insertAdjacentHTML("afterend",blockHTML(b));
+      ref=ref.nextElementSibling;
+    });
+    renumberLists();touchNote();
+    requestAnimationFrame(()=>focusBlock(ref,true));
+    return;
+  }
+  const limpo=html?cleanPastedHTML(html):esc(plain);
+  document.execCommand("insertHTML",false,limpo||esc(plain));
+  touchNote();
+});
+blockEditor.addEventListener("mouseup",()=>{saveSelection();updateBlockStyle();scheduleBubble()});
+blockEditor.addEventListener("keyup",()=>{saveSelection();scheduleBubble()});
+blockEditor.addEventListener("input",()=>hideBubble());
+$("#editorScroll").addEventListener("scroll",()=>{
+  if(bubbleBar.classList.contains("show"))scheduleBubble();
+  if(mediaSel)showResizer();
+},{passive:true});
+
+blockEditor.addEventListener("mouseover",e=>{
+  if(mediaDrag)return;
+  const row=e.target.closest?.(".block-row");
+  const m=row?alvoDeResize(row.querySelector(MEDIA_SEL)):null;
+  if(m)selectMedia(m);else agendarEsconderResizer();
+});
+blockEditor.addEventListener("mouseleave",agendarEsconderResizer);
+
+blockEditor.addEventListener("dblclick",e=>{
+  const m=e.target.closest?.(MEDIA_SEL);
+  if(!m||!blockEditor.contains(m))return;
+  histPush(true);
+  m.style.width="";m.style.height="";
+  touchNote();selectMedia(m);
+});
+/* impede o arrastar nativo da imagem dentro do contenteditable */
+blockEditor.addEventListener("dragstart",e=>{
+  if(e.target.closest?.(MEDIA_SEL))e.preventDefault();
+});
+
+mediaResizer.addEventListener("mouseenter",()=>clearTimeout(mediaHideTimer));
+mediaResizer.addEventListener("mouseleave",agendarEsconderResizer);
+mediaResizer.addEventListener("pointerdown",e=>{
+  const h=e.target.closest(".mr-handle");
+  if(!h||!mediaSel)return;
+  e.preventDefault();
+  histPush(true);
+  const r=mediaSel.getBoundingClientRect();
+  mediaDrag={x:e.clientX,w:r.width,max:larguraMaxima(mediaSel),dir:h.dataset.dir};
+  h.setPointerCapture(e.pointerId);
+  mediaResizer.classList.add("dragging");
+  mediaSize.textContent=`${Math.round(r.width)} px`;
+  document.body.style.userSelect="none";
+});
+mediaResizer.addEventListener("pointermove",e=>{
+  if(!mediaDrag||!mediaSel)return;
+  const delta=(e.clientX-mediaDrag.x)*(mediaDrag.dir==="sw"?-1:1);
+  const w=Math.max(80,Math.min(mediaDrag.max,Math.round(mediaDrag.w+delta)));
+  aplicarLargura(mediaSel,w);
+  mediaSize.textContent=`${w} px`;
+  showResizer();
+});
+mediaResizer.addEventListener("pointerup",()=>{
+  if(!mediaDrag)return;
+  mediaDrag=null;
+  mediaResizer.classList.remove("dragging");
+  document.body.style.userSelect="";
+  touchNote();showResizer();
+});
+mediaResizer.addEventListener("pointercancel",()=>{
+  if(!mediaDrag)return;
+  mediaDrag=null;mediaResizer.classList.remove("dragging");
+  document.body.style.userSelect="";
+});
+$("#mediaReset").addEventListener("click",()=>{
+  if(!mediaSel)return;
+  histPush(true);
+  mediaSel.style.width="";mediaSel.style.height="";
+  touchNote();showResizer();
+});
+
+/* ---- selecao de blocos ----
+   Cada bloco e um contenteditable separado, entao a selecao nativa do navegador
+   nunca atravessa dois blocos: sem isto nao havia como pegar varios e apagar de
+   uma vez, so esvaziar o texto e ir de Backspace. Aqui o arrasto que sai do
+   bloco de origem vira selecao de blocos, e a alca seleciona no clique. */
+let arrastoSel=null,ancoraSel=null;
+const linhasDoEditor=()=>$$(".block-row",blockEditor);
+const blocosSelecionados=()=>$$(".block-row.block-selected",blockEditor);
+
+function limparSelecaoBlocos(){
+  blocosSelecionados().forEach(r=>r.classList.remove("block-selected"));
+  ancoraSel=null;
+}
+/* tira o cursor do texto: com bloco selecionado quem responde e o teclado global */
+function soltarCursor(){
+  const a=document.activeElement;
+  if(a&&a.classList&&a.classList.contains("block-content"))a.blur();
+  getSelection()?.removeAllRanges();
+  hideBubble();
+}
+function selecionarBlocos(de,ate=de){
+  const linhas=linhasDoEditor();
+  const i=linhas.indexOf(de),j=linhas.indexOf(ate);
+  if(i<0||j<0)return;
+  soltarCursor();
+  const ini=Math.min(i,j),fim=Math.max(i,j);
+  linhas.forEach((r,k)=>r.classList.toggle("block-selected",k>=ini&&k<=fim));
+}
+/* o Ctrl+A do navegador ja pegou o bloco inteiro? entao a proxima vez sobe um nivel */
+function selecaoCobreBloco(c){
+  if(!(c.textContent||"").length)return true;
+  const s=getSelection();
+  if(!s||!s.rangeCount||s.isCollapsed)return false;
+  return s.getRangeAt(0).toString().length>=(c.textContent||"").length;
+}
+function apagarBlocosSelecionados(){
+  const alvos=blocosSelecionados();
+  if(!alvos.length)return false;
+  histPush(true);
+  const vizinho=alvos[alvos.length-1].nextElementSibling||alvos[0].previousElementSibling;
+  alvos.forEach(r=>r.remove());
+  ancoraSel=null;
+  let foco=vizinho;
+  /* nota nunca fica sem bloco nenhum, senao nao ha onde voltar a escrever */
+  if(!linhasDoEditor().length){
+    blockEditor.insertAdjacentHTML("beforeend",blockHTML(blankBlock("p","")));
+    foco=$(".block-row",blockEditor);
+  }
+  renumberLists();applyToggles();touchNote();
+  toast(alvos.length===1?"Bloco excluído":`${alvos.length} blocos excluídos`);
+  if(foco)requestAnimationFrame(()=>focusBlock(foco,true));
+  return true;
+}
+/* linha sob o ponteiro, inclusive quando o mouse passa da primeira ou da ultima */
+function linhaNoPonto(y){
+  let melhor=null,dist=Infinity;
+  for(const r of linhasDoEditor()){
+    const b=r.getBoundingClientRect();
+    if(y>=b.top&&y<=b.bottom)return r;
+    const d=y<b.top?b.top-y:y-b.bottom;
+    if(d<dist){dist=d;melhor=r}
+  }
+  return melhor;
+}
+blockEditor.addEventListener("mousedown",e=>{
+  if(e.button!==0||e.target.closest(".block-handle"))return;
+  if(!e.shiftKey&&!e.metaKey&&!e.ctrlKey)limparSelecaoBlocos();
+  const row=e.target.closest(".block-row");
+  arrastoSel=row&&e.target.closest(".block-content")?{inicio:row,ativo:false}:null;
+});
+document.addEventListener("mousemove",e=>{
+  if(!arrastoSel||!(e.buttons&1))return;
+  const row=linhaNoPonto(e.clientY);
+  /* enquanto o arrasto nao sai do bloco de origem, quem seleciona e o navegador */
+  if(!row||(!arrastoSel.ativo&&row===arrastoSel.inicio))return;
+  if(!arrastoSel.ativo){arrastoSel.ativo=true;blockEditor.classList.add("selecionando-blocos")}
+  selecionarBlocos(arrastoSel.inicio,row);
+});
+document.addEventListener("mouseup",()=>{
+  if(arrastoSel&&arrastoSel.ativo)ancoraSel=arrastoSel.inicio;
+  blockEditor.classList.remove("selecionando-blocos");
+  arrastoSel=null;
+});
+
+/* drag blocks */
+blockEditor.addEventListener("dragstart",e=>{
+  /* com texto ja selecionado o navegador tenta arrastar o proprio texto: o alvo
+     vem como no de texto (sem closest) e o gesto de selecionar varios blocos
+     morria ali. So a alca arrasta; qualquer outro arrasto e cancelado. */
+  const alvo=e.target.nodeType===1?e.target:e.target.parentElement;
+  const h=alvo&&alvo.closest?alvo.closest(".block-handle"):null;
+  if(!h){e.preventDefault();return}
+  draggedBlock=h.closest(".block-row");draggedBlock.classList.add("dragging");e.dataTransfer.effectAllowed="move"
+});
+blockEditor.addEventListener("dragover",e=>{
+  if(!draggedBlock)return;const row=e.target.closest(".block-row");if(!row||row===draggedBlock)return;
+  e.preventDefault();$$(".drop-before",blockEditor).forEach(x=>x.classList.remove("drop-before"));row.classList.add("drop-before")
+});
+blockEditor.addEventListener("drop",e=>{
+  if(!draggedBlock)return;const row=e.target.closest(".block-row");if(row&&row!==draggedBlock){e.preventDefault();histPush(true);row.before(draggedBlock);renumberLists();touchNote()}
+});
+blockEditor.addEventListener("dragend",()=>{
+  if(draggedBlock)draggedBlock.classList.remove("dragging");$$(".drop-before",blockEditor).forEach(x=>x.classList.remove("drop-before"));draggedBlock=null
+});
+
+/* slash */
+slashMenu.addEventListener("mousedown",e=>e.preventDefault());
+slashMenu.addEventListener("click",e=>{const b=e.target.closest("[data-command]");if(!b)return;const c=commands.find(x=>x.id===b.dataset.command);if(c)runSlash(c)});
+
+/* toolbar */
+function toolMouseDown(e){
+  if(e.target.closest("button[data-action],button[data-block],button[data-insert],#highlightBtn,#highlightCaret,#insertBtn,#formatMoreBtn"))e.preventDefault();
+}
+function toolClick(e){
+  const dentroDePopover=!!e.target.closest(".popover");
+  const a=e.target.closest("[data-action]");
+  if(a){
+    const action=a.dataset.action;
+    if(dentroDePopover)hideMenus();
+    if(action==="undo"||action==="redo")histApply(action==="undo"?-1:1);
+    else if(action==="createLink")createLinkFlow();
+    else execFormat(action);
+    return;
+  }
+  const b=e.target.closest("[data-block]");
+  if(b){if(dentroDePopover)hideMenus();setBlockType(currentRow(),b.dataset.block,false);return}
+  const i=e.target.closest("[data-insert]");
+  if(i){if(dentroDePopover)hideMenus();insertSpecial(i.dataset.insert);return}
+}
+[$("#formatbar"),insertMenu,formatMenu,bubbleBar,bubbleMenu].forEach(el=>{
+  el.addEventListener("mousedown",toolMouseDown);
+  el.addEventListener("click",toolClick);
+});
+function abrirPopoverDaBarra(botao,menu,chave){
+  if(menu.classList.contains("show")){hideMenus();return}
+  const r=botao.getBoundingClientRect();
+  hideMenus(chave);positionMenu(menu,r.left,r.bottom+7);
+}
+$("#bubbleHl").addEventListener("click",()=>{toggleHighlight();scheduleBubble()});
+$("#bubbleMoreBtn").addEventListener("click",e=>{
+  e.stopPropagation();
+  if(bubbleMenu.classList.contains("show")){bubbleMenu.classList.remove("show");return}
+  const r=e.currentTarget.getBoundingClientRect();
+  hideMenus("bubble");positionMenu(bubbleMenu,r.right,r.bottom+6,true);
+});
+bubbleMenu.addEventListener("click",e=>{
+  const it=e.target.closest("[data-inline]");if(!it)return;
+  const acao=it.dataset.inline;
+  bubbleMenu.classList.remove("show");
+  if(acao==="code")toggleInlineCode();
+  if(acao==="hl-clear")clearHighlight();
+  if(acao==="hl-styles"){
+    const r=$("#bubbleHl").getBoundingClientRect();
+    positionMenu(highlightMenu,r.left,r.bottom+6);
+  }
+  scheduleBubble();
+});
+$("#videoBtn").addEventListener("click",e=>{e.stopPropagation();saveSelection();abrirPopoverDaBarra(e.currentTarget,videoMenu,"video")});
+videoMenu.addEventListener("mousedown",e=>e.preventDefault());
+videoMenu.addEventListener("click",e=>{
+  const it=e.target.closest("[data-video]");if(!it)return;
+  hideMenus();
+  if(it.dataset.video==="file")$("#videoInput").click();
+  else askVideoLink();
+});
+$("#videoInput").addEventListener("change",e=>{
+  const f=e.target.files[0];e.target.value="";
+  if(!f)return;
+  if(f.size>LIMITE_VIDEO){
+    toast("Vídeo grande demais para o navegador — use um link");
+    return;
+  }
+  const r=new FileReader();
+  r.onload=()=>insertMediaBlock(`<video src="${r.result}" controls preload="metadata"></video>`);
+  r.readAsDataURL(f);
+});
+iconMenu.addEventListener("mousedown",e=>e.preventDefault());
+iconMenu.addEventListener("click",e=>{
+  const b=e.target.closest("[data-icon]");
+  if(!b||!calloutAlvo)return;
+  histPush(true);
+  calloutAlvo.dataset.icon=b.dataset.icon;
+  hideMenus();touchNote();
+});
+$("#exportBtn").addEventListener("click",e=>{
+  e.stopPropagation();
+  if(exportMenu.classList.contains("show")){hideMenus();return}
+  const r=e.currentTarget.getBoundingClientRect();
+  hideMenus("export");positionMenu(exportMenu,r.right,r.bottom+7,true);
+});
+exportMenu.addEventListener("click",e=>{
+  const it=e.target.closest("[data-export]");if(!it)return;
+  hideMenus();
+  const tipo=it.dataset.export;
+  if(tipo==="md")exportNote();
+  if(tipo==="html")exportNoteHTML();
+  if(tipo==="pdf")exportNotePDF();
+  if(tipo==="project")exportProject();
+});
+$("#insertBtn").addEventListener("click",e=>{e.stopPropagation();abrirPopoverDaBarra(e.currentTarget,insertMenu,"insert")});
+$("#formatMoreBtn").addEventListener("click",e=>{e.stopPropagation();abrirPopoverDaBarra(e.currentTarget,formatMenu,"format")});
+$("#blockStyle").addEventListener("change",e=>setBlockType(currentRow(),e.target.value,false));
+$("#fontFamily").addEventListener("change",e=>execFormat("fontName",e.target.value));
+$("#fontSize").addEventListener("change",e=>applyFontSize(e.target.value));
+$("#textColor").addEventListener("input",e=>execFormat("foreColor",e.target.value));
+$("#panelsBtn").addEventListener("click",()=>setFocus(!focusMode));
+$("#highlightBtn").addEventListener("click",toggleHighlight);
+$("#highlightCaret").addEventListener("click",e=>{
+  e.stopPropagation();
+  if(highlightMenu.classList.contains("show")){hideMenus();return}
+  const r=e.currentTarget.getBoundingClientRect();
+  hideMenus("highlight");positionMenu(highlightMenu,r.left,r.bottom+7)
+});
+highlightMenu.addEventListener("mousedown",e=>e.preventDefault());
+highlightMenu.addEventListener("click",e=>{
+  const est=e.target.closest(".hl-style");
+  if(est){setHighlightStyle(est.dataset.hlStyle);hideMenus();applyHighlight(est.dataset.hlStyle);return}
+  if(e.target.closest("[data-hl-clear]")){hideMenus();clearHighlight()}
+});
+$("#moreBtn").addEventListener("click",e=>{
+  e.stopPropagation();
+  moreMenu.innerHTML=`
+    <button class="menu-item" data-menu="import-md">Importar Markdown</button>
+    <button class="menu-item" data-menu="import-folder">Importar pasta</button>
+    <button class="menu-item" data-menu="import-project">Importar projeto</button>
+    <div class="menu-sep"></div>
+    <button class="menu-item" data-menu="duplicate">Duplicar nota</button>
+    <div class="menu-sep"></div>
+    <button class="menu-item" data-menu="export-md">Exportar nota .md</button>
+    <button class="menu-item" data-menu="export-html">Exportar nota .html</button>
+    <button class="menu-item" data-menu="export-pdf">Exportar nota em PDF</button>
+    <button class="menu-item" data-menu="export-project">Exportar projeto</button>
+    <div class="menu-sep"></div>
+    <button class="menu-item" data-menu="theme">Alternar tema</button>
+    <div class="menu-sep"></div>
+    <button class="menu-item danger" data-menu="delete-note">Apagar nota</button>`;
+  moreMenu.onclick=null;openMore(e.currentTarget)
+});
+moreMenu.addEventListener("click",e=>{
+  const item=e.target.closest("[data-menu]");if(!item)return;hideMenus();
+  const a=item.dataset.menu;
+  if(a==="import-md")$("#mdInput").click();
+  if(a==="import-folder")$("#folderInput").click();
+  if(a==="import-project")$("#projectInput").click();
+  if(a==="duplicate")duplicateNote();
+  if(a==="export-md")exportNote();
+  if(a==="export-html")exportNoteHTML();
+  if(a==="export-pdf")exportNotePDF();
+  if(a==="export-project")exportProject();
+  if(a==="theme")toggleTheme();
+  if(a==="delete-note")deleteActiveNote()
+});
+
+/* imports */
+$("#mdInput").addEventListener("change",e=>{if(e.target.files.length)importMarkdownFiles(e.target.files);e.target.value=""});
+$("#folderInput").addEventListener("change",e=>{if(e.target.files.length)importFolder(e.target.files);e.target.value=""});
+$("#projectInput").addEventListener("change",e=>{if(e.target.files[0])importProject(e.target.files[0]);e.target.value=""});
+$("#imageInput").addEventListener("change",e=>{
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>insertMediaBlock(`<img src="${r.result}" alt="${esc(f.name.replace(/\.[^.]+$/,""))}">`);
+  r.readAsDataURL(f);e.target.value=""
+});
+
+/* modal */
+modalConfirm.addEventListener("click",()=>{
+  if(modalInput.style.display==="none"){closeModal(true);return}
+  const v=modalInput.value.trim();if(!v){modalInput.focus();return}closeModal(v)
+});
+modalCancel.addEventListener("click",()=>closeModal(modalInput.style.display==="none"?false:null));
+modalBackdrop.addEventListener("mousedown",e=>{if(e.target===modalBackdrop)modalCancel.click()});
+modalInput.addEventListener("keydown",e=>{if(e.key==="Enter")modalConfirm.click();if(e.key==="Escape")modalCancel.click()});
+
+/* global */
+document.addEventListener("selectionchange",()=>{
+  scheduleBubble();
+  const s=getSelection();if(!s?.rangeCount)return;
+  const n=s.anchorNode?.nodeType===1?s.anchorNode:s.anchorNode?.parentElement;
+  if(n&&blockEditor.contains(n)){saveSelection();updateBlockStyle()}
+});
+document.addEventListener("click",e=>{
+  if(!e.target.closest(".popover")&&!e.target.closest("#moreBtn"))hideMenus();
+  if(!e.target.closest(".bubble-bar")&&!e.target.closest(".popover"))scheduleBubble();
+  if(!e.target.closest(".slash-menu")&&!e.target.closest(".block-content"))closeSlash()
+});
+document.addEventListener("keydown",e=>{
+  const mod=e.metaKey||e.ctrlKey;
+  const emCampo=/^(INPUT|TEXTAREA)$/.test(document.activeElement?.tagName||"")
+    ||!!document.activeElement?.classList?.contains("block-content");
+  if((e.key==="Backspace"||e.key==="Delete")&&!emCampo&&blocosSelecionados().length){
+    e.preventDefault();apagarBlocosSelecionados();return;
+  }
+  if(e.key==="Escape"&&settingsBackdrop.classList.contains("show")){closeSettings();return}
+  if(e.key==="Escape"&&bubbleBar.classList.contains("show")){hideBubble();return}
+  if(e.key==="Escape"&&!findBar.classList.contains("hidden")){findClose();return}
+  if(e.key==="Escape"&&blocosSelecionados().length){limparSelecaoBlocos();return}
+  if(e.key==="Escape"){
+    const hadMenu=slash.open||moreMenu.classList.contains("show")||folderMenu.classList.contains("show")||highlightMenu.classList.contains("show")||insertMenu.classList.contains("show")||formatMenu.classList.contains("show");
+    hideMenus();closeSlash();
+    if(modalBackdrop.classList.contains("show")){modalCancel.click();return}
+    if(!hadMenu&&focusMode)setFocus(false);
+  }
+  /* desfazer tambem fora do texto (ex.: logo apos redimensionar uma midia).
+     Se o bloco ja tratou, e.defaultPrevented evita o desfazer duplo. */
+  if(mod&&e.key.toLowerCase()==="z"&&!e.defaultPrevented&&!/^(INPUT|TEXTAREA)$/.test(document.activeElement?.tagName||"")){
+    e.preventDefault();histApply(e.shiftKey?1:-1);return;
+  }
+  if(mod&&e.key.toLowerCase()==="s"){e.preventDefault();saveState(true,true)}
+  if(mod&&e.key.toLowerCase()==="n"){e.preventDefault();createNote()}
+  if(mod&&e.shiftKey&&e.key.toLowerCase()==="n"){e.preventDefault();createFolder()}
+  if(mod&&e.shiftKey&&e.key.toLowerCase()==="f"){e.preventDefault();setFocus(false);$("#searchInput").focus();$("#searchInput").select();return}
+  if(mod&&e.key.toLowerCase()==="f"){e.preventDefault();findOpen();return}
+  if(mod&&e.key.toLowerCase()==="d"){e.preventDefault();duplicateNote();return}
+  if(mod&&e.key.toLowerCase()==="p"){e.preventDefault();exportNotePDF();return}
+  if(e.altKey&&e.key==="ArrowDown"){e.preventDefault();stepNote(1);return}
+  if(e.altKey&&e.key==="ArrowUp"){e.preventDefault();stepNote(-1);return}
+});
+window.addEventListener("beforeunload",()=>saveState(true));
+window.addEventListener("resize",()=>{closeSlash();hideMenus();hideBubble();hideResizer()});
+
+/* tooltips */
+let tipTimer=null;
+document.addEventListener("pointerover",e=>{
+  const el=e.target.closest("[data-tip]");if(!el)return;clearTimeout(tipTimer);
+  tipTimer=setTimeout(()=>{
+    const r=el.getBoundingClientRect();tooltip.textContent=el.dataset.tip;
+    tooltip.style.left=`${Math.max(8,Math.min(innerWidth-160,r.left+r.width/2-45))}px`;
+    tooltip.style.top=`${Math.min(innerHeight-30,r.bottom+6)}px`;
+    tooltip.classList.add("show")
+  },380)
+});
+document.addEventListener("pointerout",e=>{if(e.target.closest("[data-tip]")){clearTimeout(tipTimer);tooltip.classList.remove("show")}});
+
+/* bootstrap */
+if(!state.folders.length)state.folders.push({id:uid(),name:"Notas",parentId:null,createdAt:now()});
+if(!state.notes.length){
+  const n={id:uid(),folderId:state.folders[0].id,title:"Nova nota",createdAt:now(),updatedAt:now(),pinned:false,blocks:[blankBlock()]};
+  state.notes=[n];state.selectedNoteId=n.id
+}
+if(!state.notes.some(n=>n.id===state.selectedNoteId))state.selectedNoteId=state.notes[0].id;
+applyTheme(temaAtual());
+applyInset(insetAtual(),false);
+setHighlightStyle(hlStyle);
+renderAll();
+setSaveState("saved");histReset();
+})();
+</script>
+</body>
+</html>
