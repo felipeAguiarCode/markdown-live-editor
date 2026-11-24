@@ -3088,7 +3088,7 @@ function moverEntreBlocos(row,c,dir){
 }
 
 function focusBlock(row,end=true){
-  if(!row)return;
+  if(!row||!blockEditor.contains(row))return;
   if(row.dataset.type==="table"){focusTableCell($("td,th",row),false);return}
   const c=$(".block-content",row);if(!c||c.contentEditable==="false")return;
   c.focus();
