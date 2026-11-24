@@ -28,6 +28,8 @@
   --accentText:#805808;
   --danger:#ac382c;
   --code:#f7f3e9;
+  --scroll-thumb:color-mix(in srgb,var(--accentText) 42%,var(--sidebar2));
+  --scroll-track:color-mix(in srgb,var(--sidebar2) 42%,transparent);
   /* marca-texto: uma cor so, derivada do acento do tema */
   --hl:color-mix(in srgb,var(--accent) 45%,transparent);
   --hl-sk:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20120%2044'%20preserveAspectRatio='none'%3E%3Cpath%20d='M7%2011c24-7%2068-8%20106-4%206%201%208%206%206%2014-2%209-7%2015-14%2016-31%204-71%204-95%201-6-1-9-6-8-14%201-7%203-11%205-13z'%20fill='none'%20stroke='%23e0b400'%20stroke-width='3.2'%20stroke-linecap='round'%20stroke-opacity='.9'/%3E%3C/svg%3E");
@@ -37,7 +39,7 @@
   --sidebar-w:224px;
   --sidebar-collapsed:56px;
   --notes-w:308px;
-  --quick-actions-w:68px;
+  --quick-actions-w:102px;
   --toolbar-h:34px;
   /* distancia da borda do editor ate a primeira letra (ajustavel nas configuracoes) */
   --text-inset:32px;
@@ -159,29 +161,40 @@ html[data-theme="gruvboxlight"]{
   --shadow:0 18px 55px rgba(60,56,54,.18);
 }
 html[data-theme="dark"]{
-  --bg:#1b1c21;
-  --sidebar:#1b1c21;
-  --sidebar2:#313036;
-  --notes:#1b1c21;
-  --editor:#1b1c21;
-  --toolbar:var(--editor);
-  --raised:#24252b;
-  --text:#f3f3f5;
-  --heading-text:#fff;
-  --text2:#b2b2b8;
-  --text3:#91929a;
-  --line:#292a30;
-  --line2:rgba(255,255,255,.19);
-  --hover:rgba(255,255,255,.075);
-  --selected:#313036;
-  --accent:#d8b36b;
+  --bg:#20212b;
+  --sidebar:#22232d;
+  --sidebar2:#37394a;
+  --notes:#252632;
+  --editor:#282a36;
+  --toolbar:#262834;
+  --raised:#303241;
+  --text:#f8f8f2;
+  --heading-text:#fffdf7;
+  --text2:#c1c2d2;
+  --text3:#a1a4bf;
+  --line:#393b4c;
+  --line2:#4c4e63;
+  --hover:rgba(189,147,249,.11);
+  --selected:#434057;
+  --accent:#bd93f9;
   --accentText:var(--accent);
   --link:var(--accentText);
-  --danger:#ff7770;
-  --code:#24252b;
+  --danger:#ff858a;
+  --code:#222431;
   --hl:color-mix(in srgb,var(--accent) 32%,var(--editor));
 }
 *{box-sizing:border-box}
+html{scrollbar-color:var(--scroll-thumb) var(--scroll-track)}
+:where(.editor-scroll,.notes-list,.folder-tree,.formatbar,.block-content,.popover,.slash-menu,.settings-modal){
+  scrollbar-width:thin;
+}
+@supports not (scrollbar-color:auto){
+  ::-webkit-scrollbar{width:8px;height:8px}
+  ::-webkit-scrollbar-track{background:var(--scroll-track)}
+  ::-webkit-scrollbar-thumb{
+    background:var(--scroll-thumb);border-radius:8px;border:2px solid transparent;background-clip:padding-box;
+  }
+}
 html,body{height:100%;margin:0}
 body{
   overflow:hidden;
@@ -192,7 +205,7 @@ body{
   text-rendering:optimizeLegibility;
 }
 button,input,select{font:inherit}
-button{color:inherit}
+button{color:inherit;-webkit-tap-highlight-color:var(--hover)}
 ::selection{background:var(--hl)}
 :focus-visible{outline:2px solid var(--accentText);outline-offset:2px}
 svg{stroke-linecap:round;stroke-linejoin:round}
@@ -220,6 +233,40 @@ html[data-theme="dark"] .note-bar{background:var(--toolbar)}
 .app.focus{
   grid-template-columns:0 0 minmax(0,1fr);
 }
+.app.immersive{grid-template-columns:0 0 minmax(0,1fr)}
+.app.immersive .sidebar,.app.immersive .notes-pane{visibility:hidden}
+.app.immersive .quick-actions{
+  top:8px;right:12px;height:auto;flex-direction:column;gap:3px;
+}
+.app.immersive .note-bar{
+  position:absolute;top:103px;right:12px;min-height:0;padding:0;border:0;z-index:100;
+}
+.app.immersive .note-bar > :not(#moreBtn){display:none}
+.app.immersive .editor-scroll{padding-right:58px}
+.app.immersive .document{width:100%;padding-top:32px}
+.app.immersive .formatbar{
+  position:absolute;top:145px;right:9px;z-index:100;
+  width:42px;height:auto;max-height:calc(100% - 157px);
+  flex-direction:column;flex:none;gap:3px;padding:5px 3px;
+  border:1px solid var(--line2);border-radius:14px;background:var(--raised);
+  overflow-x:hidden;overflow-y:auto;scrollbar-width:none;box-shadow:var(--shadow);
+}
+.app.immersive .formatbar .tool-group{display:contents}
+.app.immersive .formatbar .tool-group.toolbar-extra{display:none}
+.app.immersive .formatbar .tool-group.insert-tools{display:contents}
+.app.immersive .formatbar .insert-tools .tool-btn:not([data-block="todo"]){display:none}
+.app.immersive .formatbar .tool-sep{width:20px;height:1px;margin:2px 0}
+.app.immersive .formatbar .toolbar-extra{display:none}
+.app.immersive .formatbar :is(.tool-btn,#blockStyle,#formatMoreBtn){
+  width:33px;min-width:33px;justify-content:center;padding-inline:0;
+}
+.app.immersive .formatbar #blockStyleLabel,
+.app.immersive .formatbar #blockStyle .tool-caret,
+.app.immersive .formatbar #insertBtn .tool-text{display:none}
+.app.immersive .formatbar #blockStyle::before{content:"H";font-weight:650}
+.app.immersive .formatbar :is(.underline,.strike){display:flex}
+.app.immersive .formatbar .hl-caret{display:none}
+.app.immersive #immersiveBtn{color:var(--accentText)}
 .app.focus .sidebar,.app.focus .notes-pane{border-right-color:transparent}
 /* conteudo fixo na largura final: nada reflui durante a animacao */
 .notes-head,.notes-list{min-width:var(--notes-w)}
@@ -461,7 +508,7 @@ html[data-theme="dark"] :is(.nav-row,.folder-row).active{background:var(--sideba
   background:var(--toolbar);
   backdrop-filter:blur(20px) saturate(170%);
   -webkit-backdrop-filter:blur(20px) saturate(170%);
-  overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;scrollbar-color:var(--line2) transparent;
+  overflow-x:auto;overflow-y:hidden;
 }
 .tool-group{display:flex;align-items:center;gap:1px;flex:0 0 auto}
 html[data-theme="dark"] .formatbar .tool-group{background:var(--sidebar2);border-radius:8px}
@@ -725,6 +772,43 @@ html[data-theme="dark"] :is(.collapse-btn,.note-bar .tool-btn,.formatbar .tool-b
 .block-content table{width:100%;border-collapse:collapse;font-size:13.5px;margin:6px 0}
 .block-content th,.block-content td{border:1px solid var(--line2);padding:8px 9px;min-width:90px;text-align:left}
 .block-content th{background:var(--code);font-weight:650}
+.block-row[data-type="table"] .block-content{
+  overflow:auto;padding:21px 26px 25px max(var(--content-pad),calc(24px - var(--handle-w)));
+}
+.block-row[data-type="table"] table{margin:0}
+.block-row[data-type="table"] :is(th,td){
+  min-width:76px;height:34px;line-height:1.45;vertical-align:top;
+}
+.table-tools{
+  position:fixed;inset:0;z-index:1200;pointer-events:none;
+}
+.table-tools button{
+  position:absolute;display:grid;place-items:center;width:22px;height:22px;padding:0;
+  border:1px solid var(--line2);border-radius:6px;background:var(--raised);color:var(--text2);
+  pointer-events:auto;cursor:pointer;touch-action:none;
+}
+.table-tools button[hidden]{display:none}
+.table-tools button:hover,.table-tools button:focus-visible{
+  background:var(--sidebar2);color:var(--accentText);
+}
+.table-tools svg{width:13px;height:13px}
+.table-tools [data-table-tool="row"],.table-tools [data-table-tool="column"]{cursor:grab}
+.table-tools [data-table-tool="corner"]{cursor:nwse-resize}
+.table-tools [data-table-tool="width"]{
+  width:9px;border:0;border-radius:4px;background:transparent;cursor:col-resize;
+}
+.table-tools [data-table-tool="width"]:hover,.table-tools [data-table-tool="width"]:focus-visible{
+  background:var(--accent);
+}
+.table-guide{
+  position:absolute;background:var(--accent);border-radius:2px;
+}
+.table-dimension{
+  position:absolute;padding:3px 6px;border:1px solid var(--line2);border-radius:6px;
+  background:var(--raised);color:var(--text);font:600 11px var(--font);white-space:nowrap;
+}
+.table-menu-heading{padding:5px 9px;color:var(--text2);font-size:11px;font-weight:650}
+.table-menu .menu-item:disabled{opacity:.45;cursor:default}
 .block-content img{max-width:100%;border-radius:9px;display:block;margin:9px 0}
 .block-content video,.block-content iframe.embed{
   display:block;width:100%;max-width:100%;
@@ -890,6 +974,7 @@ html[data-theme="dark"] :is(.collapse-btn,.note-bar .tool-btn,.formatbar .tool-b
 .menu-item:disabled{cursor:default;opacity:.45;background:transparent}
 .menu-item.danger{color:var(--danger)}
 .menu-item svg{width:15px;height:15px}
+.insert-menu .menu-item svg{flex:none;fill:none;stroke:currentColor;stroke-width:1.7;color:var(--accentText)}
 .menu-sep{height:1px;background:var(--line);margin:5px 3px}
 .menu-item[aria-pressed="true"]{background:var(--selected);color:var(--accentText);font-weight:650}
 .template-menu{width:min(326px,calc(100vw - 16px));max-height:calc(100dvh - 66px);padding:7px}
@@ -1021,16 +1106,20 @@ html[data-theme="dark"] .template-menu{border-radius:16px}
   @page{margin:18mm 16mm}
   html,body{height:auto;overflow:visible;background:#fff}
   .quick-actions,.sidebar,.notes-pane,.note-bar,.formatbar,.find-bar,.bubble-bar,.media-resizer,
-  .popover,.toast,.tooltip,.modal-backdrop,.slash-menu,.block-handle,.editor-empty{display:none!important}
+  .popover,.toast,.tooltip,.modal-backdrop,.slash-menu,.block-handle,.editor-empty,.table-tools{display:none!important}
   .app{display:block;width:auto;height:auto}
   .workspace{display:block;background:#fff}
   .editor-scroll{overflow:visible;height:auto}
+  .app.immersive .editor-scroll{padding-right:0}
   .document{width:100%;max-width:100%;margin:0;padding:0}
   .doc-head{padding:0 0 12px}
   .doc-title{font-size:26pt;color:#000}
   .block-editor{padding:0;min-height:0}
   .block-row{grid-template-columns:0 minmax(0,1fr);margin-left:calc(var(--indent,0) * 18px)}
   .block-content{color:#000;font-size:11.5pt;line-height:1.5}
+  .block-row[data-type="table"] .block-content{overflow:visible;padding:2px 0}
+  .block-row[data-type="table"] table{width:100%!important;table-layout:auto!important}
+  .block-row[data-type="table"] :is(th,td){min-width:0;border-color:#ccc}
   .block-content a{color:#0645ad;text-decoration:underline}
   .block-row[data-type="code"] .block-content{background:#f4f4f4;border:1px solid #ddd}
   .block-content iframe{display:none}
@@ -1052,6 +1141,10 @@ html[data-theme="dark"] .template-menu{border-radius:16px}
 @media screen and (max-width:800px){
   :root{--notes-w:100%}
   .app,.app.sidebar-collapsed,.app.focus{grid-template-columns:minmax(0,1fr)}
+  .app.immersive{grid-template-columns:minmax(0,1fr)}
+  .app.immersive .document{padding-top:20px}
+  .app:not(.mobile-editor){--quick-actions-w:68px}
+  .app:not(.mobile-editor) #immersiveBtn{display:none}
   .app:not(.mobile-editor) .quick-actions{top:16px}
   .collapse-btn{width:29px;margin-right:0}
   .sidebar{
@@ -1216,7 +1309,7 @@ html[data-theme="dark"] .template-menu{border-radius:16px}
       </div>
 
       <span class="tool-sep toolbar-extra"></span>
-      <div class="tool-group toolbar-extra">
+      <div class="tool-group toolbar-extra insert-tools">
         <button class="tool-btn" data-block="todo" data-tip="Checklist">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3.5" y="4" width="5" height="5" rx="1"/><path d="m4.8 6.5 1 1 1.8-2"/><path d="M11 6.5h9M11 12h9M11 17.5h9"/><rect x="3.5" y="10" width="5" height="5" rx="1"/><rect x="3.5" y="16" width="5" height="5" rx="1"/></svg>
         </button>
@@ -1287,7 +1380,10 @@ html[data-theme="dark"] .template-menu{border-radius:16px}
       </article>
     </div>
   </main>
-  <div class="quick-actions" role="group" aria-label="Criação de notas">
+  <div class="quick-actions" role="group" aria-label="Ações rápidas">
+    <button class="icon-btn" id="immersiveBtn" type="button" data-tip="Modo imersivo" aria-label="Modo imersivo" aria-pressed="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 4H4v5m11-5h5v5M4 15v5h5m11-5v5h-5"/></svg>
+    </button>
     <button class="icon-btn" id="templatesBtn" type="button" data-tip="Modelos" aria-label="Modelos" aria-controls="templatesMenu" aria-expanded="false">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="4.5" y="6" width="13" height="14" rx="2"/><path d="M8 3h10a2 2 0 0 1 2 2v11M8 10h6m-6 4h6"/></svg>
     </button>
@@ -1299,6 +1395,28 @@ html[data-theme="dark"] .template-menu{border-radius:16px}
 </div>
 
 <div class="slash-menu" id="slashMenu"></div>
+
+<div class="table-tools hidden" id="tableTools" role="group" aria-label="Controles da tabela">
+  <button type="button" data-table-tool="row" aria-label="Opções da linha" aria-controls="tableMenu" aria-expanded="false">
+    <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><circle cx="6" cy="4" r="1"/><circle cx="10" cy="4" r="1"/><circle cx="6" cy="8" r="1"/><circle cx="10" cy="8" r="1"/><circle cx="6" cy="12" r="1"/><circle cx="10" cy="12" r="1"/></svg>
+  </button>
+  <button type="button" data-table-tool="column" aria-label="Opções da coluna" aria-controls="tableMenu" aria-expanded="false">
+    <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><circle cx="4" cy="6" r="1"/><circle cx="8" cy="6" r="1"/><circle cx="12" cy="6" r="1"/><circle cx="4" cy="10" r="1"/><circle cx="8" cy="10" r="1"/><circle cx="12" cy="10" r="1"/></svg>
+  </button>
+  <button type="button" data-table-tool="add-row" aria-label="Adicionar linha ao final">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 8h10M8 3v10"/></svg>
+  </button>
+  <button type="button" data-table-tool="add-column" aria-label="Adicionar coluna ao final">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 8h10M8 3v10"/></svg>
+  </button>
+  <button type="button" data-table-tool="width" tabindex="-1" aria-label="Redimensionar largura da coluna"></button>
+  <button type="button" data-table-tool="corner" tabindex="-1" aria-label="Redimensionar a tabela">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 12h8V4m-1 1-6 6"/></svg>
+  </button>
+  <div class="table-guide" id="tableGuide" hidden></div>
+  <div class="table-dimension" id="tableDimension" hidden></div>
+</div>
+<div class="popover table-menu" id="tableMenu" aria-label="Opções da tabela"></div>
 
 <div class="media-resizer" id="mediaResizer">
   <button class="mr-reset" id="mediaReset" data-tip="Largura total" aria-label="Voltar a largura total">
@@ -1428,21 +1546,21 @@ html[data-theme="dark"] .template-menu{border-radius:16px}
   <button class="menu-item" data-video="link">Colar link (YouTube, Vimeo, MP4)</button>
 </div>
 
-<div class="popover" id="insertMenu">
-  <button class="menu-item" data-block="bullet">Lista</button>
-  <button class="menu-item" data-block="numbered">Lista numerada</button>
-  <button class="menu-item" data-block="todo">Checklist</button>
-  <button class="menu-item" data-block="quote">Citação</button>
-  <button class="menu-item" data-block="callout">Destaque</button>
-  <button class="menu-item" data-block="toggle">Alternar (sanfona)</button>
-  <button class="menu-item" data-block="code">Código</button>
-  <button class="menu-item" data-insert="divider">Divisor</button>
+<div class="popover insert-menu" id="insertMenu">
+  <button class="menu-item" data-block="bullet"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg>Lista</button>
+  <button class="menu-item" data-block="numbered"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 6h10M10 12h10M10 18h10M4 4h1v4M3 11h3l-3 4h3M3 17h3l-2 2h2v2H3"/></svg>Lista numerada</button>
+  <button class="menu-item" data-block="todo"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="6" height="6" rx="1"/><path d="m4.5 7 1 1 2-2M13 7h8m-8 10h8"/><rect x="3" y="14" width="6" height="6" rx="1"/></svg>Checklist</button>
+  <button class="menu-item" data-block="quote"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 7H5v5h6v-3c0-2-1-3-3-4m12 2h-5v5h6V9c0-2-1-3-3-4M5 16h16"/></svg>Citação</button>
+  <button class="menu-item" data-block="callout"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 15a6 6 0 1 1 8 0c-.8.7-1 1.3-1 2H9c0-.7-.2-1.3-1-2Zm2 5h4"/></svg>Destaque</button>
+  <button class="menu-item" data-block="toggle"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 6 5 4-5 4zM13 7h8m-8 6h8m-8 5h6"/></svg>Alternar (sanfona)</button>
+  <button class="menu-item" data-block="code"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 7-5 5 5 5m8-10 5 5-5 5M14 4l-4 16"/></svg>Código</button>
+  <button class="menu-item" data-insert="divider"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18"/></svg>Divisor</button>
   <div class="menu-sep"></div>
-  <button class="menu-item" data-insert="table">Tabela</button>
-  <button class="menu-item" data-insert="image">Imagem</button>
-  <button class="menu-item" data-video="file">Arquivo de vídeo</button>
-  <button class="menu-item" data-video="link">Link de vídeo</button>
-  <button class="menu-item" data-action="createLink">Link ⌘K</button>
+  <button class="menu-item" data-insert="table"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 9h18M9 4v16m6-16v16"/></svg>Tabela</button>
+  <button class="menu-item" data-insert="image"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8" cy="9" r="1.5"/><path d="m4 17 5-5 4 4 3-3 4 4"/></svg>Imagem</button>
+  <button class="menu-item" data-video="file"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3z"/></svg>Arquivo de vídeo</button>
+  <button class="menu-item" data-video="link"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v3m-1 3h-3a2 2 0 0 0 0 4h3a2 2 0 0 0 0-4Zm-6 3h-2a2 2 0 0 0 0 4h3a2 2 0 0 0 2-2"/></svg>Link de vídeo</button>
+  <button class="menu-item" data-action="createLink"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 14.5 5-5m-7 7-1 1a3 3 0 0 1-4-4l5-5a3 3 0 0 1 4 0m5 0 1-1a3 3 0 0 1 4 4l-5 5a3 3 0 0 1-4 0"/></svg>Link ⌘K</button>
 </div>
 
 <div class="popover format-menu" id="formatMenu">
@@ -1564,7 +1682,7 @@ const TEMAS = {
   rosepine:   {nome:"Ros\u00e9 Pine",    claro:true,  cores:["#f2e9e1","#faf4ed","#575279","#e8b3af"]},
   nordlight:  {nome:"Nord Claro",   claro:true,  cores:["#e5e9f0","#eceff4","#2e3440","#88c0d0"]},
   gruvboxlight:{nome:"Gruvbox Claro",claro:true, cores:["#f2e5bc","#fbf1c7","#3c3836","#fabd2f"]},
-  dark:       {nome:"Escuro",       claro:false, cores:["#313036","#1b1c21","#f3f3f5","#d8b36b"]},
+  dark:       {nome:"Escuro",       claro:false, cores:["#37394a","#282a36","#f8f8f2","#bd93f9"]},
   dracula:    {nome:"Dracula",      claro:false, cores:["#21222c","#282a36","#f8f8f2","#bd93f9"]},
   catppuccin: {nome:"Catppuccin",   claro:false, cores:["#181825","#1e1e2e","#cdd6f4","#cba6f7"]},
   htb:        {nome:"Hack The Box", claro:false, cores:["#0b1120","#111927","#dbe4f2","#9fef00"]},
@@ -2078,13 +2196,14 @@ function markdownToNote(markdown,fileTitle="Nota importada"){
 
     if(/^\|.+\|$/.test(line) && i+1<lines.length && /^\|(?:\s*:?-+:?\s*\|)+$/.test(lines[i+1])){
       const rows=[];
-      const parse=v=>v.trim().replace(/^\||\|$/g,"").split("|").map(c=>c.trim());
+      const parse=v=>v.trim().slice(1,-1).split(/(?<!\\)\|/).map(c=>
+        c.trim().replace(/\\\|/g,"|").split(/<br\s*\/?>/i).map(markdownInlineToHTML).join("<br>"));
       rows.push(parse(line));
       i+=2;
       while(i<lines.length && /^\|.+\|$/.test(lines[i])){rows.push(parse(lines[i]));i++}
       i--;
       const head=rows[0]||[], body=rows.slice(1);
-      const table=`<table><thead><tr>${head.map(c=>`<th>${markdownInlineToHTML(c)}</th>`).join("")}</tr></thead><tbody>${body.map(r=>`<tr>${r.map(c=>`<td>${markdownInlineToHTML(c)}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+      const table=`<table><thead><tr>${head.map(c=>`<th scope="col">${c}</th>`).join("")}</tr></thead><tbody>${body.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
       blocks.push(blankBlock("table",table));continue;
     }
 
@@ -2419,7 +2538,7 @@ function placeholder(type){
 
 function blockHTML(b){
   const type=b.type||"p";
-  const table=`<table><thead><tr><th>Cabeçalho</th><th>Cabeçalho</th><th>Cabeçalho</th></tr></thead><tbody><tr><td>Texto</td><td>Texto</td><td>Texto</td></tr><tr><td>Texto</td><td>Texto</td><td>Texto</td></tr></tbody></table>`;
+  const table=`<table><thead><tr>${'<th scope="col"></th>'.repeat(3)}</tr></thead><tbody>${"<tr><td></td><td></td><td></td></tr>".repeat(2)}</tbody></table>`;
   const indent=Math.max(0,Math.min(6,Number(b.indent)||0));
   const align=validBlockAlignment(b.align);
   return `<div class="block-row ${b.checked?"checked":""} ${b.collapsed?"collapsed":""}" data-block-id="${esc(String(b.id))}" data-type="${esc(type)}" data-indent="${indent}" style="--indent:${indent}">
@@ -2491,7 +2610,7 @@ function renderEditor(focus=false){
   $(".workspace").classList.toggle("no-note",!note);
   $("#editorEmpty").classList.toggle("hidden",!!note);
   noteLocation.textContent=folderName(note?.folderId||state.selectedFolderId);
-  hideResizer();hideBubble();closeSlash();savedRange=null;
+  hideResizer();hideTableTools();hideMenus();hideBubble();closeSlash();savedRange=null;
   if(changed)$("#editorScroll").scrollTop=0;
   if(!note){
     domNoteId=null;
@@ -2753,6 +2872,7 @@ function moverEntreBlocos(row,c,dir){
 
 function focusBlock(row,end=true){
   if(!row)return;
+  if(row.dataset.type==="table"){focusTableCell($("td,th",row),false);return}
   const c=$(".block-content",row);if(!c||c.contentEditable==="false")return;
   c.focus();
   const r=document.createRange();r.selectNodeContents(c);r.collapse(!end);
@@ -2762,6 +2882,7 @@ function setBlockType(row,type,clear=false){
   if(!row)return;
   histPush(true);
   row.dataset.type=type;row.classList.remove("checked");
+  if(type!=="table")placeTableTools();
   const c=$(".block-content",row);
   c.contentEditable=type==="divider"?"false":"true";
   c.dataset.placeholder=placeholder(type);
@@ -2810,6 +2931,378 @@ function handleEditorEnter(row,content){
   insertAfter(row,continues.includes(type)?type:"p",rest.innerHTML,level,
     {record:false,focusEnd:false,align:validBlockAlignment(content.style.textAlign)});
 }
+
+/* Tabelas simples mantêm o HTML original das notas e dos arquivos Markdown. */
+const tableTools=$("#tableTools"),tableMenu=$("#tableMenu");
+const tableGuide=$("#tableGuide"),tableDimension=$("#tableDimension");
+const tableButtons=new Map($$("[data-table-tool]",tableTools).map(button=>[button.dataset.tableTool,button]));
+let activeTableCell=null,tableGesture=null,skipTableClick=false;
+
+function tableCellAt(node){
+  const element=node?.nodeType===Node.ELEMENT_NODE?node:node?.parentElement;
+  const cell=element?.closest("td,th");
+  const block=cell?.closest('.block-row[data-type="table"]');
+  return block&&blockEditor.contains(block)?cell:null;
+}
+function selectedTableCell(){
+  const selection=getSelection();
+  return tableCellAt(selection?.anchorNode);
+}
+function tableGrid(table){
+  const rows=Array.from(table.rows);
+  const columns=Math.max(0,...rows.map(row=>row.cells.length));
+  const simple=!!columns&&!table.tFoot&&(table.tHead?.rows.length??0)<=1&&
+    rows.every(row=>Array.from(row.cells).every(cell=>cell.colSpan===1&&cell.rowSpan===1));
+  return {rows,columns,simple};
+}
+function tableHeaders(table){
+  const first=table.rows[0];
+  const cells=Array.from(first.cells);
+  return {
+    row:first.parentElement===table.tHead||(!!cells.length&&cells.every(cell=>cell.tagName==="TH"&&cell.scope!=="row")),
+    column:table.hasAttribute("data-header-column")||cells[0]?.scope==="row"
+  };
+}
+function applyTableHeaders(table,headers){
+  const rows=Array.from(table.rows);
+  const body=table.tBodies[0]||table.createTBody();
+  const rest=headers.row?rows.slice(1):rows;
+  if(headers.row){
+    const head=table.tHead||table.createTHead();
+    if(rows[0].parentElement!==head)head.append(rows[0]);
+  }
+  if(rest.some(row=>row.parentElement!==body))body.append(...rest);
+  if(!headers.row)table.deleteTHead();
+  table.toggleAttribute("data-header-column",headers.column);
+  rows.forEach((row,r)=>Array.from(row.cells).forEach((original,c)=>{
+    const scope=headers.row&&r===0?"col":headers.column&&c===0?"row":"";
+    let cell=original;
+    if((cell.tagName==="TH")!==!!scope){
+      cell=document.createElement(scope?"th":"td");
+      for(const {name,value} of original.attributes)cell.setAttribute(name,value);
+      cell.append(...original.childNodes);original.replaceWith(cell);
+    }
+    if(scope)cell.scope=scope;
+    else cell.removeAttribute("scope");
+  }));
+}
+function tableWidths(table){
+  const group=table.querySelector(":scope > colgroup[data-table-widths]");
+  return group?Array.from(group.children,col=>parseInt(col.style.width,10)):null;
+}
+function setTableWidths(table,widths){
+  let group=table.querySelector(":scope > colgroup[data-table-widths]");
+  if(!widths){
+    group?.remove();
+    table.style.removeProperty("width");table.style.removeProperty("table-layout");
+    return;
+  }
+  if(!group){
+    group=document.createElement("colgroup");group.dataset.tableWidths="";
+    table.insertBefore(group,table.querySelector(":scope > thead, :scope > tbody"));
+  }
+  const cols=widths.map(width=>{
+    const col=document.createElement("col");col.style.width=width+"px";return col;
+  });
+  group.replaceChildren(...cols);
+  table.style.width=widths.reduce((total,width)=>total+width,0)+"px";
+  table.style.tableLayout="fixed";
+}
+function focusTableCell(cell,end=false){
+  if(!cell)return;
+  const content=cell.closest(".block-content");
+  content.focus();
+  const range=intervaloDoBloco(cell);
+  range.collapse(!end);restaurarCaret(content,range);
+  cell.scrollIntoView({block:"nearest",inline:"nearest"});
+  showTableTools(cell);
+}
+function editTable(table,change,focusRow,focusColumn){
+  const grid=tableGrid(table);
+  if(!grid.simple){toast("Use uma tabela sem células mescladas para alterar linhas e colunas.");return}
+  const headers=tableHeaders(table);
+  histPush(true);
+  for(const row of grid.rows){
+    while(row.cells.length<grid.columns)row.insertCell();
+  }
+  change(headers);
+  applyTableHeaders(table,headers);
+  const row=table.rows[Math.min(focusRow,table.rows.length-1)];
+  focusTableCell(row.cells[Math.min(focusColumn,row.cells.length-1)]);
+  touchNote();histPush(true);
+}
+function moveTableEntry(node,target,after){
+  if(after)target.after(node);
+  else target.before(node);
+}
+function mutateTableAxis(table,axis,operation,index,target=index){
+  const rows=Array.from(table.rows);
+  if(axis==="row"){
+    const row=rows[index];
+    if(operation==="insert"){
+      const added=table.insertRow(index);
+      for(let n=0;n<rows[0].cells.length;n++)added.insertCell();
+    }
+    if(operation==="remove")row.remove();
+    if(operation==="duplicate")row.after(row.cloneNode(true));
+    if(operation==="move")moveTableEntry(row,rows[target],target>index);
+    if(operation==="clear")Array.from(row.cells).forEach(cell=>cell.replaceChildren());
+    return;
+  }
+  for(const row of rows){
+    const cell=row.cells[index];
+    if(operation==="insert")row.insertCell(index);
+    if(operation==="remove")cell.remove();
+    if(operation==="duplicate")cell.after(cell.cloneNode(true));
+    if(operation==="move")moveTableEntry(cell,row.cells[target],target>index);
+    if(operation==="clear")cell.replaceChildren();
+  }
+  const widths=tableWidths(table);
+  if(!widths||operation==="clear")return;
+  if(operation==="insert")widths.splice(index,0,widths[index]??widths.at(-1));
+  if(operation==="remove")widths.splice(index,1);
+  if(operation==="duplicate")widths.splice(index+1,0,widths[index]);
+  if(operation==="move")widths.splice(target,0,...widths.splice(index,1));
+  setTableWidths(table,widths);
+}
+function tableAction(cell,axis,operation,offset=0){
+  const table=cell.closest("table");
+  const {rows,columns}=tableGrid(table);
+  const row=cell.parentElement.rowIndex,column=cell.cellIndex;
+  if(operation==="clear-cell"){
+    histPush(true);cell.replaceChildren();focusTableCell(cell);touchNote();histPush(true);return;
+  }
+  const index=axis==="row"?row:column;
+  const count=axis==="row"?rows.length:columns;
+  const at=operation==="append"?count:operation==="insert"?index+offset:index;
+  const next=operation==="move"?index+offset:(operation==="duplicate"?index+1:at);
+  if(operation==="remove"&&count===1)return;
+  if(operation==="move"&&(next<0||next>=count||next===index))return;
+  editTable(table,headers=>{
+    if(operation==="header")headers[axis]=!headers[axis];
+    else if(operation==="fit")setTableWidths(table,null);
+    else mutateTableAxis(table,axis,operation==="append"?"insert":operation,at,next);
+  },axis==="row"?next:row,axis==="column"?next:column);
+}
+
+function hideTableTools(){
+  tableTools.classList.add("hidden");
+  activeTableCell=null;
+}
+function placeTableTool(name,x,y,bounds){
+  const button=tableButtons.get(name);
+  button.hidden=y<bounds.top||y+22>bounds.bottom||x<0||x+22>innerWidth;
+  button.style.left=x+"px";button.style.top=y+"px";
+}
+function placeTableTools(){
+  if(!activeTableCell?.isConnected||!tableCellAt(activeTableCell)){hideTableTools();return}
+  const table=activeTableCell.closest("table");
+  if(!table.getClientRects().length){hideTableTools();return}
+  const cell=activeTableCell.getBoundingClientRect(),rect=table.getBoundingClientRect();
+  const content=table.closest(".block-content").getBoundingClientRect();
+  const bounds=$("#editorScroll").getBoundingClientRect();
+  if(rect.bottom<bounds.top||rect.top>bounds.bottom){tableTools.classList.add("hidden");return}
+  tableTools.classList.remove("hidden");
+  const left=Math.max(rect.left,content.left+6,bounds.left+6);
+  const right=Math.min(rect.right,content.right-25,bounds.right-25);
+  const columnVisible=cell.right>left&&cell.left<right;
+  const column=Math.max(left,Math.min(right-22,(cell.left+cell.right)/2-11));
+  const midRow=Math.max(bounds.top,Math.min(bounds.bottom-22,(rect.top+rect.bottom)/2-11));
+  placeTableTool("row",Math.max(bounds.left,left-23),(cell.top+cell.bottom)/2-11,bounds);
+  placeTableTool("column",column,rect.top-23,bounds);
+  placeTableTool("add-row",(left+right)/2-11,rect.bottom+3,bounds);
+  placeTableTool("add-column",right+2,midRow,bounds);
+  placeTableTool("corner",right+2,rect.bottom+3,bounds);
+  placeTableTool("width",cell.right-4,rect.top-3,bounds);
+  if(!columnVisible)tableButtons.get("column").hidden=true;
+  if(!columnVisible||cell.right>right+2)tableButtons.get("width").hidden=true;
+}
+function showTableTools(cell){
+  activeTableCell=cell;
+  placeTableTools();
+}
+
+function openTableMenu(cell,scope,x,y,anchor=null){
+  const table=cell.closest("table");
+  const {rows,columns,simple}=tableGrid(table);
+  const headers=tableHeaders(table);
+  const item=(label,axis,operation,offset=0,disabled=false,danger=false)=>
+    `<button type="button" class="menu-item${danger?" danger":""}" data-table-action="${axis}:${operation}:${offset}" ${disabled?"disabled":""}>${label}</button>`;
+  const section=(axis,index,count)=>{
+    const isRow=axis==="row",name=isRow?"linha":"coluna";
+    return `<div class="table-menu-heading">${isRow?"Linha":"Coluna"} ${index+1}</div>`+
+      item(isRow?"Inserir acima":"Inserir à esquerda",axis,"insert",0,!simple)+
+      item(isRow?"Inserir abaixo":"Inserir à direita",axis,"insert",1,!simple)+
+      item(`Duplicar ${name}`,axis,"duplicate",0,!simple)+
+      item(isRow?"Mover para cima":"Mover para a esquerda",axis,"move",-1,!simple||index===0)+
+      item(isRow?"Mover para baixo":"Mover para a direita",axis,"move",1,!simple||index===count-1)+
+      item(`Limpar ${name}`,axis,"clear",0,!simple)+
+      item(`Remover ${name}`,axis,"remove",0,!simple||count===1,true);
+  };
+  const options=[];
+  if(scope!=="column")options.push(section("row",cell.parentElement.rowIndex,rows.length));
+  if(scope!=="row")options.push(section("column",cell.cellIndex,columns));
+  options.push(item(headers.row?"Desativar cabeçalho de linha":"Ativar cabeçalho de linha","row","header",0,!simple)+
+    item(headers.column?"Desativar cabeçalho de coluna":"Ativar cabeçalho de coluna","column","header",0,!simple)+
+    item("Ajustar à largura da nota","column","fit",0,!simple)+item("Limpar célula","cell","clear-cell"));
+  tableMenu.innerHTML=options.join('<div class="menu-sep"></div>');
+  showTableTools(cell);hideMenus("table");popoverAnchor=anchor;
+  for(const tool of ["row","column"])tableButtons.get(tool).setAttribute("aria-expanded","false");
+  if(anchor)anchor.setAttribute("aria-expanded","true");
+  positionMenu(tableMenu,x,y);
+  $("button:not(:disabled)",tableMenu)?.focus({preventScroll:true});
+}
+
+blockEditor.addEventListener("pointerover",e=>{
+  const cell=tableCellAt(e.target);
+  if(cell&&!tableGesture&&!tableMenu.classList.contains("show")&&e.pointerType!=="touch")showTableTools(cell);
+});
+document.addEventListener("pointerdown",e=>{
+  if(!tableTools.contains(e.target)&&!tableMenu.contains(e.target)&&!tableCellAt(e.target))hideTableTools();
+});
+blockEditor.addEventListener("contextmenu",e=>{
+  const cell=tableCellAt(e.target)||selectedTableCell();
+  if(!cell||!cell.closest(".block-content").contains(e.target))return;
+  e.preventDefault();openTableMenu(cell,"cell",e.clientX,e.clientY);
+});
+document.addEventListener("scroll",()=>{if(activeTableCell)placeTableTools()},true);
+window.addEventListener("resize",()=>{if(activeTableCell)placeTableTools()});
+tableTools.addEventListener("mousedown",e=>e.preventDefault());
+tableTools.addEventListener("click",e=>{
+  const button=e.target.closest("[data-table-tool]");
+  if(!button||!activeTableCell)return;
+  e.stopPropagation();
+  if(skipTableClick){skipTableClick=false;return}
+  const action=button.dataset.tableTool;
+  if(action.startsWith("add-")){tableAction(activeTableCell,action.slice(4),"append");return}
+  if(action==="row"||action==="column"){
+    if(tableMenu.classList.contains("show")&&popoverAnchor===button){hideMenus();return}
+    hideMenus();
+    const rect=button.getBoundingClientRect();
+    openTableMenu(activeTableCell,action,rect.left,rect.bottom+4,button);
+  }
+});
+tableMenu.addEventListener("click",e=>{
+  const button=e.target.closest("[data-table-action]");
+  if(!button||button.disabled||!activeTableCell)return;
+  const [axis,operation,offset]=button.dataset.tableAction.split(":");
+  const cell=activeTableCell;hideMenus();tableAction(cell,axis,operation,Number(offset));
+});
+
+tableTools.addEventListener("pointerdown",e=>{
+  const button=e.target.closest("[data-table-tool]");
+  if(e.button!==0||!button||!activeTableCell)return;
+  skipTableClick=false;
+  if(button.dataset.tableTool.startsWith("add-"))return;
+  const cell=activeTableCell,table=cell.closest("table");
+  if(!tableGrid(table).simple)return;
+  const kind=button.dataset.tableTool;
+  const row=cell.parentElement.rowIndex,column=cell.cellIndex;
+  tableGesture={kind,table,row,column,x:e.clientX,y:e.clientY,active:false};
+  button.setPointerCapture(e.pointerId);
+});
+tableTools.addEventListener("pointermove",e=>{
+  const gesture=tableGesture;
+  if(!gesture||(!gesture.active&&Math.hypot(e.clientX-gesture.x,e.clientY-gesture.y)<5))return;
+  if(!gesture.active){gesture.active=true;hideMenus()}
+  const {kind,table,row,column}=gesture;
+  const bounds=table.getBoundingClientRect();
+  const dx=e.clientX-gesture.x,dy=e.clientY-gesture.y;
+  const rect=table.rows[row].cells[column].getBoundingClientRect();
+  if(kind==="corner"){
+    const {rows,columns}=tableGrid(table);
+    gesture.rows=Math.max(1,rows.length+Math.round(dy/Math.max(34,rect.height)));
+    gesture.columns=Math.max(1,columns+Math.round(dx/Math.max(76,rect.width)));
+    tableDimension.textContent=`${gesture.rows} × ${gesture.columns}`;
+    tableDimension.style.left=Math.max(4,Math.min(e.clientX+8,innerWidth-76))+"px";
+    tableDimension.style.top=Math.max(4,Math.min(e.clientY+8,innerHeight-28))+"px";
+    tableDimension.hidden=false;
+    return;
+  }
+  if(kind==="width"){
+    gesture.width=Math.max(76,Math.round(rect.width+dx));
+    Object.assign(tableGuide.style,{left:(rect.left+gesture.width)+"px",top:bounds.top+"px",width:"2px",height:bounds.height+"px"});
+  }else{
+    const entries=kind==="row"?Array.from(table.rows):Array.from(table.rows[0].cells);
+    const origin=kind==="row"?row:column;
+    const position=kind==="row"?e.clientY:e.clientX;
+    const edge=end=>kind==="row"?(end?"bottom":"top"):(end?"right":"left");
+    const index=entries.findIndex(entry=>position<entry.getBoundingClientRect()[edge(true)]);
+    gesture.target=index<0?entries.length-1:index;
+    const line=entries[gesture.target].getBoundingClientRect()[edge(gesture.target>origin)];
+    Object.assign(tableGuide.style,kind==="row"?
+      {left:bounds.left+"px",top:line+"px",width:bounds.width+"px",height:"2px"}:
+      {left:line+"px",top:bounds.top+"px",width:"2px",height:bounds.height+"px"});
+  }
+  tableGuide.hidden=false;
+});
+function finishTableGesture(commit){
+  const gesture=tableGesture;tableGesture=null;
+  tableGuide.hidden=true;tableDimension.hidden=true;
+  if(!gesture?.active)return;
+  skipTableClick=true;
+  const {kind,table,row,column,target}=gesture;
+  if(!commit||!table.isConnected)return;
+  if(kind==="row"||kind==="column"){
+    const origin=kind==="row"?row:column;
+    if(target!==origin)tableAction(table.rows[row].cells[column],kind,"move",target-origin);
+    return;
+  }
+  if(kind==="width"){
+    const widths=Array.from(table.rows[0].cells,cell=>Math.round(cell.getBoundingClientRect().width));
+    widths[column]=gesture.width;
+    editTable(table,()=>setTableWidths(table,widths),row,column);
+    return;
+  }
+  const grid=tableGrid(table);
+  if(grid.rows.length===gesture.rows&&grid.columns===gesture.columns)return;
+  editTable(table,()=>{
+    while(table.rows.length<gesture.rows)mutateTableAxis(table,"row","insert",table.rows.length);
+    while(table.rows.length>gesture.rows)mutateTableAxis(table,"row","remove",table.rows.length-1);
+    for(let c=grid.columns;c<gesture.columns;c++)mutateTableAxis(table,"column","insert",c);
+    for(let c=grid.columns;c>gesture.columns;c--)mutateTableAxis(table,"column","remove",c-1);
+  },row,column);
+}
+tableTools.addEventListener("pointerup",()=>finishTableGesture(true));
+tableTools.addEventListener("pointercancel",()=>finishTableGesture(false));
+
+function tableCellBoundary(cell,forward){
+  const selection=getSelection();
+  if(!selection?.isCollapsed||!cell.contains(selection.anchorNode))return false;
+  const rest=intervaloDoBloco(cell);
+  if(forward)rest.setStart(selection.anchorNode,selection.anchorOffset);
+  else rest.setEnd(selection.anchorNode,selection.anchorOffset);
+  return !rest.toString()&&!rest.cloneContents().querySelector("img,video,iframe");
+}
+function handleTableKey(e,cell){
+  const table=cell.closest("table");
+  if(e.key==="ContextMenu"||(e.key==="F10"&&e.shiftKey)){
+    e.preventDefault();
+    const rect=cell.getBoundingClientRect();
+    openTableMenu(cell,"cell",rect.left,rect.bottom,tableButtons.get("row"));
+    return true;
+  }
+  if(e.key==="Tab"&&!e.ctrlKey&&!e.metaKey&&!e.altKey){
+    const cells=Array.from(table.rows).flatMap(row=>Array.from(row.cells));
+    const next=cells[cells.indexOf(cell)+(e.shiftKey?-1:1)];
+    if(!next&&e.shiftKey)return false;
+    e.preventDefault();
+    if(next)focusTableCell(next);
+    else if(tableGrid(table).simple){
+      tableAction(cell,"row","append");
+      focusTableCell(table.rows[table.rows.length-1].cells[0]);
+    }
+    return true;
+  }
+  if(e.key==="Enter"&&!e.ctrlKey&&!e.metaKey&&!e.altKey){
+    e.preventDefault();apagarSelecaoTexto();insertNewlineAtCaret();touchNote();return true;
+  }
+  if((e.key==="Backspace"||e.key==="Delete")&&tableCellBoundary(cell,e.key==="Delete")){
+    e.preventDefault();return true;
+  }
+  return false;
+}
+
 /* Video: arquivo pequeno vira data URL; link vira player embutido.
    O limite existe porque tudo mora no localStorage do navegador. */
 const LIMITE_VIDEO=2*1024*1024;
@@ -3255,7 +3748,7 @@ function updateBubble(){
   bubbleBar.classList.add("show");
   const bw=bubbleBar.offsetWidth||190, bh=bubbleBar.offsetHeight||40;
   const left=Math.max(10,Math.min(innerWidth-bw-10,r.left+r.width/2-bw/2));
-  const limite=$("#formatbar").getBoundingClientRect().bottom+8;
+  const limite=$("#editorScroll").getBoundingClientRect().top+8;
   let top=r.top-bh-10;
   if(top<limite)top=r.bottom+10;                    /* nao cobre a barra de cima */
   top=Math.min(top,innerHeight-bh-10);
@@ -3276,7 +3769,8 @@ function updateBlockStyle(){
 }
 
 function tableToMarkdown(table){
-  const rows=Array.from(table.querySelectorAll("tr")).map(tr=>Array.from(tr.querySelectorAll("th,td")).map(c=>(c.textContent||"").trim().replace(/\|/g,"\\|")));
+  const rows=Array.from(table.rows,row=>Array.from(row.cells,cell=>
+    inlineToMarkdown(cell.innerHTML).trim().replace(/\|/g,"\\|").replace(/\r?\n/g,"<br>")));
   if(!rows.length)return"";
   const cols=Math.max(...rows.map(r=>r.length));
   const nr=rows.map(r=>[...r,...Array(Math.max(0,cols-r.length)).fill("")]);
@@ -3714,7 +4208,7 @@ async function importProject(file){
 function toast(msg,ms=1600){
   const t=$("#toast");t.textContent=msg;t.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove("show"),ms)
 }
-const popovers={more:moreMenu,folder:folderMenu,move:moveMenu,sort:sortMenu,templates:templatesMenu,import:importMenu,blockStyle:blockStyleMenu,
+const popovers={more:moreMenu,folder:folderMenu,move:moveMenu,sort:sortMenu,templates:templatesMenu,import:importMenu,blockStyle:blockStyleMenu,table:tableMenu,
   highlight:highlightMenu,insert:insertMenu,format:formatMenu,bubble:bubbleMenu,video:videoMenu,export:exportMenu,icon:iconMenu};
 let popoverAnchor=null;
 
@@ -3722,7 +4216,7 @@ function hideMenus(except=""){
   for(const [name,menu] of Object.entries(popovers)){
     if(except===name)continue;
     menu.classList.remove("show");
-    $(`button[aria-controls="${menu.id}"]`)?.setAttribute("aria-expanded","false");
+    $$(`button[aria-controls="${menu.id}"]`).forEach(button=>button.setAttribute("aria-expanded","false"));
   }
   if(!except)popoverAnchor=null;
 }
@@ -3732,8 +4226,9 @@ function syncPanels(){
   const collapse=$("#collapseBtn");
   collapse.dataset.tip=open?"Recolher pastas":"Expandir pastas";
   collapse.setAttribute("aria-expanded",String(open));
-  $("#sidebar").inert=mobileLayout.matches?!open:focusMode;
-  $(".notes-pane").inert=!mobileLayout.matches&&focusMode;
+  const immersive=app.classList.contains("immersive");
+  $("#sidebar").inert=immersive||(mobileLayout.matches?!open:focusMode);
+  $(".notes-pane").inert=immersive||(!mobileLayout.matches&&focusMode);
 }
 function setFocus(on,remember=false){
   focusMode=!!on;
@@ -3751,6 +4246,16 @@ function setDrawer(open){
 }
 function setMobileEditor(open){
   app.classList.toggle("mobile-editor",open);
+}
+function setImmersive(on){
+  const button=$("#immersiveBtn");
+  app.classList.toggle("immersive",on);
+  if(on){setDrawer(false);setMobileEditor(true)}
+  button.setAttribute("aria-pressed",String(on));
+  button.setAttribute("aria-label",on?"Sair do modo imersivo":"Modo imersivo");
+  button.dataset.tip=button.getAttribute("aria-label");
+  syncPanels();
+  hideMenus();closeSlash();hideBubble();hideResizer();placeTableTools();
 }
 function positionMenu(menu,x,y,right=false){
   menu.classList.add("show");
@@ -3780,6 +4285,7 @@ $("#collapseBtn").addEventListener("click",()=>{
   else {state.sidebarCollapsed=!state.sidebarCollapsed;syncPanels()}
   saveState();
 });
+$("#immersiveBtn").addEventListener("click",()=>setImmersive(!app.classList.contains("immersive")));
 mobileLayout.addEventListener("change",()=>setDrawer(false));
 $("#sidebarScrim").addEventListener("click",()=>setDrawer(false));
 $("#mobileBack").addEventListener("click",()=>{
@@ -4085,6 +4591,9 @@ docTitle.addEventListener("keydown",e=>{
 /* editor */
 blockEditor.addEventListener("input",e=>{
   const row=e.target.closest(".block-row");if(!row||!e.target.matches(".block-content"))return;
+  if(row.dataset.type==="table"){
+    closeSlash();touchNote();placeTableTools();return;
+  }
   if(checkMarkdownShortcut(row))return;
   const text=e.target.textContent||"",m=text.match(/^\/([^\s]*)$/);
   if(m)showSlash(row,m[1]);else closeSlash();
@@ -4149,6 +4658,9 @@ blockEditor.addEventListener("keydown",e=>{
   if((e.key==="Delete"||e.key==="Backspace")&&apagarSelecaoTexto()){
     e.preventDefault();return;
   }
+  const inTable=row.dataset.type==="table";
+  const cell=inTable?selectedTableCell():null;
+  if(cell&&handleTableKey(e,cell))return;
 
   if(slash.open){
     if(e.key==="ArrowDown"){e.preventDefault();slash.index=Math.min(slash.items.length-1,slash.index+1);markSlashSelection();return}
@@ -4168,7 +4680,7 @@ blockEditor.addEventListener("keydown",e=>{
     if(row.dataset.type==="code"){document.execCommand("insertText",false,"  ");touchNote();return}
     setIndent(row,e.shiftKey?-1:1);return;
   }
-  if((e.key==="ArrowUp"||e.key==="ArrowDown")&&!e.shiftKey&&!e.altKey&&!e.metaKey&&!e.ctrlKey){
+  if(!inTable&&(e.key==="ArrowUp"||e.key==="ArrowDown")&&!e.shiftKey&&!e.altKey&&!e.metaKey&&!e.ctrlKey){
     if(moverEntreBlocos(row,c,e.key==="ArrowUp"?-1:1)){e.preventDefault();return}
   }
   if(e.key==="Enter"&&!e.shiftKey&&row.dataset.type!=="table"){
@@ -4177,7 +4689,7 @@ blockEditor.addEventListener("keydown",e=>{
     handleEditorEnter(target,$(".block-content",target));
     return;
   }
-  if(e.key==="Backspace"&&!(c.textContent||"").length){
+  if(!inTable&&e.key==="Backspace"&&!(c.textContent||"").length){
     const prev=row.previousElementSibling;
     if((Number(row.dataset.indent)||0)>0){e.preventDefault();setIndent(row,-1);return}
     if(row.dataset.type!=="p"){e.preventDefault();setBlockType(row,"p",true);return}
@@ -4211,6 +4723,11 @@ blockEditor.addEventListener("paste",e=>{
   const plain=e.clipboardData.getData("text/plain")||"";
   const html=e.clipboardData.getData("text/html")||"";
   e.preventDefault();
+  if(row.dataset.type==="table"){
+    apagarSelecaoTexto();
+    if(selectedTableCell())document.execCommand("insertText",false,plain);
+    touchNote();return;
+  }
   if(row.dataset.type==="code"){document.execCommand("insertText",false,plain);touchNote();return}
   /* varias linhas: interpreta como Markdown e vira blocos de verdade */
   if(/\n/.test(plain.trim())){
@@ -4375,6 +4892,21 @@ function blocosPodemJuntar(first,last){
     &&!first.querySelector(MEDIA_SEL)&&!last.querySelector(MEDIA_SEL);
 }
 
+function deleteEditableRange(content,range){
+  const table=content.closest('.block-row[data-type="table"]')&&$("table",content);
+  if(!table){range.deleteContents();return range}
+  /* Delete o texto das células selecionadas sem desmontar a estrutura da tabela. */
+  const parts=Array.from(table.rows).flatMap(row=>Array.from(row.cells))
+    .filter(cell=>range.intersectsNode(cell)).map(cell=>{
+      const part=intervaloDoBloco(cell);
+      if(cell.contains(range.startContainer))part.setStart(range.startContainer,range.startOffset);
+      if(cell.contains(range.endContainer))part.setEnd(range.endContainer,range.endOffset);
+      return part;
+    });
+  parts.forEach(part=>part.deleteContents());
+  return parts[0]||range;
+}
+
 function apagarSelecaoEntreBlocos(){
   const selection=selecaoEntreBlocos();if(!selection)return null;
   const {range,inicio,fim}=selection;
@@ -4383,14 +4915,16 @@ function apagarSelecaoEntreBlocos(){
   corteInicio.setStart(range.startContainer,range.startOffset);
   corteFim.setEnd(range.endContainer,range.endOffset);
   histPush(true);
-  corteInicio.deleteContents();corteFim.deleteContents();
+  const caret=deleteEditableRange(inicio,corteInicio);
+  deleteEditableRange(fim,corteFim);
   for(let row=primeiro.nextElementSibling;row&&row!==ultimo;){
     const next=row.nextElementSibling;row.remove();row=next;
   }
   if(blocosPodemJuntar(primeiro,ultimo)){
     inicio.append(...fim.childNodes);ultimo.remove();
   }
-  renumberLists();applyToggles();restaurarCaret(inicio,corteInicio);touchNote();
+  caret.collapse(true);
+  renumberLists();applyToggles();restaurarCaret(inicio,caret);touchNote();
   return primeiro;
 }
 
@@ -4403,7 +4937,8 @@ function apagarSelecaoTexto(){
   const content=conteudoDoNo(range.startContainer);
   if(!content?.isContentEditable||!content.contains(range.endContainer))return null;
   histPush(true);
-  range.deleteContents();range.collapse(true);restaurarCaret(content,range);
+  const caret=deleteEditableRange(content,range);
+  caret.collapse(true);restaurarCaret(content,caret);
   touchNote();
   return content.closest(".block-row");
 }
@@ -4530,6 +5065,13 @@ document.addEventListener("pointerdown",e=>{
 blockEditor.addEventListener("beforeinput",e=>{
   if(e.isComposing)return;
   if(e.inputType.startsWith("delete")&&apagarSelecaoTexto()){e.preventDefault();return}
+  const cell=selectedTableCell();
+  if(cell&&e.inputType.startsWith("delete")&&tableCellBoundary(cell,e.inputType.endsWith("Forward"))){
+    e.preventDefault();return;
+  }
+  if(cell&&e.inputType==="insertParagraph"){
+    e.preventDefault();insertNewlineAtCaret();touchNote();return;
+  }
   if(e.inputType==="insertParagraph"){
     const row=e.target.closest(".block-row");
     if(row&&row.dataset.type!=="table"){
@@ -4779,7 +5321,11 @@ document.addEventListener("selectionchange",()=>{
   scheduleBubble();
   const s=getSelection();if(!s?.rangeCount)return;
   const n=s.anchorNode?.nodeType===1?s.anchorNode:s.anchorNode?.parentElement;
-  if(n&&blockEditor.contains(n)){saveSelection();updateBlockStyle()}
+  if(n&&blockEditor.contains(n)){
+    saveSelection();updateBlockStyle();
+    const cell=tableCellAt(n);
+    if(cell&&!tableGesture&&!tableMenu.classList.contains("show"))showTableTools(cell);
+  }
 });
 document.addEventListener("click",e=>{
   if(!e.target.closest(".popover"))hideMenus();
@@ -4813,6 +5359,7 @@ document.addEventListener("keydown",e=>{
     if(!findBar.classList.contains("hidden")){findClose();return}
     if(blocosSelecionados().length){limparSelecaoBlocos();return}
     if(app.classList.contains("drawer-open")){setDrawer(false);$("#collapseBtn").focus();return}
+    if(app.classList.contains("immersive")){setImmersive(false);return}
     if(focusMode)setFocus(false,true);
   }
   /* desfazer tambem fora do texto (ex.: logo apos redimensionar uma midia).
