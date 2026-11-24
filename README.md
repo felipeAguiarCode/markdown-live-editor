@@ -20,7 +20,7 @@ Sem build, sem login, sem servidor — tudo salvo no seu navegador.
 ## Recursos
 
 - **Modelos de nota** — o menu **Modelos** reúne prompts como Zero-shot, Few-shot e Many-shot, specs técnicas e uma seção **Fundamentos de projeto** com modelos de contexto do app, stack e bibliotecas, arquitetura, convenções e setup. Cada modelo cria uma nota editável na pasta ativa.
-- **Blocos pelo menu `/`** — título, lista, checklist, citação, destaque, toggle, código, tabela e divisor. Selecione várias alças com Shift ou Ctrl/⌘ e arraste uma delas para mover o conjunto.
+- **Blocos pelo menu `/`** — título, lista, checklist, citação, destaque, toggle, código, tabela e divisor. Selecione vários blocos pelo texto ou pelas alças e arraste uma alça para mover o conjunto. Use **Estilo do bloco** ou o botão direito na alça para **Transformar em** outro estilo.
 - **Tabelas editáveis** — use as alças para inserir, duplicar, mover ou remover linhas e colunas. Os botões nas bordas acrescentam linhas e colunas ao final, e Tab avança para a próxima célula.
 - **Organização** — pastas e subpastas, notas fixadas no topo, busca sem acentos e ordenação por edição, criação ou título. Use o menu da nota ou arraste-a para movê-la a outra pasta.
 - **Desktop e celular** — no desktop, os painéis começam ocultos. Use **Mostrar painéis** para abrir pastas e notas. No celular, a seta do editor volta à lista.

@@ -628,6 +628,11 @@ html[data-theme="dark"] :is(.collapse-btn,.note-bar .tool-btn,.formatbar .tool-b
 #blockStyle:hover,#blockStyle[aria-expanded="true"]{background:var(--sidebar2)}
 #blockStyleLabel{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .block-style-menu{min-width:158px}
+.block-style-menu [data-style-type] > span:first-child{
+  flex:0 0 24px;color:var(--text2);font-size:11px;text-align:center;
+}
+.block-style-title,.block-style-hint{margin:0;padding:7px 9px;font-size:11.5px;color:var(--text2)}
+.block-style-title{font-weight:650}
 .tool-wide{gap:5px;padding:0 10px}
 .tool-text{font-size:12.5px;font-weight:600;letter-spacing:-.01em}
 .tool-caret{width:12px!important;height:12px!important;opacity:.6}
@@ -1909,6 +1914,7 @@ const bubbleMenu = $("#bubbleMenu");
 const videoMenu = $("#videoMenu");
 const exportMenu = $("#exportMenu");
 const blockStyleMenu = $("#blockStyleMenu");
+let styleRows=[];
 const iconMenu = $("#iconMenu");
 let calloutAlvo = null;
 const settingsBackdrop = $("#settingsBackdrop");
@@ -3085,18 +3091,24 @@ function focusBlock(row,end=true){
   const s=getSelection();s.removeAllRanges();s.addRange(r);savedRange=r.cloneRange();
 }
 function setBlockType(row,type,clear=false){
-  if(!row)return;
+  if(row)setBlockTypes([row],type,{clear});
+}
+function setBlockTypes(rows,type,{clear=false,keepSelection=false}={}){
+  const changed=rows.filter(row=>blockEditor.contains(row)&&(clear||row.dataset.type!==type));
+  if(!changed.length)return;
   histPush(true);
-  row.dataset.type=type;row.classList.remove("checked");
-  if(type!=="table")placeTableTools();
-  const c=$(".block-content",row);
-  c.contentEditable=type==="divider"?"false":"true";
-  c.dataset.placeholder=placeholder(type);
-  if(clear)c.innerHTML="";
-  if(type==="todo")$(".todo-box",row).checked=false;
+  for(const row of changed){
+    row.dataset.type=type;row.classList.remove("checked","collapsed");
+    const c=$(".block-content",row);
+    c.contentEditable=type==="divider"?"false":"true";
+    c.dataset.placeholder=placeholder(type);
+    if(clear)c.innerHTML="";
+    if(type==="todo")$(".todo-box",row).checked=false;
+  }
   renumberLists();applyToggles();
-  touchNote();
-  if(type!=="divider")requestAnimationFrame(()=>focusBlock(row,true));
+  if(type!=="table")placeTableTools();
+  touchNote();histPush(true);
+  if(!keepSelection&&type!=="divider")requestAnimationFrame(()=>focusBlock(changed[0],true));
   updateBlockStyle();
 }
 function insertAfter(row,type="p",html="",indent=0,{record=true,focusEnd=true,align}={}){
@@ -3965,13 +3977,35 @@ function scheduleBubble(){
   bubbleRaf=requestAnimationFrame(updateBubble);
 }
 
-function updateBlockStyle(){
-  const type=currentRow()?.dataset.type;
-  const active=commands.find(command=>command.kind==="block"&&command.id===type);
-  $("#blockStyleLabel").textContent=active?.label||"Texto";
+function blockStyleRows(){
+  const rows=selectedBlockRows();
+  const row=currentRow();
+  return rows.length?rows:row?[row]:[];
+}
+function canChangeBlockStyle(rows){
+  return rows.length>0&&rows.every(row=>!["table","media"].includes(row.dataset.type));
+}
+function updateBlockStyle(rows=blockStyleMenu.classList.contains("show")?styleRows:blockStyleRows()){
+  const types=new Set(rows.map(row=>row.dataset.type));
+  const type=types.size===1?rows[0].dataset.type:null;
+  const active=commands.find(command=>command.id===type);
+  $("#blockStyleLabel").textContent=types.size>1?"Estilos mistos":active?.label||(type==="media"?"Mídia":"Texto");
+  const allowed=canChangeBlockStyle(rows);
+  $(".block-style-hint",blockStyleMenu).hidden=allowed;
   $$("[data-style-type]",blockStyleMenu).forEach(button=>{
-    button.setAttribute("aria-pressed",String(button.dataset.styleType===(active?.id||"p")));
+    button.disabled=!allowed;
+    button.setAttribute("aria-pressed",String(button.dataset.styleType===type));
   });
+}
+function changeBlockStyle(rows,type){
+  if(!canChangeBlockStyle(rows))return;
+  const keepSelection=rows.length>1||rows[0].classList.contains("block-selected");
+  if(keepSelection){
+    soltarCursor();
+    rows.forEach(row=>row.classList.add("block-selected"));
+    if(!rows.includes(ancoraSel))ancoraSel=rows[0];
+  }
+  setBlockTypes(rows,type,{keepSelection});
 }
 
 function tableToMarkdown(table){
@@ -5130,6 +5164,12 @@ function partesDaSelecao({range,inicio,fim}){
   }
   return parts;
 }
+function selectedBlockRows(){
+  const rows=blocosSelecionados();
+  if(rows.length)return rows;
+  const text=selecaoEntreBlocos();
+  return text?partesDaSelecao(text).map(({row})=>row):[];
+}
 
 function pintarSelecaoEntreBlocos(){
   const selection=selecaoEntreBlocos();
@@ -5303,7 +5343,12 @@ function atualizarArrastoSelecao(e){
   getSelection().setBaseAndExtent(anchor.startContainer,anchor.startOffset,end.startContainer,end.startOffset);
 }
 
-blockEditor.addEventListener("pointerdown",e=>{editorPointerType=e.pointerType});
+let pendingBlockDrag=[];
+blockEditor.addEventListener("pointerdown",e=>{
+  editorPointerType=e.pointerType;
+  const handle=e.target.closest(".block-handle");
+  pendingBlockDrag=handle&&e.button===0?selectedBlockRows():[];
+});
 blockEditor.addEventListener("mousedown",e=>{
   if(e.button!==0||e.target.closest(".block-handle"))return;
   if(!e.shiftKey&&!e.metaKey&&!e.ctrlKey)limparSelecaoBlocos();
@@ -5324,7 +5369,7 @@ document.addEventListener("mouseup",e=>{
 });
 window.addEventListener("blur",()=>{arrastoSel=null});
 document.addEventListener("pointerdown",e=>{
-  if(!blockEditor.contains(e.target))limparSelecaoBlocos();
+  if(!blockEditor.contains(e.target)&&!e.target.closest("#blockStyle,#blockStyleMenu,button[data-block]"))limparSelecaoBlocos();
 });
 blockEditor.addEventListener("beforeinput",e=>{
   if(e.isComposing)return;
@@ -5394,8 +5439,14 @@ blockEditor.addEventListener("dragstart",e=>{
   const h=alvo&&alvo.closest?alvo.closest(".block-handle"):null;
   if(!h){e.preventDefault();return}
   const row=h.closest(".block-row");
-  if(!row.classList.contains("block-selected"))limparSelecaoBlocos();
-  const rows=row.classList.contains("block-selected")?blocosSelecionados():[row];
+  const selection=pendingBlockDrag.length?pendingBlockDrag:selectedBlockRows();
+  pendingBlockDrag=[];
+  const rows=selection.includes(row)?selection:[row];
+  if(!selection.includes(row))limparSelecaoBlocos();
+  if(rows.length>1){
+    soltarCursor();rows.forEach(line=>line.classList.add("block-selected"));
+    ancoraSel=row;
+  }
   blockDrag={rows,marker:null};
   rows.forEach(line=>line.classList.add("dragging"));
   e.dataTransfer.setData("application/x-live-notes-blocks","move");
@@ -5454,7 +5505,7 @@ function toolClick(e){
     return;
   }
   const b=e.target.closest("[data-block]");
-  if(b){if(dentroDePopover)hideMenus();setBlockType(currentRow(),b.dataset.block,false);return}
+  if(b){if(dentroDePopover)hideMenus();changeBlockStyle(blockStyleRows(),b.dataset.block);return}
   const i=e.target.closest("[data-insert]");
   if(i){if(dentroDePopover)hideMenus();insertSpecial(i.dataset.insert);return}
 }
@@ -5530,16 +5581,37 @@ exportMenu.addEventListener("click",e=>{
 });
 $("#insertBtn").addEventListener("click",e=>{saveSelection();toggleMenu(e,"insert",false)});
 $("#formatMoreBtn").addEventListener("click",e=>{saveSelection();toggleMenu(e,"format",false)});
-blockStyleMenu.innerHTML=commands.filter(command=>command.kind==="block").map(({id,label})=>
-  `<button class="menu-item" data-style-type="${id}" aria-pressed="false">${esc(label)}</button>`
-).join("");
-$("#blockStyle").addEventListener("click",e=>{saveSelection();updateBlockStyle();toggleMenu(e,"blockStyle",false)});
+blockStyleMenu.innerHTML='<div class="block-style-title">Transformar em</div>'+
+  '<p class="block-style-hint" hidden>Selecione blocos de texto.</p>'+
+  commands.filter(command=>command.kind==="block").map(({id,icon,label})=>
+    `<button class="menu-item" data-style-type="${id}" aria-pressed="false"><span aria-hidden="true">${esc(icon)}</span>${esc(label)}</button>`
+  ).join("");
+$("#blockStyle").addEventListener("click",e=>{
+  styleRows=blockStyleRows();saveSelection();updateBlockStyle(styleRows);
+  toggleMenu(e,"blockStyle",false);
+});
+blockEditor.addEventListener("contextmenu",e=>{
+  const row=e.target.closest(".block-row"),handle=e.target.closest(".block-handle");
+  if(e.defaultPrevented||!row||(!handle&&!row.classList.contains("block-selected")))return;
+  e.preventDefault();
+  const selection=selectedBlockRows();
+  styleRows=selection.includes(row)?selection:[row];
+  if(!selection.includes(row)){
+    limparSelecaoBlocos();selecionarBlocos(row);ancoraSel=row;
+  }
+  hideMenus("blockStyle");popoverAnchor=handle||$(".block-handle",row);
+  updateBlockStyle(styleRows);
+  if(e.clientX||e.clientY)positionMenu(blockStyleMenu,e.clientX,e.clientY);
+  else positionAnchoredMenu(blockStyleMenu,popoverAnchor,5,false);
+  ($("button:not(:disabled)",blockStyleMenu)||popoverAnchor).focus({preventScroll:true});
+});
 blockStyleMenu.addEventListener("mousedown",e=>e.preventDefault());
 blockStyleMenu.addEventListener("click",e=>{
   const type=e.target.closest("[data-style-type]")?.dataset.styleType;
   if(!type)return;
-  const row=currentRow();
-  hideMenus();setBlockType(row,type,false);
+  const anchor=popoverAnchor;
+  hideMenus();changeBlockStyle(styleRows,type);
+  if(styleRows.length>1||styleRows[0]?.classList.contains("block-selected"))anchor?.focus({preventScroll:true});
 });
 $("#fontFamily").addEventListener("change",e=>execFormat("fontName",e.target.value));
 $("#fontSize").addEventListener("change",e=>applyFontSize(e.target.value));
