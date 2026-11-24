@@ -5,7 +5,7 @@
 **Editor de notas em blocos que cabe num único arquivo HTML.**
 Sem build, sem login, sem servidor — tudo salvo no seu navegador.
 
-[![Abrir markdown-live-editor](https://img.shields.io/badge/%E2%96%B6%20ABRIR%20O%20APP-live%20agora-111111?style=for-the-badge&labelColor=22c55e)](https://felipeaguiarcode.github.io/live-notes/)
+[![Abrir markdown-live-editor](https://img.shields.io/badge/%E2%96%B6%20ABRIR%20O%20APP-live%20agora-111111?style=for-the-badge&labelColor=22c55e)](https://felipeaguiarcode.github.io/markdown-live-editor/)
 
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white)
@@ -70,5 +70,4 @@ index.html     o app inteiro — markup, estilo e lógica
 servidor.py    servidor estático local, escolhe porta livre e abre o navegador
 abrir.cmd      atalho de duplo clique para o servidor
 .store/        ícones, capas, capturas e vídeo de divulgação
-mox.md         roteiro para criar a skill store-assets
 ```
