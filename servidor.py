@@ -1,4 +1,4 @@
-"""Sobe o Live Notes em http://localhost e abre o navegador.
+"""Sobe o markdown-live-editor em http://localhost e abre o navegador.
 
 Existe porque o YouTube recusa embed quando a pagina vem de file:// (a origem
 vira "null" e o player devolve erro 153). Servido por http, o video toca dentro
@@ -35,7 +35,7 @@ def main():
 
     url = f"http://localhost:{porta}/index.html"
     print("", flush=True)
-    print(f"  Live Notes  ->  {url}", flush=True)
+    print(f"  markdown-live-editor  ->  {url}", flush=True)
     print("  Deixe esta janela aberta. Ctrl+C (ou fechar a janela) para o servidor.", flush=True)
     print("", flush=True)
     if "--sem-navegador" not in sys.argv:

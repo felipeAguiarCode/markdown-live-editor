@@ -1,11 +1,11 @@
 <div align="center">
 
-# Live Notes
+# markdown-live-editor
 
 **Editor de notas em blocos que cabe num único arquivo HTML.**
 Sem build, sem login, sem servidor — tudo salvo no seu navegador.
 
-[![Abrir o app](https://img.shields.io/badge/%E2%96%B6%20ABRIR%20O%20APP-live%20agora-111111?style=for-the-badge&labelColor=22c55e)](https://felipeaguiarcode.github.io/live-notes/)
+[![Abrir markdown-live-editor](https://img.shields.io/badge/%E2%96%B6%20ABRIR%20O%20APP-live%20agora-111111?style=for-the-badge&labelColor=22c55e)](https://felipeaguiarcode.github.io/live-notes/)
 
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white)
@@ -33,12 +33,13 @@ Sem build, sem login, sem servidor — tudo salvo no seu navegador.
 - **Entrada e saída** — a barra lateral importa Markdown (arquivo ou pasta) e permite fazer backup do projeto inteiro em JSON.
 - **Exportação de pastas** — clique com o botão direito sobre uma pasta e escolha **Exportar pasta** para baixar um ZIP com as subpastas e todas as notas em Markdown.
 - **Uso offline** — notas, modelos e preferências ficam disponíveis localmente. Mídias vinculadas a sites externos dependem de conexão.
+- **Sobre** — ao lado das Configurações, abra a apresentação de Felipe Silva Aguiar e os links para LinkedIn, GitHub e Instagram.
 
 ---
 
 ## Referências dos modelos
 
-As specs do Live Notes adaptam para português estruturas do Spec Coding.
+As specs do markdown-live-editor adaptam para português estruturas do Spec Coding.
 
 | Modelo | Referência |
 | --- | --- |
@@ -68,4 +69,6 @@ Abrir o `index.html` por duplo clique também funciona — só que aí o YouTube
 index.html     o app inteiro — markup, estilo e lógica
 servidor.py    servidor estático local, escolhe porta livre e abre o navegador
 abrir.cmd      atalho de duplo clique para o servidor
+.store/        ícones, capas, capturas e vídeo de divulgação
+mox.md         roteiro para criar a skill store-assets
 ```

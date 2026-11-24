@@ -16,7 +16,7 @@ if errorlevel 1 (
   exit /b 1
 )
 echo.
-echo   Live Notes  ->  http://localhost:8123/index.html
+echo   markdown-live-editor  -^>  http://localhost:8123/index.html
 echo   Deixe esta janela aberta. Fechar a janela para o servidor.
 echo.
 start "" /b powershell -NoProfile -WindowStyle Hidden -Command "Start-Sleep -Seconds 3; Start-Process 'http://localhost:8123/index.html'"

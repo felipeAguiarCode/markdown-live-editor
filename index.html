@@ -4,8 +4,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="color-scheme" content="light dark" />
-<title>Live Notes</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20x='5'%20y='7'%20width='22'%20height='21'%20rx='4.5'%20fill='%23FFCC00'/%3E%3Cpath%20d='M11%2015h10M11%2020h7'%20stroke='%231d1d1f'%20stroke-width='2.4'%20stroke-linecap='round'/%3E%3Cpath%20d='M12%203.5v5M20%203.5v5'%20stroke='%236e6e73'%20stroke-width='2.6'%20stroke-linecap='round'/%3E%3C/svg%3E">
+<title>markdown-live-editor</title>
+<meta name="application-name" content="markdown-live-editor" />
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20128%20128%27%3E%3Cdefs%3E%3ClinearGradient%20id%3D%27tile%27%20x2%3D%27.24%27%20y2%3D%271%27%3E%3Cstop%20stop-color%3D%27%23f8fbff%27%2F%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%23c9d9f3%27%2F%3E%3C%2FlinearGradient%3E%3ClinearGradient%20id%3D%27paper%27%20x2%3D%27.15%27%20y2%3D%271%27%3E%3Cstop%20stop-color%3D%27%23fffdf8%27%2F%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%23fff2d5%27%2F%3E%3C%2FlinearGradient%3E%3ClinearGradient%20id%3D%27binding%27%20x2%3D%270%27%20y2%3D%271%27%3E%3Cstop%20stop-color%3D%27%23ffdf78%27%2F%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%23ffc64f%27%2F%3E%3C%2FlinearGradient%3E%3ClinearGradient%20id%3D%27browser%27%20x2%3D%27.2%27%20y2%3D%271%27%3E%3Cstop%20stop-color%3D%27%236b9bff%27%2F%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%233868da%27%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20x%3D%273%27%20y%3D%274%27%20width%3D%27122%27%20height%3D%27122%27%20rx%3D%2729%27%20fill%3D%27%234b6a9d%27%20opacity%3D%27.16%27%2F%3E%3Crect%20x%3D%273%27%20y%3D%272%27%20width%3D%27122%27%20height%3D%27122%27%20rx%3D%2729%27%20fill%3D%27url(%23tile)%27%20stroke%3D%27%23a4b7da%27%20stroke-width%3D%271.5%27%2F%3E%3Crect%20x%3D%275%27%20y%3D%274%27%20width%3D%27118%27%20height%3D%27118%27%20rx%3D%2727%27%20fill%3D%27none%27%20stroke%3D%27%23fff%27%20opacity%3D%27.68%27%2F%3E%3Crect%20x%3D%2724%27%20y%3D%2724%27%20width%3D%2765%27%20height%3D%2781%27%20rx%3D%2712%27%20fill%3D%27%235873a6%27%20opacity%3D%27.22%27%2F%3E%3Crect%20x%3D%2722%27%20y%3D%2720%27%20width%3D%2765%27%20height%3D%2781%27%20rx%3D%2712%27%20fill%3D%27url(%23paper)%27%20stroke%3D%27%23b99c60%27%20stroke-opacity%3D%27.48%27%2F%3E%3Cpath%20d%3D%27M34%2020h41a12%2012%200%200%201%2012%2012v10H22V32a12%2012%200%200%201%2012-12Z%27%20fill%3D%27url(%23binding)%27%2F%3E%3Cpath%20d%3D%27M22%2042h65%27%20stroke%3D%27%23dca845%27%20opacity%3D%27.64%27%2F%3E%3Cpath%20d%3D%27M34%2055h40M34%2067h27M34%2079h23M34%2090h18%27%20fill%3D%27none%27%20stroke%3D%27%239b94a1%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27%20opacity%3D%27.76%27%2F%3E%3Crect%20x%3D%2764%27%20y%3D%2760%27%20width%3D%2747%27%20height%3D%2739%27%20rx%3D%2710%27%20fill%3D%27%23274582%27%20opacity%3D%27.27%27%2F%3E%3Crect%20x%3D%2763%27%20y%3D%2756%27%20width%3D%2747%27%20height%3D%2739%27%20rx%3D%2710%27%20fill%3D%27url(%23browser)%27%20stroke%3D%27%23365cbc%27%20stroke-width%3D%271.25%27%2F%3E%3Cpath%20d%3D%27M64%2069h45%27%20stroke%3D%27%23e8f2ff%27%20stroke-opacity%3D%27.7%27%20stroke-width%3D%271.5%27%2F%3E%3Cpath%20d%3D%27M70%2063h1m5%200h1m5%200h1%27%20stroke%3D%27%23fff%27%20stroke-width%3D%272.8%27%20stroke-linecap%3D%27round%27%2F%3E%3Crect%20x%3D%2770%27%20y%3D%2775%27%20width%3D%2733%27%20height%3D%2713%27%20rx%3D%274%27%20fill%3D%27%23edf5ff%27%2F%3E%3Cpath%20d%3D%27M76%2081.5h15%27%20stroke%3D%27%2390ace4%27%20stroke-width%3D%272.2%27%20stroke-linecap%3D%27round%27%2F%3E%3C%2Fsvg%3E">
 <style>
 :root{
   color-scheme:light;
@@ -1137,6 +1138,26 @@ html[data-theme="dark"] .template-menu{border-radius:16px}
 }
 .modal input:focus{border-color:var(--accentText);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
 .modal-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:15px}
+.about-modal{max-height:calc(100dvh - 28px);color:var(--text)}
+.about-modal::backdrop{background:rgba(0,0,0,.24);backdrop-filter:blur(4px)}
+.about-header,.about-identity{display:flex;align-items:center;gap:12px}
+.about-header{justify-content:space-between;margin:0 0 13px}
+.about-header h3{margin:0}
+.about-header .icon-btn{width:28px;height:28px;color:var(--text2)}
+.about-header .icon-btn svg{width:15px;height:15px}
+.about-identity{margin:0 0 14px}
+.about-identity img{width:50px;height:50px;flex:none}
+.about-identity strong,.about-identity span{display:block}
+.about-identity strong{font-size:17px;line-height:1.25}
+.about-identity span{font-size:12px;color:var(--text2);margin-top:3px;overflow-wrap:anywhere}
+.about-socials{display:grid;gap:5px;margin-top:16px}
+.about-socials a{
+  display:flex;align-items:center;gap:10px;min-height:37px;padding:6px 10px;border-radius:8px;
+  border:1px solid var(--line);color:var(--text);font-size:13px;text-decoration:none;
+}
+.about-socials a:hover{background:var(--hover);border-color:var(--line2)}
+.about-socials svg{width:16px;height:16px;flex:none;color:var(--accentText)}
+.about-socials svg:last-child{width:13px;height:13px;margin-left:auto;color:var(--text2)}
 .btn{
   height:34px;border:1px solid var(--line);border-radius:9px;
   padding:0 13px;background:var(--editor);cursor:pointer
@@ -1223,7 +1244,7 @@ html[data-theme="dark"] .template-menu{border-radius:16px}
   @page{margin:18mm 16mm}
   html,body{height:auto;overflow:visible;background:#fff}
   .quick-actions,.sidebar,.notes-pane,.note-bar,.formatbar,.find-bar,.bubble-bar,.media-resizer,
-  .popover,.toast,.tooltip,.modal-backdrop,.slash-menu,.block-handle,.editor-empty,.table-tools{display:none!important}
+  .popover,.toast,.tooltip,.modal-backdrop,.about-modal,.slash-menu,.block-handle,.editor-empty,.table-tools{display:none!important}
   .app{display:block;width:auto;height:auto}
   .workspace{display:block;background:#fff}
   .editor-scroll{overflow:visible;height:auto}
@@ -1349,6 +1370,9 @@ html[data-theme="dark"] .template-menu{border-radius:16px}
         </button>
         <button class="icon-btn" id="settingsBtn" data-tip="Configurações">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 9 19.4a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4.6 9a1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>
+        </button>
+        <button class="icon-btn" id="aboutBtn" type="button" aria-label="Sobre" data-tip="Sobre" aria-haspopup="dialog" aria-controls="aboutDialog">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5m0-8v.1"/></svg>
         </button>
       </div>
     </div>
@@ -1819,6 +1843,37 @@ html[data-theme="dark"] .template-menu{border-radius:16px}
   </div>
 </div>
 
+<dialog class="modal about-modal" id="aboutDialog" aria-labelledby="aboutTitle" aria-describedby="aboutBio">
+  <div class="about-header">
+    <h3 id="aboutTitle">Sobre o app</h3>
+    <button class="icon-btn" id="aboutClose" type="button" aria-label="Fechar" autofocus>
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <div class="about-identity">
+    <img id="aboutIcon" alt="" width="50" height="50">
+    <div><strong>Felipe Silva Aguiar</strong><span id="aboutCredit"></span></div>
+  </div>
+  <p id="aboutBio">Sou desenvolvedor full stack e instrutor na DIO. Compartilho projetos e exemplos práticos de desenvolvimento web e engenharia de IA.</p>
+  <nav class="about-socials" aria-label="Perfis de Felipe Silva Aguiar">
+    <a href="https://www.linkedin.com/in/felipeaguiar-exe" target="_blank" rel="noopener noreferrer">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 8a1.7 1.7 0 1 0 0-3.4A1.7 1.7 0 0 0 5 8ZM3.6 9.8h2.8V20H3.6zM9 9.8h2.7v1.4a3.4 3.4 0 0 1 3-1.7c2.8 0 4 1.7 4 4.2V20h-2.8v-5.6c0-1.5-.5-2.3-1.8-2.3-1.4 0-2.3 1-2.3 2.5V20H9z"/></svg>
+      LinkedIn
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M6 18 18 6M8 6h10v10"/></svg>
+    </a>
+    <a href="https://github.com/felipeAguiarCode" target="_blank" rel="noopener noreferrer">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.8a9.2 9.2 0 0 0-2.9 17.9c.46.09.63-.2.63-.45v-1.7c-2.57.55-3.1-1.1-3.1-1.1-.42-1.05-1.02-1.33-1.02-1.33-.84-.58.06-.57.06-.57.93.07 1.42.96 1.42.96.82 1.4 2.15 1 2.67.77.08-.6.32-1 .58-1.22-2.05-.23-4.2-1.03-4.2-4.55 0-1 .36-1.82.95-2.47-.1-.23-.42-1.18.09-2.46 0 0 .77-.25 2.53.95a8.8 8.8 0 0 1 4.6 0c1.76-1.2 2.53-.95 2.53-.95.5 1.28.19 2.23.09 2.46.6.65.94 1.47.94 2.47 0 3.53-2.15 4.31-4.2 4.54.33.29.63.85.63 1.71v2.49c0 .25.16.54.63.45A9.2 9.2 0 0 0 12 2.8Z"/></svg>
+      GitHub
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M6 18 18 6M8 6h10v10"/></svg>
+    </a>
+    <a href="https://www.instagram.com/felipeaguiar.exe/" target="_blank" rel="noopener noreferrer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17.2" cy="6.8" r=".9" fill="currentColor" stroke="none"/></svg>
+      Instagram
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M6 18 18 6M8 6h10v10"/></svg>
+    </a>
+  </nav>
+</dialog>
+
 <div class="toast" id="toast" role="status"></div>
 <div class="tooltip" id="tooltip"></div>
 
@@ -1832,6 +1887,7 @@ html[data-theme="dark"] .template-menu{border-radius:16px}
 (() => {
 "use strict";
 
+const APP_NAME = document.title;
 const STORAGE_KEY = "minimal-markdown-notes-block-v3";
 const OLD_STORAGE_KEY = "minimal-markdown-notes-v1";
 const THEME_KEY = "minimal-markdown-notes-theme";
@@ -1923,6 +1979,7 @@ let styleRows=[];
 const iconMenu = $("#iconMenu");
 let calloutAlvo = null;
 const settingsBackdrop = $("#settingsBackdrop");
+const aboutDialog = $("#aboutDialog");
 const themeGrid = $("#themeGrid");
 const insetRange = $("#insetRange");
 const paperStyle = $("#paperStyle");
@@ -2316,8 +2373,8 @@ function demoState(){
       {id:projectsId,name:"Projetos",parentId:null,createdAt:now()}
     ],
     notes:[
-      demoNote(notesId,"Boas-vindas ao Live Notes",[
-        blankBlock("p","Use o Live Notes para guardar ideias, rascunhar prompts e planejar projetos. Suas notas ficam salvas neste navegador."),
+      demoNote(notesId,`Boas-vindas ao ${APP_NAME}`,[
+        blankBlock("p",`Use o ${APP_NAME} para guardar ideias, rascunhar prompts e planejar projetos. Suas notas ficam salvas neste navegador.`),
         blankBlock("divider"),
         blankBlock("h2","Comece por aqui"),
         blankBlock("todo","Crie uma nota para registrar uma ideia"),
@@ -4233,7 +4290,7 @@ function exportNotePDF(){
 
 function exportProject(){
   saveState(true);
-  download(`notes-project-${new Date().toISOString().slice(0,10)}.json`,JSON.stringify({app:"Notes Block Editor",version:3,exportedAt:now(),data:state},null,2),"application/json");
+  download(`${APP_NAME}-${new Date().toISOString().slice(0,10)}.json`,JSON.stringify({app:APP_NAME,version:3,exportedAt:now(),data:state},null,2),"application/json");
   toast("Projeto exportado")
 }
 
@@ -4771,6 +4828,18 @@ $("#themeBtn").addEventListener("click",toggleTheme);
 $("#settingsBtn").addEventListener("click",openSettings);
 $("#settingsClose").addEventListener("click",closeSettings);
 settingsBackdrop.addEventListener("mousedown",e=>{if(e.target===settingsBackdrop)closeSettings()});
+$("#aboutBtn").addEventListener("click",()=>{
+  hideMenus();closeSlash();hideBubble();
+  $("#aboutIcon").src=$('link[rel="icon"]').href;
+  $("#aboutCredit").textContent=`Criador do ${APP_NAME}`;
+  aboutDialog.showModal();
+});
+$("#aboutClose").addEventListener("click",()=>aboutDialog.close());
+aboutDialog.addEventListener("click",e=>{
+  if(e.target!==aboutDialog)return;
+  const box=aboutDialog.getBoundingClientRect();
+  if(e.clientX<box.left||e.clientX>box.right||e.clientY<box.top||e.clientY>box.bottom)aboutDialog.close();
+});
 themeGrid.addEventListener("click",e=>{
   const c=e.target.closest("[data-tema]");if(!c)return;
   changeTheme(c.dataset.tema,c);
@@ -5466,7 +5535,7 @@ blockEditor.addEventListener("dragstart",e=>{
   }
   blockDrag={rows,marker:null};
   rows.forEach(line=>line.classList.add("dragging"));
-  e.dataTransfer.setData("application/x-live-notes-blocks","move");
+  e.dataTransfer.setData("application/x-markdown-live-editor-blocks","move");
   e.dataTransfer.effectAllowed="move";
 });
 blockEditor.addEventListener("dragover",e=>{
@@ -5890,6 +5959,7 @@ document.addEventListener("click",e=>{
   if(!e.target.closest(".slash-menu")&&!e.target.closest(".block-content"))closeSlash()
 });
 document.addEventListener("keydown",e=>{
+  if(aboutDialog.open)return;
   const mod=e.metaKey||e.ctrlKey;
   if(modalBackdrop.classList.contains("show")){
     if(e.key==="Escape")modalCancel.click();
