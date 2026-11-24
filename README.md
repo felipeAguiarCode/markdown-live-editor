@@ -19,12 +19,34 @@ Sem build, sem login, sem servidor — tudo salvo no seu navegador.
 
 ## Recursos
 
+- **Modelos de nota** — o ícone **Modelos** no canto superior direito abre oito modelos de prompt, incluindo Zero-shot, Few-shot e Many-shot, e nove categorias de specs com opções especializadas. Cada modelo cria uma nota editável na pasta ativa.
 - **Blocos pelo menu `/`** — título, lista, checklist, citação, destaque, toggle, código, tabela e divisor.
-- **Organização** — pastas, busca e blocos que se reordenam arrastando.
-- **7 temas** — claro, escuro, Dracula, Catppuccin, Nord, Gruvbox e HTB.
+- **Organização** — pastas e subpastas, notas fixadas no topo, busca sem acentos e ordenação por edição, criação ou título. Use o menu da nota ou arraste-a para movê-la a outra pasta.
+- **Desktop e celular** — no desktop, os painéis começam ocultos. Use **Mostrar painéis** para abrir pastas e notas. No celular, a seta do editor volta à lista.
+- **13 temas** — o tema Escuro é o padrão. As escolhas de tema e visibilidade dos painéis são salvas no navegador.
 - **Mídia** — imagem, vídeo do YouTube/Vimeo/`.mp4`, tudo redimensionável.
-- **Entra e sai fácil** — importa Markdown (arquivo ou pasta) e exporta `.md`, `.html`, PDF ou o projeto inteiro em `.json`.
-- **Offline de verdade** — tudo mora no `localStorage`, nada sai da sua máquina.
+- **Opções da nota** — o menu de três pontos reúne exportação em Markdown, HTML ou PDF e a opção **Resetar nota…**, que confirma antes de limpar o conteúdo.
+- **Entrada e saída** — a barra lateral importa Markdown (arquivo ou pasta) e permite fazer backup do projeto inteiro em JSON.
+- **Exportação de pastas** — clique com o botão direito sobre uma pasta e escolha **Exportar pasta** para baixar um ZIP com as subpastas e todas as notas em Markdown.
+- **Uso offline** — notas, modelos e preferências ficam disponíveis localmente. Mídias vinculadas a sites externos dependem de conexão.
+
+---
+
+## Referências dos modelos
+
+As specs do Live Notes adaptam para português estruturas do Spec Coding.
+
+| Modelo | Referência |
+| --- | --- |
+| Contexto de projeto | [Software Spec Template](https://spec-coding.dev/resources/software-spec-template-google-docs) |
+| Spec de funcionalidade | [Feature Spec](https://spec-coding.dev/templates/feature-spec) |
+| Spec de API | [API Spec](https://spec-coding.dev/templates/api-spec) |
+| Spec de banco de dados | [DB Spec](https://spec-coding.dev/templates/db-spec) |
+| Design técnico | [SDD Design Doc](https://spec-coding.dev/templates/sdd-design-doc) |
+| Plano de implementação | [SDD Tasks Plan](https://spec-coding.dev/templates/sdd-tasks-plan) |
+| Critérios de aceite | [Acceptance Criteria](https://spec-coding.dev/guides/acceptance-criteria-examples) |
+| Registro de evidências | [SDD Evidence Log](https://spec-coding.dev/templates/sdd-evidence-log) |
+| Revisão de código com IA | [AI Coding Review](https://spec-coding.dev/templates/ai-coding-review) |
 
 ---
 
