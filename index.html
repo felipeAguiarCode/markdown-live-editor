@@ -1085,7 +1085,9 @@ html[data-theme="dark"] :is(.collapse-btn,.note-bar .tool-btn,.formatbar .tool-b
 .menu-item.danger{color:var(--danger)}
 .menu-item svg{width:15px;height:15px}
 .insert-menu .menu-item svg{flex:none;fill:none;stroke:currentColor;stroke-width:1.7;color:var(--accentText)}
-.note-actions-menu .menu-item > svg{flex:none;fill:none;stroke:currentColor;stroke-width:1.7}
+.note-actions-menu .menu-item > svg,.editor-context-menu .menu-item > svg{flex:none;fill:none;stroke:currentColor;stroke-width:1.7}
+.editor-context-menu .menu-item > svg:last-child:not(:first-child){margin-left:auto;color:var(--text3)}
+.editor-context-title{padding:6px 9px;color:var(--text2);font-size:11.5px;font-weight:650}
 .menu-sep{height:1px;background:var(--line);margin:5px 3px}
 .menu-item[aria-pressed="true"]{background:var(--selected);color:var(--accentText);font-weight:650}
 .template-menu{width:min(326px,calc(100vw - 16px));max-height:calc(100dvh - 66px);padding:7px}
@@ -1693,6 +1695,7 @@ html[data-theme="dark"] .template-menu{border-radius:16px}
   </button>
 </div>
 <div class="popover block-style-menu" id="blockStyleMenu" aria-label="Estilos do bloco"></div>
+<div class="popover editor-context-menu" id="editorMenu" aria-label="Opções do editor"></div>
 
 <div class="popover" id="videoMenu">
   <button class="menu-item" data-video="file">Arquivo do computador</button>
@@ -1914,6 +1917,8 @@ const bubbleMenu = $("#bubbleMenu");
 const videoMenu = $("#videoMenu");
 const exportMenu = $("#exportMenu");
 const blockStyleMenu = $("#blockStyleMenu");
+const editorMenu = $("#editorMenu");
+const editorScroll = $("#editorScroll");
 let styleRows=[];
 const iconMenu = $("#iconMenu");
 let calloutAlvo = null;
@@ -4076,9 +4081,8 @@ function codeToPlain(html=""){
   d.innerHTML=String(html).replace(/<br\s*\/?>/gi,"\n").replace(/<\/(div|p)>/gi,"\n").replace(/<(div|p)[^>]*>/gi,"");
   return (d.textContent||"").replace(/\n$/,"");
 }
-function noteToMarkdown(note){
-  const blocks=note.blocks||[];
-  const out=[`# ${note.title||"Sem título"}`,""];
+function blocksToMarkdown(blocks){
+  const out=[];
   const sanfonas=[];   /* indentacoes de toggles abertos, para fechar o <details> */
   const fecharAte=ind=>{
     while(sanfonas.length&&ind<=sanfonas[sanfonas.length-1]){sanfonas.pop();out.push("</details>","")}
@@ -4112,7 +4116,10 @@ function noteToMarkdown(note){
     }else out.push(md,"");
   });
   fecharAte(-1);
-  return out.join("\n").replace(/\n{3,}/g,"\n\n").trim()+"\n";
+  return out.join("\n").replace(/\n{3,}/g,"\n\n").trimEnd()+"\n";
+}
+function noteToMarkdown(note){
+  return `# ${note.title||"Sem título"}\n\n${blocksToMarkdown(note.blocks||[])}`.trimEnd()+"\n";
 }
 function download(name,text,type="text/plain"){
   const blob=new Blob([text],{type}),url=URL.createObjectURL(blob);
@@ -4448,7 +4455,7 @@ async function importProject(file){
 function toast(msg,ms=1600){
   const t=$("#toast");t.textContent=msg;t.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove("show"),ms)
 }
-const popovers={more:moreMenu,folder:folderMenu,move:moveMenu,sort:sortMenu,templates:templatesMenu,import:importMenu,blockStyle:blockStyleMenu,table:tableMenu,
+const popovers={more:moreMenu,folder:folderMenu,move:moveMenu,sort:sortMenu,templates:templatesMenu,import:importMenu,blockStyle:blockStyleMenu,table:tableMenu,editor:editorMenu,
   highlight:highlightMenu,insert:insertMenu,format:formatMenu,bubble:bubbleMenu,video:videoMenu,export:exportMenu,icon:iconMenu};
 let popoverAnchor=null;
 
@@ -5016,23 +5023,25 @@ blockEditor.addEventListener("keydown",e=>{
 blockEditor.addEventListener("paste",e=>{
   if(!e.clipboardData)return;
   const row=apagarSelecaoEntreBlocos()||e.target.closest?.(".block-row");
+  if(pasteIntoBlock(row,e.clipboardData.getData("text/plain")||"",e.clipboardData.getData("text/html")||"")){
+    e.preventDefault();
+  }
+});
+function pasteIntoBlock(row,plain,html=""){
   const c=row&&$(".block-content",row);
-  if(!c||c.contentEditable==="false")return;
-  const plain=e.clipboardData.getData("text/plain")||"";
-  const html=e.clipboardData.getData("text/html")||"";
-  e.preventDefault();
+  if(!c||c.contentEditable==="false")return false;
   if(row.dataset.type==="table"){
     apagarSelecaoTexto();
     if(selectedTableCell())document.execCommand("insertText",false,plain);
-    touchNote();return;
+    touchNote();return true;
   }
-  if(row.dataset.type==="code"){document.execCommand("insertText",false,plain);touchNote();return}
+  if(row.dataset.type==="code"){document.execCommand("insertText",false,plain);touchNote();return true}
   /* varias linhas: interpreta como Markdown e vira blocos de verdade */
   if(/\n/.test(plain.trim())){
     histPush(true);
     const parsed=markdownToNote(plain,"");
     const blocos=parsed.blocks.filter(b=>b.type!=="p"||htmlToPlain(b.html).trim());
-    if(!blocos.length)return;
+    if(!blocos.length)return true;
     const vazio=!(c.textContent||"").trim();
     let ref=row;
     blocos.forEach((b,i)=>{
@@ -5048,14 +5057,15 @@ blockEditor.addEventListener("paste",e=>{
       ref.insertAdjacentHTML("afterend",blockHTML(b));
       ref=ref.nextElementSibling;
     });
-    renumberLists();touchNote();
+    renumberLists();applyToggles();touchNote();
     requestAnimationFrame(()=>focusBlock(ref,true));
-    return;
+    return true;
   }
   const limpo=html?cleanPastedHTML(html):esc(plain);
   document.execCommand("insertHTML",false,limpo||esc(plain));
   touchNote();
-});
+  return true;
+}
 blockEditor.addEventListener("mouseup",()=>{saveSelection();updateBlockStyle();scheduleBubble()});
 blockEditor.addEventListener("keyup",()=>{saveSelection();scheduleBubble()});
 blockEditor.addEventListener("input",()=>hideBubble());
@@ -5291,8 +5301,7 @@ function selecaoCobreBloco(c){
   if(!s||!s.rangeCount||s.isCollapsed)return false;
   return s.getRangeAt(0).toString().length>=(c.textContent||"").length;
 }
-function apagarBlocosSelecionados(){
-  const alvos=blocosSelecionados();
+function apagarBlocosSelecionados(alvos=blocosSelecionados()){
   if(!alvos.length)return false;
   histPush(true);
   const vizinho=alvos[alvos.length-1].nextElementSibling||alvos[0].previousElementSibling;
@@ -5306,6 +5315,7 @@ function apagarBlocosSelecionados(){
   }
   renumberLists();applyToggles();touchNote();
   toast(alvos.length===1?"Bloco excluído":`${alvos.length} blocos excluídos`);
+  foco||=$(".block-row:not(.oculto)",blockEditor);
   if(foco)requestAnimationFrame(()=>focusBlock(foco,true));
   return true;
 }
@@ -5369,7 +5379,7 @@ document.addEventListener("mouseup",e=>{
 });
 window.addEventListener("blur",()=>{arrastoSel=null});
 document.addEventListener("pointerdown",e=>{
-  if(!blockEditor.contains(e.target)&&!e.target.closest("#blockStyle,#blockStyleMenu,button[data-block]"))limparSelecaoBlocos();
+  if(!editorScroll.contains(e.target)&&!e.target.closest("#blockStyle,#blockStyleMenu,#editorMenu,button[data-block]"))limparSelecaoBlocos();
 });
 blockEditor.addEventListener("beforeinput",e=>{
   if(e.isComposing)return;
@@ -5431,6 +5441,13 @@ function finishBlockDrag(){
   blockDrag.rows.forEach(row=>row.classList.remove("dragging"));
   blockDrag=null;
 }
+function moveBlockRows(rows,before){
+  histPush(true);
+  const fragment=document.createDocumentFragment();
+  fragment.append(...rows);
+  blockEditor.insertBefore(fragment,before);
+  renumberLists();applyToggles();touchNote();histPush(true);
+}
 blockEditor.addEventListener("dragstart",e=>{
   /* com texto ja selecionado o navegador tenta arrastar o proprio texto: o alvo
      vem como no de texto (sem closest) e o gesto de selecionar varios blocos
@@ -5477,11 +5494,7 @@ blockEditor.addEventListener("drop",e=>{
   const reordered=remaining.slice();
   reordered.splice(index,0,...moving);
   if(reordered.every((row,i)=>row===current[i]))return;
-  histPush(true);
-  const fragment=document.createDocumentFragment();
-  fragment.append(...moving);
-  blockEditor.insertBefore(fragment,remaining[index]??null);
-  renumberLists();applyToggles();touchNote();
+  moveBlockRows(moving,remaining[index]??null);
 });
 blockEditor.addEventListener("dragend",finishBlockDrag);
 
@@ -5590,28 +5603,189 @@ $("#blockStyle").addEventListener("click",e=>{
   styleRows=blockStyleRows();saveSelection();updateBlockStyle(styleRows);
   toggleMenu(e,"blockStyle",false);
 });
-blockEditor.addEventListener("contextmenu",e=>{
-  const row=e.target.closest(".block-row"),handle=e.target.closest(".block-handle");
-  if(e.defaultPrevented||!row||(!handle&&!row.classList.contains("block-selected")))return;
-  e.preventDefault();
-  const selection=selectedBlockRows();
-  styleRows=selection.includes(row)?selection:[row];
-  if(!selection.includes(row)){
-    limparSelecaoBlocos();selecionarBlocos(row);ancoraSel=row;
-  }
-  hideMenus("blockStyle");popoverAnchor=handle||$(".block-handle",row);
-  updateBlockStyle(styleRows);
-  if(e.clientX||e.clientY)positionMenu(blockStyleMenu,e.clientX,e.clientY);
-  else positionAnchoredMenu(blockStyleMenu,popoverAnchor,5,false);
-  ($("button:not(:disabled)",blockStyleMenu)||popoverAnchor).focus({preventScroll:true});
-});
 blockStyleMenu.addEventListener("mousedown",e=>e.preventDefault());
 blockStyleMenu.addEventListener("click",e=>{
   const type=e.target.closest("[data-style-type]")?.dataset.styleType;
   if(!type)return;
   const anchor=popoverAnchor;
+  const keepFocus=styleRows.every(row=>row.dataset.type===type)||styleRows.length>1||styleRows[0]?.classList.contains("block-selected");
   hideMenus();changeBlockStyle(styleRows,type);
-  if(styleRows.length>1||styleRows[0]?.classList.contains("block-selected"))anchor?.focus({preventScroll:true});
+  if(keepFocus)anchor?.focus({preventScroll:true});
+});
+
+const editorActionIcons={
+  transform:'<path d="M5 5h14M12 5v14m-4 0h8"/>',
+  copy:'<rect x="7" y="7" width="13" height="13" rx="2"/><path d="M4 16V6a2 2 0 0 1 2-2h10"/>',
+  cut:'<circle cx="6" cy="7" r="2.5"/><circle cx="6" cy="17" r="2.5"/><path d="m8 8.5 12 8.5M8 15.5l12-8.5"/>',
+  paste:'<rect x="5" y="5" width="14" height="16" rx="2"/><path d="M9 5V3h6v4H9V5m0 6h6m-6 4h6"/>',
+  duplicate:'<rect x="7" y="7" width="13" height="13" rx="2"/><path d="M4 16V6a2 2 0 0 1 2-2h10m-5 9h5m-2.5-2.5v5"/>',
+  above:'<path d="M5 17h14M12 4v8m-4-4h8"/>',
+  below:'<path d="M5 7h14m-7 5v8m-4-4h8"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  up:'<path d="M12 19V5m-5 5 5-5 5 5"/>',
+  down:'<path d="M12 5v14m-5-5 5 5 5-5"/>',
+  delete:'<path d="M4 7h16m-14 0 1 12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-12m-9 0V4h6v3m-5 4v5m4-5v5"/>'
+};
+let editorContext=null,rightClickRange=null;
+
+function editorRange(){
+  const selection=getSelection();
+  const range=selection?.rangeCount?selection.getRangeAt(0):null;
+  return range&&conteudoDoNo(range.startContainer)&&conteudoDoNo(range.endContainer)?range.cloneRange():null;
+}
+function includeToggleChildren(rows){
+  const blocks=new Set(rows);
+  for(const row of rows){
+    if(row.dataset.type!=="toggle")continue;
+    const indent=Number(row.dataset.indent);
+    for(let child=row.nextElementSibling;child&&Number(child.dataset.indent)>indent;child=child.nextElementSibling){
+      blocks.add(child);
+    }
+  }
+  return linhasDoEditor().filter(row=>blocks.has(row));
+}
+function editorAction(action,label,icon=action,{disabled=false,danger=false,submenu=false}={}){
+  return `<button type="button" class="menu-item${danger?" danger":""}" data-editor-action="${action}" ${disabled?"disabled":""}>
+    <svg viewBox="0 0 24 24" aria-hidden="true">${editorActionIcons[icon]}</svg>
+    <span>${label}</span>${submenu?icons.chev:""}
+  </button>`;
+}
+function openEditorMenu(row,anchor,point,range){
+  const note=selectedNote();
+  const content=row&&$(".block-content",row);
+  const blocks=blocosSelecionados();
+  const text=blocks.includes(row)?null:range&&!range.collapsed&&range.intersectsNode(content||blockEditor)?range:null;
+  const spanning=text&&selecaoEntreBlocos(text);
+  const selected=spanning?partesDaSelecao(spanning).map(({row})=>row):blocks;
+  const rows=row?(selected.includes(row)?selected:[row]):[];
+  const structural=includeToggleChildren(rows);
+  const before=structural[0]?.previousElementSibling||null;
+  const after=structural.at(-1)?.nextElementSibling||null;
+  const caret=content?.isContentEditable?
+    (point&&anchor===content?caretNoConteudo(content,point.x,point.y):range&&content.contains(range.startContainer)?range:null):null;
+  const insertionIndent=side=>Number(rows[side==="above"?0:rows.length-1]?.dataset.indent)||0;
+  editorContext={noteId:note?.id,row,rows,structural,text,caret,before,after,insertionIndent};
+
+  const separator='<div class="menu-sep"></div>';
+  const title=rows.length>1?`${rows.length} blocos`:rows.length?"Ações do bloco":"Editor";
+  const items=[`<div class="editor-context-title">${title}</div>`];
+  if(row){
+    const target=text?"texto":rows.length>1?"blocos":"bloco";
+    items.push(editorAction("transform","Transformar em","transform",{disabled:!canChangeBlockStyle(rows),submenu:true}),
+      separator, editorAction("copy",`Copiar ${target}`),editorAction("cut",`Recortar ${target}`),
+      editorAction("paste","Colar texto","paste",{disabled:!content.isContentEditable}),editorAction("duplicate",rows.length>1?"Duplicar blocos":"Duplicar bloco"),
+      separator,editorAction("above","Inserir bloco acima"),editorAction("below","Inserir bloco abaixo"),
+      editorAction("up","Mover para cima","up",{disabled:!before}),editorAction("down","Mover para baixo","down",{disabled:!after}),
+      separator,editorAction("delete",rows.length>1?"Excluir blocos":"Excluir bloco","delete",{danger:true}));
+  }else items.push(editorAction("append",note?"Adicionar bloco":"Nova nota","plus"));
+  editorMenu.innerHTML=items.join("");
+  rightClickRange=null;
+  closeSlash();hideBubble();hideMenus("editor");
+  popoverAnchor=anchor;
+  if(point)positionMenu(editorMenu,point.x,point.y);
+  else positionAnchoredMenu(editorMenu,anchor,5,false);
+  $("button:not(:disabled)",editorMenu)?.focus({preventScroll:true});
+}
+function openEditorMenuFromEvent(event,keyboard=false){
+  if(event.defaultPrevented||event.target===docTitle||event.target.closest("input,select,textarea"))return;
+  const row=event.target.closest(".block-row");
+  const content=row&&$(".block-content",row);
+  const anchor=event.target.closest(".block-handle")||
+    (content?.contains(event.target)?content:row&&$(".block-handle",row))||docTitle;
+  const point=keyboard?null:{x:event.clientX,y:event.clientY};
+  event.preventDefault();
+  openEditorMenu(row,anchor,point,keyboard?editorRange():rightClickRange||editorRange());
+}
+editorScroll.addEventListener("pointerdown",e=>{rightClickRange=e.button===2?editorRange():null});
+editorScroll.addEventListener("contextmenu",e=>openEditorMenuFromEvent(e));
+editorScroll.addEventListener("keydown",e=>{
+  if(e.key==="ContextMenu"||(e.key==="F10"&&e.shiftKey))openEditorMenuFromEvent(e,true);
+});
+
+function restoreEditorPosition(context){
+  const range=context.text||context.caret;
+  const start=conteudoDoNo(range?.startContainer);
+  if(start){restaurarCaret(start,range);return start.closest(".block-row")}
+  focusBlock(context.row,true);
+  return context.row;
+}
+function contextBlocks(context){
+  const ids=new Set(context.structural.map(row=>row.dataset.blockId));
+  syncActiveNoteFromDOM();
+  return selectedNote().blocks.filter(block=>ids.has(block.id));
+}
+async function copyEditorContext(context,cut){
+  const selection=context.text&&selecaoEntreBlocos(context.text);
+  const text=selection?partesDaSelecao(selection).map(({part})=>part.toString()).join("\n"):
+    context.text?context.text.toString():blocksToMarkdown(contextBlocks(context)).trimEnd();
+  try{
+    await navigator.clipboard.writeText(text);
+  }catch{
+    toast("Não foi possível acessar a área de transferência.");return;
+  }
+  if(!cut){toast("Copiado");return}
+  if(!context.row.isConnected||selectedNote()?.id!==context.noteId)return;
+  if(context.text){restoreEditorPosition(context);apagarSelecaoTexto()}
+  else apagarBlocosSelecionados(context.structural);
+}
+async function pasteEditorContext(context){
+  try{
+    const plain=await navigator.clipboard.readText();
+    if(!plain||!context.row.isConnected||selectedNote()?.id!==context.noteId)return;
+    const row=restoreEditorPosition(context);
+    pasteIntoBlock(apagarSelecaoEntreBlocos()||row,plain);
+  }catch{
+    if(context.row.isConnected)restoreEditorPosition(context);
+    toast("Use Ctrl+V ou ⌘V para colar.");
+  }
+}
+editorMenu.addEventListener("click",e=>{
+  const action=e.target.closest("[data-editor-action]")?.dataset.editorAction;
+  const context=editorContext,anchor=popoverAnchor;
+  if(!action||!context||context.noteId!==selectedNote()?.id)return;
+  const {rows,structural,before,after}=context;
+  if(action==="transform"){
+    const rect=editorMenu.getBoundingClientRect();
+    styleRows=rows;
+    hideMenus("blockStyle");popoverAnchor=anchor;
+    updateBlockStyle(rows);positionMenu(blockStyleMenu,rect.left,rect.top);
+    $("button:not(:disabled)",blockStyleMenu)?.focus({preventScroll:true});
+    return;
+  }
+  hideMenus();
+  if(action==="append"){
+    const last=linhasDoEditor().at(-1);
+    if(last)insertAfter(last);else createNote();
+  }else if(action==="copy"||action==="cut"){
+    anchor?.focus({preventScroll:true});copyEditorContext(context,action==="cut");
+  }else if(action==="paste"){
+    pasteEditorContext(context);
+  }else if(action==="delete"){
+    apagarBlocosSelecionados(structural);
+  }else if(action==="duplicate"){
+    histPush(true);
+    const copies=contextBlocks(context).map(block=>blockHTML({...block,id:uid()})).join("");
+    structural.at(-1).insertAdjacentHTML("afterend",copies);
+    normalizarVideos();renumberLists();applyToggles();touchNote();histPush(true);
+    anchor?.focus({preventScroll:true});
+  }else if(action==="up"||action==="down"){
+    moveBlockRows(structural,action==="up"?before:includeToggleChildren([after]).at(-1).nextElementSibling);
+    anchor?.focus({preventScroll:true});
+  }else if(action==="above"||action==="below"){
+    const above=action==="above";
+    const edge=above?structural[0]:structural.at(-1);
+    if(above){
+      histPush(true);
+      edge.insertAdjacentHTML("beforebegin",blockHTML(blankBlock("p","",context.insertionIndent(action))));
+      renumberLists();applyToggles();touchNote();focusBlock(edge.previousElementSibling,false);
+    }else insertAfter(edge,"p","",context.insertionIndent(action),{focusEnd:false});
+  }
+});
+editorMenu.addEventListener("keydown",e=>{
+  if(!["ArrowUp","ArrowDown","Home","End"].includes(e.key))return;
+  const buttons=$$("button:not(:disabled)",editorMenu),index=buttons.indexOf(document.activeElement);
+  const next=e.key==="Home"?0:e.key==="End"?buttons.length-1:(index+buttons.length+(e.key==="ArrowDown"?1:-1))%buttons.length;
+  e.preventDefault();buttons[next]?.focus({preventScroll:true});
 });
 $("#fontFamily").addEventListener("change",e=>execFormat("fontName",e.target.value));
 $("#fontSize").addEventListener("change",e=>applyFontSize(e.target.value));
