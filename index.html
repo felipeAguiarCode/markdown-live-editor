@@ -8,30 +8,32 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20x='5'%20y='7'%20width='22'%20height='21'%20rx='4.5'%20fill='%23FFCC00'/%3E%3Cpath%20d='M11%2015h10M11%2020h7'%20stroke='%231d1d1f'%20stroke-width='2.4'%20stroke-linecap='round'/%3E%3Cpath%20d='M12%203.5v5M20%203.5v5'%20stroke='%236e6e73'%20stroke-width='2.6'%20stroke-linecap='round'/%3E%3C/svg%3E">
 <style>
 :root{
-  --bg:#f6f3eb;
-  --sidebar:#f6f3eb;
-  --sidebar2:#efebe1;
-  --notes:#fcfaf5;
-  --editor:#fffefa;
-  --toolbar:#fffefa;
+  color-scheme:light;
+  --bg:#f7f7f5;
+  --sidebar:#f7f7f5;
+  --sidebar2:#efeeeb;
+  --notes:#fbfbfa;
+  --editor:#ffffff;
+  --toolbar:#ffffff;
   --raised:var(--editor);
-  --link:#007aff;
-  --text:#28251f;
+  --link:#0b6e99;
+  --text:#37352f;
   --heading-text:var(--text);
-  --text2:#6e675b;
-  --text3:#7d7364;
-  --line:rgba(80,64,34,.12);
-  --line2:rgba(80,64,34,.22);
-  --hover:rgba(88,67,22,.065);
-  --selected:#f7ebcd;
-  --accent:#eebd4f;
-  --accentText:#805808;
-  --danger:#ac382c;
-  --code:#f7f3e9;
+  --text2:#64615b;
+  --text3:#76736c;
+  --line:rgba(55,53,47,.12);
+  --line2:rgba(55,53,47,.22);
+  --hover:rgba(55,53,47,.065);
+  --selected:#eeedea;
+  --accent:#a7d4e9;
+  --accentText:#0b6e99;
+  --danger:#a63332;
+  --code:#f4f3f0;
   --scroll-thumb:color-mix(in srgb,var(--accentText) 42%,var(--sidebar2));
   --scroll-track:color-mix(in srgb,var(--sidebar2) 42%,transparent);
   /* marca-texto: uma cor so, derivada do acento do tema */
   --hl:color-mix(in srgb,var(--accent) 45%,transparent);
+  --text-selection:var(--hl);
   --hl-sk:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20120%2044'%20preserveAspectRatio='none'%3E%3Cpath%20d='M7%2011c24-7%2068-8%20106-4%206%201%208%206%206%2014-2%209-7%2015-14%2016-31%204-71%204-95%201-6-1-9-6-8-14%201-7%203-11%205-13z'%20fill='none'%20stroke='%23e0b400'%20stroke-width='3.2'%20stroke-linecap='round'%20stroke-opacity='.9'/%3E%3C/svg%3E");
   --shadow:0 18px 55px rgba(0,0,0,.15);
   --font:-apple-system,BlinkMacSystemFont,"Segoe UI Variable","Segoe UI",system-ui,sans-serif;
@@ -39,7 +41,7 @@
   --sidebar-w:224px;
   --sidebar-collapsed:56px;
   --notes-w:308px;
-  --quick-actions-w:102px;
+  --quick-actions-w:170px;
   --toolbar-h:34px;
   /* distancia da borda do editor ate a primeira letra (ajustavel nas configuracoes) */
   --text-inset:32px;
@@ -57,13 +59,20 @@ html[data-theme="dracula"],
 html[data-theme="catppuccin"],
 html[data-theme="htb"],
 html[data-theme="nord"],
-html[data-theme="gruvbox"]{
+html[data-theme="gruvbox"],
+html[data-theme="dio"],
+html[data-theme="aurora"],
+html[data-theme="forest"],
+html[data-theme="onyx"],
+html[data-theme="cocoa"],
+html[data-theme="blueberry"]{
   color-scheme:dark;
   --line:rgba(255,255,255,.09);
   --line2:rgba(255,255,255,.16);
   --hover:rgba(255,255,255,.06);
   --hl:color-mix(in srgb,var(--accent) 32%,transparent);
   --shadow:0 22px 70px rgba(0,0,0,.42);
+  --link:var(--accentText);
 }
 html[data-theme="dracula"]{
   --bg:#21222c;--sidebar:#282a36;--sidebar2:#343746;--notes:#282a36;--editor:#282a36;
@@ -160,28 +169,81 @@ html[data-theme="gruvboxlight"]{
   --accent:#fabd2f;--accentText:#8f5f0a;--danger:#9d0006;--code:#ebdbb2;
   --shadow:0 18px 55px rgba(60,56,54,.18);
 }
+html[data-theme="lavender"]{
+  --bg:#f1edf8;--sidebar:#f1edf8;--sidebar2:#e8e0f2;--notes:#f8f4fc;--editor:#fcf9ff;
+  --toolbar:#fcf9ff;--text:#34263e;--text2:#655371;--text3:#766182;
+  --selected:#eee3fa;--accent:#c6a2ef;--accentText:#663298;--link:var(--accentText);--code:#f1eaf7;
+}
+html[data-theme="sage"]{
+  --bg:#edf2e9;--sidebar:#edf2e9;--sidebar2:#e0eadb;--notes:#f3f7ef;--editor:#fafcf7;
+  --toolbar:#fafcf7;--text:#26372b;--text2:#53675a;--text3:#627564;
+  --selected:#e1eedf;--accent:#a4c9a9;--accentText:#285d41;--link:var(--accentText);--code:#eef3e9;
+}
+html[data-theme="vanilla"]{
+  --bg:#f8edda;--sidebar:#f8edda;--sidebar2:#efdfc5;--notes:#fcf4e7;--editor:#fff9ed;
+  --toolbar:#fff9ed;--text:#412e24;--text2:#6f5142;--text3:#7f5d49;
+  --selected:#f4e4c9;--accent:#e7ba79;--accentText:#855126;--link:var(--accentText);--code:#f6ebd8;
+}
+html[data-theme="peach"]{
+  --bg:#f8eae4;--sidebar:#f8eae4;--sidebar2:#f1ded3;--notes:#fdf3ee;--editor:#fff8f4;
+  --toolbar:#fff8f4;--text:#442c29;--text2:#74544c;--text3:#826159;
+  --selected:#f7e0d6;--accent:#eba88e;--accentText:#93472f;--link:var(--accentText);--code:#f7e8df;
+}
+html[data-theme="dio"]{
+  --bg:#151515;--sidebar:#181628;--sidebar2:#2e2a4d;--notes:#181628;--editor:#1e192c;
+  --toolbar:#151515;--raised:#28213c;--text:#fbf7ff;--text2:#d0c2e3;--text3:#ae9dca;
+  --selected:color-mix(in srgb,#b800e7 22%,var(--editor));
+  --accent:#d267f1;--accentText:#e192f9;--danger:#ff7999;--code:#181628;
+}
+html[data-theme="aurora"]{
+  --bg:#10182b;--sidebar:#141e35;--sidebar2:#233653;--notes:#17223a;--editor:#19253e;
+  --toolbar:#141e35;--raised:#1e304c;--text:#ecf3ff;--text2:#afc2e1;--text3:#91a7c8;
+  --selected:#273f60;--accent:#73d7ef;--accentText:#8ee4f7;--danger:#ff8798;--code:#101b2f;
+}
+html[data-theme="forest"]{
+  --bg:#171f1c;--sidebar:#1b2620;--sidebar2:#314238;--notes:#202c24;--editor:#242f27;
+  --toolbar:#1b2620;--raised:#2a392f;--text:#eef3dd;--text2:#bfcdb1;--text3:#a4b499;
+  --selected:#394d37;--accent:#b1d18b;--accentText:#c4e3a3;--danger:#ff968b;--code:#1b2620;
+}
+html[data-theme="onyx"]{
+  --bg:#181615;--sidebar:#211e1b;--sidebar2:#3d342c;--notes:#272320;--editor:#2a2521;
+  --toolbar:#211e1b;--raised:#332b26;--text:#faf1e6;--text2:#d3c2b1;--text3:#bba696;
+  --selected:#4a352c;--accent:#e7aa8a;--accentText:#f0bda5;--danger:#ff968a;--code:#211b18;
+}
+html[data-theme="cocoa"]{
+  --bg:#211815;--sidebar:#2c201c;--sidebar2:#4a342a;--notes:#32251f;--editor:#382922;
+  --toolbar:#2c201c;--raised:#433128;--text:#f9ecd8;--text2:#dec5ab;--text3:#c0a289;
+  --selected:#554030;--accent:#e6b779;--accentText:#f3c995;--danger:#ffa18c;--code:#2c201a;
+}
+html[data-theme="blueberry"]{
+  --bg:#1c1b29;--sidebar:#242135;--sidebar2:#3a3452;--notes:#29263d;--editor:#2f2a44;
+  --toolbar:#242135;--raised:#36304d;--text:#f6edff;--text2:#cec0e2;--text3:#b5a5ce;
+  --selected:#463960;--accent:#c9a5e3;--accentText:#ddbbf3;--danger:#ffa1a8;--code:#211e32;
+}
 html[data-theme="dark"]{
-  --bg:#20212b;
-  --sidebar:#22232d;
-  --sidebar2:#37394a;
-  --notes:#252632;
+  --bg:#21222c;
+  --sidebar:#21222c;
+  --sidebar2:#44475a;
+  --notes:#282a36;
   --editor:#282a36;
-  --toolbar:#262834;
-  --raised:#303241;
+  --toolbar:#21222c;
+  --raised:#353747;
   --text:#f8f8f2;
-  --heading-text:#fffdf7;
-  --text2:#c1c2d2;
-  --text3:#a1a4bf;
-  --line:#393b4c;
-  --line2:#4c4e63;
-  --hover:rgba(189,147,249,.11);
-  --selected:#434057;
+  --text2:color-mix(in srgb,#6272a4 36%,var(--text));
+  --text3:color-mix(in srgb,#6272a4 58%,var(--text));
+  --line:#44475a;
+  --line2:#6272a4;
+  --hover:color-mix(in srgb,#6272a4 20%,transparent);
+  --selected:#44475a;
   --accent:#bd93f9;
   --accentText:var(--accent);
-  --link:var(--accentText);
-  --danger:#ff858a;
-  --code:#222431;
+  --link:#8be9fd;
+  --danger:#ff5555;
+  --code:#21222c;
   --hl:color-mix(in srgb,var(--accent) 32%,var(--editor));
+  --text-selection:var(--selected);
+  --scroll-thumb:#6272a4;
+  --scroll-track:#282a36;
 }
 *{box-sizing:border-box}
 html{scrollbar-color:var(--scroll-thumb) var(--scroll-track)}
@@ -206,9 +268,24 @@ body{
 }
 button,input,select{font:inherit}
 button{color:inherit;-webkit-tap-highlight-color:var(--hover)}
-::selection{background:var(--hl)}
+::selection{background:var(--text-selection)}
 :focus-visible{outline:2px solid var(--accentText);outline-offset:2px}
 svg{stroke-linecap:round;stroke-linejoin:round}
+
+html[data-theme-transition]::view-transition{pointer-events:none}
+html[data-theme-transition]::view-transition-group(root),
+html[data-theme-transition]::view-transition-old(root),
+html[data-theme-transition]::view-transition-new(root){animation:none;mix-blend-mode:normal}
+html[data-theme-transition="expand"]::view-transition-new(root){
+  animation:theme-reveal .62s ease-in-out both;
+}
+html[data-theme-transition="contract"]::view-transition-old(root){
+  z-index:1;animation:theme-reveal .62s ease-in-out reverse both;
+}
+@keyframes theme-reveal{
+  from{clip-path:circle(0px at var(--theme-origin))}
+  to{clip-path:circle(var(--theme-radius) at var(--theme-origin))}
+}
 
 .app{
   width:100%;height:100vh;height:100dvh;
@@ -221,6 +298,7 @@ svg{stroke-linecap:round;stroke-linejoin:round}
   position:absolute;inset:0 8px auto auto;z-index:100;height:34px;
   display:flex;align-items:center;gap:4px;
 }
+.view-actions{display:flex;align-items:center;gap:inherit}
 .quick-actions .icon-btn{width:30px;height:28px;color:var(--text2)}
 .quick-actions .icon-btn svg{width:16px;height:16px}
 .quick-actions .icon-btn[aria-expanded="true"]{background:var(--hover);color:var(--accentText)}
@@ -233,20 +311,26 @@ html[data-theme="dark"] .note-bar{background:var(--toolbar)}
 .app.focus{
   grid-template-columns:0 0 minmax(0,1fr);
 }
-.app.immersive{grid-template-columns:0 0 minmax(0,1fr)}
+.app.immersive{
+  --immersive-actions-bottom:max(12px,env(safe-area-inset-bottom));
+  grid-template-columns:0 0 minmax(0,1fr);
+  transition:none;
+}
 .app.immersive .sidebar,.app.immersive .notes-pane{visibility:hidden}
 .app.immersive .quick-actions{
-  top:8px;right:12px;height:auto;flex-direction:column;gap:3px;
+  inset:auto 12px var(--immersive-actions-bottom) auto;
+  height:auto;padding:3px;gap:3px;border:1px solid var(--line);
+  border-radius:10px;background:var(--raised);
 }
-.app.immersive .note-bar{
-  position:absolute;top:103px;right:12px;min-height:0;padding:0;border:0;z-index:100;
-}
-.app.immersive .note-bar > :not(#moreBtn){display:none}
+.app.immersive .note-bar{display:none}
+.app.immersive .view-actions{position:fixed;top:8px;right:12px}
+.app.immersive #immersiveBtn{color:var(--accentText)}
+.app.immersive .find-bar{margin-right:58px}
 .app.immersive .editor-scroll{padding-right:58px}
 .app.immersive .document{width:100%;padding-top:32px}
 .app.immersive .formatbar{
-  position:absolute;top:145px;right:9px;z-index:100;
-  width:42px;height:auto;max-height:calc(100% - 157px);
+  position:absolute;top:50%;right:9px;transform:translateY(-50%);z-index:100;
+  width:42px;height:auto;max-height:max(42px,calc(100% - 92px - 2 * var(--immersive-actions-bottom)));
   flex-direction:column;flex:none;gap:3px;padding:5px 3px;
   border:1px solid var(--line2);border-radius:14px;background:var(--raised);
   overflow-x:hidden;overflow-y:auto;scrollbar-width:none;box-shadow:var(--shadow);
@@ -266,7 +350,6 @@ html[data-theme="dark"] .note-bar{background:var(--toolbar)}
 .app.immersive .formatbar #blockStyle::before{content:"H";font-weight:650}
 .app.immersive .formatbar :is(.underline,.strike){display:flex}
 .app.immersive .formatbar .hl-caret{display:none}
-.app.immersive #immersiveBtn{color:var(--accentText)}
 .app.focus .sidebar,.app.focus .notes-pane{border-right-color:transparent}
 /* conteudo fixo na largura final: nada reflui durante a animacao */
 .notes-head,.notes-list{min-width:var(--notes-w)}
@@ -614,6 +697,25 @@ html[data-theme="dark"] :is(.collapse-btn,.note-bar .tool-btn,.formatbar .tool-b
 .find-bar .icon-btn{width:28px;height:28px}
 .find-bar .icon-btn svg{width:14px;height:14px}
 .editor-scroll{flex:1;min-height:0;overflow:auto}
+@media screen{
+  .editor-scroll[data-paper]{
+    --paper-ink:color-mix(in srgb,var(--text3) 23%,transparent);
+    background-attachment:local;
+  }
+  .editor-scroll[data-paper="ruled"]{
+    background-image:linear-gradient(to bottom,transparent calc(100% - 1px),var(--paper-ink) 0);
+    background-size:100% 27px;
+  }
+  .editor-scroll[data-paper="grid"]{
+    background-image:linear-gradient(to bottom,var(--paper-ink) 1px,transparent 1px),
+      linear-gradient(to right,var(--paper-ink) 1px,transparent 1px);
+    background-size:23px 23px;
+  }
+  .editor-scroll[data-paper="dots"]{
+    background-image:radial-gradient(circle,var(--paper-ink) 1px,transparent 1.4px);
+    background-size:21px 21px;
+  }
+}
 .document{
   width:min(766px,100%);
   margin:0;
@@ -628,7 +730,7 @@ html[data-theme="dark"] :is(.collapse-btn,.note-bar .tool-btn,.formatbar .tool-b
   padding:0;
 }
 .doc-title::placeholder{color:color-mix(in srgb,var(--text3) 60%,transparent)}
-.workspace.no-note .document,.workspace.no-note .formatbar,.workspace.no-note #moreBtn{display:none}
+.workspace.no-note .document,.workspace.no-note .formatbar,#moreBtn[hidden]{display:none}
 .editor-empty{
   height:100%;min-height:230px;display:grid;align-content:center;justify-items:center;
   gap:11px;padding:24px;color:var(--text2);text-align:center;
@@ -766,9 +868,12 @@ html[data-theme="dark"] :is(.collapse-btn,.note-bar .tool-btn,.formatbar .tool-b
 }
 .block-row[data-type="divider"] .block-content::before{content:none}
 .block-row.dragging{opacity:.35}
-.block-row.drop-before::before{
-  content:"";position:absolute;left:var(--handle-w);right:0;top:-2px;height:2px;border-radius:2px;background:var(--accentText)
+.block-row.drop-before::before,.block-row.drop-after::after{
+  content:"";position:absolute;left:var(--handle-w);right:0;height:2px;border-radius:2px;
+  background:var(--accentText);pointer-events:none;z-index:1;
 }
+.block-row.drop-before::before{top:-2px}
+.block-row.drop-after::after{bottom:-2px}
 .block-content table{width:100%;border-collapse:collapse;font-size:13.5px;margin:6px 0}
 .block-content th,.block-content td{border:1px solid var(--line2);padding:8px 9px;min-width:90px;text-align:left}
 .block-content th{background:var(--code);font-weight:650}
@@ -858,7 +963,7 @@ html[data-theme="dark"] :is(.collapse-btn,.note-bar .tool-btn,.formatbar .tool-b
 .block-row.block-selected .block-handle{opacity:1}
 .block-row.text-selected .block-content{background:var(--selected)}
 .block-editor.text-selection .block-content::selection{background:transparent}
-::highlight(editor-selection){background-color:var(--hl);color:var(--text)}
+::highlight(editor-selection){background-color:var(--text-selection);color:var(--text)}
 
 /* moldura de redimensionamento (fora do conteudo editavel, para nao sujar o HTML) */
 .media-resizer{
@@ -975,6 +1080,7 @@ html[data-theme="dark"] :is(.collapse-btn,.note-bar .tool-btn,.formatbar .tool-b
 .menu-item.danger{color:var(--danger)}
 .menu-item svg{width:15px;height:15px}
 .insert-menu .menu-item svg{flex:none;fill:none;stroke:currentColor;stroke-width:1.7;color:var(--accentText)}
+.note-actions-menu .menu-item > svg{flex:none;fill:none;stroke:currentColor;stroke-width:1.7}
 .menu-sep{height:1px;background:var(--line);margin:5px 3px}
 .menu-item[aria-pressed="true"]{background:var(--selected);color:var(--accentText);font-weight:650}
 .template-menu{width:min(326px,calc(100vw - 16px));max-height:calc(100dvh - 66px);padding:7px}
@@ -1033,9 +1139,12 @@ html[data-theme="dark"] .template-menu{border-radius:16px}
 
 .settings-modal{
   width:min(470px,calc(100vw - 30px));padding:16px 18px 14px;
-  max-height:calc(100vh - 40px);overflow:auto;   /* 13 temas nao cabem em tela baixa */
+  max-height:calc(100dvh - 40px);overflow:auto;
 }
-.settings-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.settings-head{
+  position:sticky;top:0;z-index:1;background:var(--raised);
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;
+}
 .settings-head h3{margin:0}
 .settings-section{
   margin:14px 0 8px;font-size:10.5px;font-weight:700;color:var(--text3);
@@ -1055,6 +1164,7 @@ html[data-theme="dark"] .template-menu{border-radius:16px}
 .theme-swatch i{flex:1}
 .theme-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
 .settings-row{display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:40px}
+.settings-row .tool-select{min-width:132px;background-color:var(--bg);border:1px solid var(--line)}
 .settings-label{display:flex;flex-direction:column;font-size:12.5px;color:var(--text)}
 .settings-label em{font-style:normal;font-size:10.5px;color:var(--text3);margin-top:2px}
 .settings-control{display:flex;align-items:center;gap:9px;flex:0 0 auto}
@@ -1143,8 +1253,8 @@ html[data-theme="dark"] .template-menu{border-radius:16px}
   .app,.app.sidebar-collapsed,.app.focus{grid-template-columns:minmax(0,1fr)}
   .app.immersive{grid-template-columns:minmax(0,1fr)}
   .app.immersive .document{padding-top:20px}
-  .app:not(.mobile-editor){--quick-actions-w:68px}
-  .app:not(.mobile-editor) #immersiveBtn{display:none}
+  .app:not(.mobile-editor){--quick-actions-w:102px}
+  .app:not(.mobile-editor) :is(#immersiveBtn,#moreBtn){display:none}
   .app:not(.mobile-editor) .quick-actions{top:16px}
   .collapse-btn{width:29px;margin-right:0}
   .sidebar{
@@ -1230,9 +1340,6 @@ html[data-theme="dark"] .template-menu{border-radius:16px}
         <button class="icon-btn" id="exportProjectQuickBtn" data-tip="Exportar projeto">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><path d="M12 16V4"/><path d="m8 8 4-4 4 4"/><path d="M4 19h16"/></svg>
         </button>
-        <button class="icon-btn" id="themeBtn" data-tip="Alternar tema">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><circle cx="12" cy="12" r="3.5"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M18.7 5.3l-1.4 1.4M6.7 17.3l-1.4 1.4"/></svg>
-        </button>
         <button class="icon-btn" id="settingsBtn" data-tip="Configurações">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 9 19.4a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4.6 9a1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>
         </button>
@@ -1274,9 +1381,6 @@ html[data-theme="dark"] .template-menu{border-radius:16px}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M3.5 7a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2Z"/></svg>
         <span id="noteLocation"></span>
       </div>
-      <button class="tool-btn" id="moreBtn" aria-label="Opções da nota" data-tip="Opções da nota">
-        <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>
-      </button>
     </div>
     <nav class="formatbar" id="formatbar" aria-label="Formatação da nota">
       <div class="tool-group">
@@ -1381,14 +1485,22 @@ html[data-theme="dark"] .template-menu{border-radius:16px}
     </div>
   </main>
   <div class="quick-actions" role="group" aria-label="Ações rápidas">
-    <button class="icon-btn" id="immersiveBtn" type="button" data-tip="Modo imersivo" aria-label="Modo imersivo" aria-pressed="false">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 4H4v5m11-5h5v5M4 15v5h5m11-5v5h-5"/></svg>
+    <button class="icon-btn" id="newNoteBtn" type="button" data-tip="Nova nota" aria-label="Nova nota">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
     </button>
     <button class="icon-btn" id="templatesBtn" type="button" data-tip="Modelos" aria-label="Modelos" aria-controls="templatesMenu" aria-expanded="false">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="4.5" y="6" width="13" height="14" rx="2"/><path d="M8 3h10a2 2 0 0 1 2 2v11M8 10h6m-6 4h6"/></svg>
     </button>
-    <button class="icon-btn" id="newNoteBtn" type="button" data-tip="Nova nota" aria-label="Nova nota">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+    <div class="view-actions">
+      <button class="icon-btn" id="themeBtn" type="button" data-tip="Alternar tema" aria-label="Alternar tema">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path fill="currentColor" stroke="none" d="M12 3.5a8.5 8.5 0 0 1 0 17z"/></svg>
+      </button>
+      <button class="icon-btn" id="immersiveBtn" type="button" data-tip="Modo imersivo (Ctrl+I)" aria-label="Modo imersivo" aria-keyshortcuts="Control+I" aria-pressed="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 4H4v5m11-5h5v5M4 15v5h5m11-5v5h-5"/></svg>
+      </button>
+    </div>
+    <button class="icon-btn" id="moreBtn" type="button" aria-label="Opções da nota" data-tip="Opções da nota" aria-controls="moreMenu" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><g stroke="none"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></g></svg>
     </button>
   </div>
   <span class="sr-only" id="saveState" role="status">Salvo</span>
@@ -1457,15 +1569,29 @@ html[data-theme="dark"] .template-menu{border-radius:16px}
   <button class="menu-item" data-menu="import-folder">Importar pasta</button>
   <button class="menu-item" data-menu="import-project">Importar projeto</button>
 </div>
-<div class="popover" id="moreMenu" aria-label="Opções da nota">
-  <button class="menu-item" data-note-action="find">Buscar nesta nota</button>
-  <button class="menu-item" data-note-action="pin">Fixar no topo</button>
-  <button class="menu-item" data-note-action="move">Mover para pasta…</button>
-  <button class="menu-item" data-note-action="duplicate">Duplicar nota</button>
-  <button class="menu-item" data-note-action="export" aria-controls="exportMenu" aria-expanded="false">Exportar…</button>
+<div class="popover note-actions-menu" id="moreMenu" aria-label="Opções da nota">
+  <button class="menu-item" data-note-action="find">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="5.5"/><path d="m15 15 4.5 4.5"/></svg>Buscar nesta nota
+  </button>
+  <button class="menu-item" data-note-action="pin">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 4 5 5-3 1-3 4v3l-7-7h3l4-3 1-3ZM5 19l5-5"/></svg><span>Fixar no topo</span>
+  </button>
+  <button class="menu-item" data-note-action="move">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Zm6 6h6m-2-2 2 2-2 2"/></svg>Mover para pasta…
+  </button>
+  <button class="menu-item" data-note-action="duplicate">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>Duplicar nota
+  </button>
+  <button class="menu-item" data-note-action="export" aria-controls="exportMenu" aria-expanded="false">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m-4-4 4 4 4-4M5 16v3a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3"/></svg>Exportar…
+  </button>
   <div class="menu-sep"></div>
-  <button class="menu-item danger" data-note-action="reset">Resetar nota…</button>
-  <button class="menu-item danger" data-note-action="delete">Apagar nota</button>
+  <button class="menu-item danger" data-note-action="reset">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11a8 8 0 1 1 2.3 6.7M4 5v6h6"/></svg>Resetar nota…
+  </button>
+  <button class="menu-item danger" data-note-action="delete">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16m-14 0 1 12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-12m-9 0V4h6v3m-5 4v5m4-5v5"/></svg>Apagar nota
+  </button>
 </div>
 <div class="popover" id="moveMenu" aria-label="Mover para pasta"></div>
 <div class="popover" id="sortMenu" aria-label="Ordenar notas">
@@ -1478,6 +1604,11 @@ html[data-theme="dark"] .template-menu{border-radius:16px}
   <button class="template-option" id="promptCatalogBtn" aria-controls="promptCatalog">
     <span class="template-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" aria-hidden="true"><path d="M12 3c0 5-4 9-9 9 5 0 9 4 9 9 0-5 4-9 9-9-5 0-9-4-9-9Z"/></svg></span>
     <span><strong>Prompts de IA</strong><small>Zero-shot, Few-shot, Many-shot e outros</small></span>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+  </button>
+  <button class="template-option" id="projectCatalogBtn" type="button" aria-controls="projectCatalog">
+    <span class="template-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" aria-hidden="true"><path d="M4 7h6l2 2h8v11H4zM8 13h8m-8 3h5"/></svg></span>
+    <span><strong>Fundamentos de projeto</strong><small>Contexto do app, stack, bibliotecas e setup</small></span>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
   </button>
   <button class="template-option" id="specCatalogBtn" aria-controls="specCatalog">
@@ -1494,6 +1625,15 @@ html[data-theme="dark"] .template-menu{border-radius:16px}
       <strong>Prompts de IA</strong>
     </div>
     <div id="promptCatalogList"></div>
+  </div>
+  <div id="projectCatalog" hidden>
+    <div class="template-catalog-head">
+      <button class="icon-btn" id="projectCatalogBack" type="button" aria-label="Voltar aos modelos">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>
+      </button>
+      <strong>Fundamentos de projeto</strong>
+    </div>
+    <div id="projectCatalogList"></div>
   </div>
   <div id="specCatalog" hidden>
     <div class="template-catalog-head">
@@ -1532,12 +1672,20 @@ html[data-theme="dark"] .template-menu{border-radius:16px}
   </div>
 </div>
 
-<div class="popover" id="exportMenu">
-  <button class="menu-item" data-export="md">Markdown (.md)</button>
-  <button class="menu-item" data-export="html">Página HTML (.html)</button>
-  <button class="menu-item" data-export="pdf">PDF (imprimir)</button>
+<div class="popover note-actions-menu" id="exportMenu" aria-label="Exportar nota">
+  <button class="menu-item" data-export="md">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M6.5 14.5V9.5l2.5 2.8 2.5-2.8v5m5-5v5m-2-2 2 2 2-2"/></svg>Markdown (.md)
+  </button>
+  <button class="menu-item" data-export="html">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 7-5 5 5 5m8-10 5 5-5 5M14 5l-4 14"/></svg>Página HTML (.html)
+  </button>
+  <button class="menu-item" data-export="pdf">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8V4h10v4M7 17H4V9h16v8h-3m-10-3h10v6H7zM7 11h1"/></svg>PDF (imprimir)
+  </button>
   <div class="menu-sep"></div>
-  <button class="menu-item" data-export="project">Projeto inteiro (.json)</button>
+  <button class="menu-item" data-export="project">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6H6a1 1 0 0 0-1 1v3l-2 2 2 2v3a1 1 0 0 0 1 1h2m8-12h2a1 1 0 0 1 1 1v3l2 2-2 2v3a1 1 0 0 1-1 1h-2"/></svg>Projeto inteiro (.json)
+  </button>
 </div>
 <div class="popover block-style-menu" id="blockStyleMenu" aria-label="Estilos do bloco"></div>
 
@@ -1641,6 +1789,15 @@ html[data-theme="dark"] .template-menu{border-radius:16px}
     <div class="theme-grid" id="themeGrid"></div>
 
     <div class="settings-section">Editor</div>
+    <label class="settings-row" for="paperStyle">
+      <span class="settings-label">Papel do editor</span>
+      <select class="tool-select" id="paperStyle">
+        <option value="plain">Liso</option>
+        <option value="ruled">Pautado</option>
+        <option value="grid">Quadriculado</option>
+        <option value="dots">Pontilhado</option>
+      </select>
+    </label>
     <div class="settings-row">
       <span class="settings-label">Margem do texto<em>distância da borda até a primeira letra</em></span>
       <span class="settings-control">
@@ -1671,23 +1828,33 @@ const STORAGE_KEY = "minimal-markdown-notes-block-v3";
 const OLD_STORAGE_KEY = "minimal-markdown-notes-v1";
 const THEME_KEY = "minimal-markdown-notes-theme";
 const INSET_KEY = "minimal-markdown-notes-inset";
-const LAST_LIGHT_KEY = "minimal-markdown-notes-last-light";
+const PAPER_KEY = "minimal-markdown-notes-paper";
 const LAST_DARK_KEY = "minimal-markdown-notes-last-dark";
 
 const TEMAS = {
-  light:      {nome:"Claro",        claro:true,  cores:["#f6f3eb","#fffefa","#28251f","#eebd4f"]},
+  light:      {nome:"Claro",        claro:true,  cores:["#f7f7f5","#ffffff","#37352f","#a7d4e9"]},
   solarized:  {nome:"Solarized",    claro:true,  cores:["#eee8d5","#fdf6e3","#073642","#268bd2"]},
   github:     {nome:"GitHub",       claro:true,  cores:["#f6f8fa","#ffffff","#1f2328","#54aeff"]},
   latte:      {nome:"Latte",        claro:true,  cores:["#e6e9ef","#eff1f5","#4c4f69","#c6a0f6"]},
   rosepine:   {nome:"Ros\u00e9 Pine",    claro:true,  cores:["#f2e9e1","#faf4ed","#575279","#e8b3af"]},
   nordlight:  {nome:"Nord Claro",   claro:true,  cores:["#e5e9f0","#eceff4","#2e3440","#88c0d0"]},
   gruvboxlight:{nome:"Gruvbox Claro",claro:true, cores:["#f2e5bc","#fbf1c7","#3c3836","#fabd2f"]},
-  dark:       {nome:"Escuro",       claro:false, cores:["#37394a","#282a36","#f8f8f2","#bd93f9"]},
+  lavender:   {nome:"Lavanda",      claro:true,  cores:["#f1edf8","#fcf9ff","#34263e","#c6a2ef"]},
+  sage:       {nome:"Sálvia",       claro:true,  cores:["#edf2e9","#fafcf7","#26372b","#a4c9a9"]},
+  vanilla:    {nome:"Baunilha",     claro:true,  cores:["#f8edda","#fff9ed","#412e24","#e7ba79"]},
+  peach:      {nome:"Pêssego",      claro:true,  cores:["#f8eae4","#fff8f4","#442c29","#eba88e"]},
+  dark:       {nome:"Escuro",       claro:false, cores:["#44475a","#282a36","#f8f8f2","#bd93f9"]},
   dracula:    {nome:"Dracula",      claro:false, cores:["#21222c","#282a36","#f8f8f2","#bd93f9"]},
   catppuccin: {nome:"Catppuccin",   claro:false, cores:["#181825","#1e1e2e","#cdd6f4","#cba6f7"]},
   htb:        {nome:"Hack The Box", claro:false, cores:["#0b1120","#111927","#dbe4f2","#9fef00"]},
   nord:       {nome:"Nord",         claro:false, cores:["#2e3440","#3b4252","#eceff4","#88c0d0"]},
-  gruvbox:    {nome:"Gruvbox",      claro:false, cores:["#1d2021","#282828","#ebdbb2","#fabd2f"]}
+  gruvbox:    {nome:"Gruvbox",      claro:false, cores:["#1d2021","#282828","#ebdbb2","#fabd2f"]},
+  dio:        {nome:"DIO",          claro:false, cores:["#181628","#1e192c","#fbf7ff","#d267f1"]},
+  aurora:     {nome:"Aurora",       claro:false, cores:["#141e35","#19253e","#ecf3ff","#73d7ef"]},
+  forest:     {nome:"Floresta",     claro:false, cores:["#1b2620","#242f27","#eef3dd","#b1d18b"]},
+  onyx:       {nome:"Ônix",         claro:false, cores:["#211e1b","#2a2521","#faf1e6","#e7aa8a"]},
+  cocoa:      {nome:"Cacau",        claro:false, cores:["#2c201c","#382922","#f9ecd8","#e6b779"]},
+  blueberry:  {nome:"Mirtilo",      claro:false, cores:["#242135","#2f2a44","#f6edff","#c9a5e3"]}
 };
 const INSET_PADRAO = 32;
 
@@ -1717,6 +1884,7 @@ const docTitle = $("#docTitle");
 const listTitle = $("#listTitle");
 const slashMenu = $("#slashMenu");
 const moreMenu = $("#moreMenu");
+const moreButton = $("#moreBtn");
 const folderMenu = $("#folderMenu");
 const moveMenu = $("#moveMenu");
 const sortMenu = $("#sortMenu");
@@ -1746,6 +1914,7 @@ let calloutAlvo = null;
 const settingsBackdrop = $("#settingsBackdrop");
 const themeGrid = $("#themeGrid");
 const insetRange = $("#insetRange");
+const paperStyle = $("#paperStyle");
 const insetValue = $("#insetValue");
 const mediaResizer = $("#mediaResizer");
 const mediaSize = $("#mediaSize");
@@ -1763,7 +1932,7 @@ let savedRange = null;
 let contextFolderId = null;
 let contextNoteId = null;
 let draggedNoteId = null;
-let draggedBlock = null;
+let blockDrag = null;
 let slash = {open:false,row:null,index:0,items:[]};
 let focusMode = true;
 let hist = {id:null,stack:[],i:-1,timer:null,lock:false};
@@ -1929,6 +2098,42 @@ const promptVariants=[
     ["Primeira versão","Descreva o objetivo, os insumos e a saída inicial."],
     ["Feedback","Registre o que precisa mudar, quais restrições seguir e quais trechos preservar."],
     ["Critério de parada","Defina quando aceitar uma versão e quais pontos ainda exigem decisão humana."]
+  ]}
+];
+
+const projectTemplates=[
+  {title:"Fundamentos do projeto",description:"Briefing completo para a equipe ou um agente de IA",icon:"project",sections:[
+    ["Identificação",["Nome do app, responsável e data da última revisão — …","Repositório, documentação e ambiente de referência — …"],"bullet"],
+    ["Contexto do app", "Descreva o problema, os perfis de usuário, os fluxos principais e o resultado que o app entrega. Indique o estágio atual e os limites do produto."],
+    ["Stack e bibliotecas",["Frontend, backend, armazenamento e infraestrutura — …","Runtime e versões mínimas — …","Bibliotecas principais, versões e motivos da escolha — …"],"bullet"],
+    ["Arquitetura e pontos de entrada", "Mapeie módulos e pastas, responsabilidades, fluxo de dados e integrações. Aponte os arquivos que mostram cada padrão em uso."],
+    ["Ambiente e comandos",["Pré-requisitos e configuração local — …","Comandos para instalar, rodar, testar e gerar o build — …","Ambientes, variáveis por nome e onde obter acesso — …"],"bullet"],
+    ["Convenções e restrições", "Registre padrões de código, contratos a preservar, critérios de revisão e mudanças que exigem decisão da equipe."],
+    ["O que atualizar",["Confirmar versões e comandos no repositório.","Registrar decisões em aberto com responsável."],"todo"]
+  ]},
+  {title:"Contexto do app",description:"Problema, usuários, fluxos e limites do produto",icon:"feature",sections:[
+    ["Resumo do app", "Explique o que o app faz, quem o usa e em que situação. Indique o estágio atual e o responsável pelo produto."],
+    ["Problema e resultado esperado", "Descreva a necessidade do usuário e como reconhecer que o app a atende."],
+    ["Fluxos essenciais",["Fluxo — perfil, ponto de entrada, ações e resultado.","Variações por perfil, plataforma ou permissão — …"],"bullet"],
+    ["Escopo e materiais",["Capacidades atuais e limites — …","Dados e integrações relevantes — …","Links para app, repositório, designs e documentação — …"],"bullet"]
+  ]},
+  {title:"Stack e bibliotecas",description:"Tecnologias, versões e dependências por camada",icon:"api",sections:[
+    ["Plataformas e runtimes", "Informe plataformas suportadas, versões mínimas da linguagem e runtime, gerenciador de pacotes e arquivos que definem as versões."],
+    ["Stack por camada",["Frontend e UI — linguagem, framework e build.","Backend e integrações — runtime, framework e contratos.","Persistência e infraestrutura — banco, cache, filas e hospedagem."],"bullet"],
+    ["Bibliotecas principais",["Pacote e versão — responsabilidade, onde é usado e motivo da escolha.","Dependência externa — responsável, contrato e ambiente de teste."],"bullet"],
+    ["Atualizações e compatibilidade", "Registre versões fixadas, limitações conhecidas e os testes que validam uma atualização."]
+  ]},
+  {title:"Arquitetura e convenções",description:"Módulos, fluxo de dados e padrões do código",icon:"design",sections:[
+    ["Mapa do repositório", "Liste as pastas principais, seus responsáveis e os pontos de entrada de cada módulo."],
+    ["Fluxo de dados", "Siga uma ação do usuário até a persistência ou integração. Identifique quem valida, quem é dono do estado e quais contratos são públicos."],
+    ["Convenções do projeto",["Nomes, organização de arquivos e padrões de código — …","Tratamento de erros, logs e testes por camada — …","Arquivos de exemplo que novos colaboradores podem seguir — …"],"bullet"],
+    ["Decisões e limites", "Vincule as decisões arquiteturais e descreva os contratos compartilhados, as restrições e quem aprova mudanças."]
+  ]},
+  {title:"Setup e fluxo de trabalho",description:"Ambiente local, comandos, testes e publicação",icon:"tasks",sections:[
+    ["Pré-requisitos", "Informe versões, ferramentas, acessos e serviços locais necessários."],
+    ["Configuração local",["Repositório e pasta de trabalho — …","Arquivos de configuração e nomes das variáveis de ambiente — …","Dados de exemplo e serviço a iniciar primeiro — …"],"bullet"],
+    ["Comandos", "Instalar dependências — …\nIniciar o app — …\nExecutar testes e lint — …\nGerar o build — …", "code"],
+    ["Validação e publicação",["Conferir a instalação em um ambiente limpo.","Registrar os checks de PR, a sequência de deploy e como reverter."],"todo"]
   ]}
 ];
 
@@ -2608,6 +2813,7 @@ function renderEditor(focus=false){
   const note=selectedNote();
   const changed=domNoteId!==(note?.id??null);
   $(".workspace").classList.toggle("no-note",!note);
+  moreButton.hidden=!note;
   $("#editorEmpty").classList.toggle("hidden",!!note);
   noteLocation.textContent=folderName(note?.folderId||state.selectedFolderId);
   hideResizer();hideTableTools();hideMenus();hideBubble();closeSlash();savedRange=null;
@@ -4253,17 +4459,22 @@ function setImmersive(on){
   if(on){setDrawer(false);setMobileEditor(true)}
   button.setAttribute("aria-pressed",String(on));
   button.setAttribute("aria-label",on?"Sair do modo imersivo":"Modo imersivo");
-  button.dataset.tip=button.getAttribute("aria-label");
+  button.dataset.tip=`${button.getAttribute("aria-label")} (Ctrl+I)`;
   syncPanels();
   hideMenus();closeSlash();hideBubble();hideResizer();placeTableTools();
 }
-function positionMenu(menu,x,y,right=false){
+function positionMenu(menu,x,y,right=false,above=false){
   menu.classList.add("show");
   const r=menu.getBoundingClientRect();
-  let left=right?x-r.width:x,top=y;
+  let left=right?x-r.width:x,top=above?y-r.height:y;
   left=Math.max(8,Math.min(innerWidth-r.width-8,left));
   top=Math.max(8,Math.min(innerHeight-r.height-8,top));
   menu.style.left=`${left}px`;menu.style.top=`${top}px`;
+}
+function positionAnchoredMenu(menu,anchor,gap,alignRight=true){
+  const r=anchor.getBoundingClientRect();
+  const above=!!anchor.closest(".immersive .quick-actions");
+  positionMenu(menu,alignRight?r.right:r.left,above?r.top-gap:r.bottom+gap,alignRight,above);
 }
 function toggleMenu(event,name,alignRight=true){
   event.stopPropagation();
@@ -4273,8 +4484,7 @@ function toggleMenu(event,name,alignRight=true){
   hideMenus(name);
   popoverAnchor=anchor;
   if(anchor.getAttribute("aria-controls")===menu.id)anchor.setAttribute("aria-expanded","true");
-  const r=anchor.getBoundingClientRect();
-  positionMenu(menu,alignRight?r.right:r.left,r.bottom+7,alignRight);
+  positionAnchoredMenu(menu,anchor,7,alignRight);
   if(event.detail===0)$("button",menu)?.focus();
 }
 
@@ -4310,6 +4520,7 @@ const templateButton=$("#templatesBtn");
 const specCatalog=$("#specCatalog");
 const specVariantsPanel=$("#specVariants");
 const promptCatalog=$("#promptCatalog");
+const projectCatalog=$("#projectCatalog");
 const promptIcon='<path d="M12 3c0 5-4 9-9 9 5 0 9 4 9 9 0-5 4-9 9-9-5 0-9-4-9-9Z"/>';
 let activeSpecType=null;
 function templateOption(attribute,key,icon,title,description,disclosure=false){
@@ -4327,17 +4538,20 @@ $("#specCatalogList").innerHTML=Object.entries(specVariants).map(([key])=>{
 $("#promptCatalogList").innerHTML=promptVariants.map((prompt,index)=>
   templateOption("data-prompt-option",index,promptIcon,prompt.label,prompt.description)
 ).join("");
+$("#projectCatalogList").innerHTML=projectTemplates.map((template,index)=>
+  templateOption("data-project-option",index,specCatalogIcons[template.icon],template.title,template.description)
+).join("");
 
 function showTemplateView(view,focusTarget){
   $("#templatesHome").hidden=view!=="home";
   specCatalog.hidden=view!=="catalog";
   specVariantsPanel.hidden=view!=="spec";
   promptCatalog.hidden=view!=="prompts";
+  projectCatalog.hidden=view!=="projects";
   templatesMenu.classList.toggle("catalog-open",view!=="home");
   templatesMenu.scrollTop=0;
   if(!templatesMenu.classList.contains("show"))return;
-  const anchor=templateButton.getBoundingClientRect();
-  positionMenu(templatesMenu,anchor.right,anchor.bottom+7,true);
+  positionAnchoredMenu(templatesMenu,templateButton,7);
   focusTarget?.focus();
 }
 
@@ -4362,14 +4576,21 @@ $("#specCatalogBack").addEventListener("click",()=>showTemplateView("home",$("#s
 $("#specVariantsBack").addEventListener("click",()=>showTemplateView("catalog",$("[data-spec-type='"+activeSpecType+"']",specCatalog)));
 $("#promptCatalogBtn").addEventListener("click",()=>showTemplateView("prompts",$("#promptCatalogBack")));
 $("#promptCatalogBack").addEventListener("click",()=>showTemplateView("home",$("#promptCatalogBtn")));
+$("#projectCatalogBtn").addEventListener("click",()=>showTemplateView("projects",$("#projectCatalogBack")));
+$("#projectCatalogBack").addEventListener("click",()=>showTemplateView("home",$("#projectCatalogBtn")));
 templatesMenu.addEventListener("click",e=>{
   const category=e.target.closest("[data-spec-type]");
   if(category){showSpecVariants(category.dataset.specType);return}
-  const option=e.target.closest("[data-prompt-option], [data-spec-option]");
+  const option=e.target.closest("[data-prompt-option], [data-project-option], [data-spec-option]");
   if(!option)return;
-  const index=Number(option.dataset.specOption);
-  const template=option.hasAttribute("data-prompt-option")?promptVariants[Number(option.dataset.promptOption)]:
-    index===0?templates[activeSpecType]:specVariants[activeSpecType]?.[index-1];
+  const {promptOption,projectOption,specOption}=option.dataset;
+  let template;
+  if(promptOption!==undefined)template=promptVariants[Number(promptOption)];
+  else if(projectOption!==undefined)template=projectTemplates[Number(projectOption)];
+  else{
+    const index=Number(specOption);
+    template=index===0?templates[activeSpecType]:specVariants[activeSpecType]?.[index-1];
+  }
   if(!template)return;
   hideMenus();createNote(template);
 });
@@ -4395,7 +4616,7 @@ searchInput.addEventListener("keydown",e=>{
 findInput.addEventListener("input",e=>findRun(e.target.value));
 findInput.addEventListener("keydown",e=>{
   if(e.key==="Enter"){e.preventDefault();findGo(find.i+(e.shiftKey?-1:1))}
-  if(e.key==="Escape"){e.preventDefault();findClose()}
+  if(e.key==="Escape"){e.preventDefault();e.stopPropagation();findClose()}
 });
 $("#findNext").addEventListener("click",()=>{findGo(find.i+1);findInput.focus()});
 $("#findPrev").addEventListener("click",()=>{findGo(find.i-1);findInput.focus()});
@@ -4422,17 +4643,51 @@ function applyTheme(id){
   document.documentElement.dataset.theme=alvo;
   document.documentElement.style.setProperty("--hl-sk",tracoSketch(acentoRGBA(1)));
   storageSet(THEME_KEY,alvo);
-  storageSet(TEMAS[alvo].claro?LAST_LIGHT_KEY:LAST_DARK_KEY,alvo);
+  if(!TEMAS[alvo].claro)storageSet(LAST_DARK_KEY,alvo);
   $$(".theme-card",themeGrid).forEach(c=>c.classList.toggle("active",c.dataset.tema===alvo));
 }
-/* o botao alterna claro/escuro guardando o ultimo tema de cada lado,
-   para quem usa Dracula nao cair no escuro padrao ao voltar */
-function toggleTheme(){
-  const atual=temaAtual();
+let themeSwitch=null;
+function changeTheme(id,anchor){
+  const current=temaAtual();
+  if(id===(themeSwitch?.id??current))return;
+
+  const root=document.documentElement;
+  themeSwitch?.view.skipTransition();
+  themeSwitch=null;
+  delete root.dataset.themeTransition;
+  if(id===current)return;
+  if(!document.startViewTransition||matchMedia("(prefers-reduced-motion: reduce)").matches){
+    applyTheme(id);
+    return;
+  }
+
+  const {left,top,width,height}=anchor.getBoundingClientRect();
+  const x=left+width/2,y=top+height/2;
+  const radius=Math.hypot(Math.max(x,innerWidth-x),Math.max(y,innerHeight-y));
+  root.style.setProperty("--theme-origin",`${x}px ${y}px`);
+  root.style.setProperty("--theme-radius",`${radius}px`);
+  root.dataset.themeTransition=!TEMAS[current].claro&&TEMAS[id].claro?"contract":"expand";
+
+  const change={id,view:document.startViewTransition(()=>{
+    if(themeSwitch===change)applyTheme(id);
+  })};
+  themeSwitch=change;
+  change.view.ready.catch(()=>{}); // A nova seleção pode interromper este efeito.
+  function finish(){
+    if(themeSwitch!==change)return;
+    themeSwitch=null;
+    delete root.dataset.themeTransition;
+  }
+  change.view.finished.then(finish,finish);
+}
+/* O atalho usa o Claro padrão e guarda o último tema escuro. */
+function toggleTheme(event){
+  const atual=themeSwitch?.id??temaAtual();
+  const lastDark=storageGet(LAST_DARK_KEY);
   const alvo=TEMAS[atual].claro
-    ? (TEMAS[storageGet(LAST_DARK_KEY)]?storageGet(LAST_DARK_KEY):"dark")
-    : (TEMAS[storageGet(LAST_LIGHT_KEY)]?storageGet(LAST_LIGHT_KEY):"light");
-  applyTheme(alvo);
+    ? (TEMAS[lastDark]?.claro===false?lastDark:"dark")
+    : "light";
+  changeTheme(alvo,event.currentTarget);
 }
 function insetAtual(){
   const n=parseInt(storageGet(INSET_KEY),10);
@@ -4444,6 +4699,12 @@ function applyInset(px,persistir=true){
   if(insetRange)insetRange.value=n;
   if(insetValue)insetValue.textContent=`${n} px`;
   if(persistir)storageSet(INSET_KEY,String(n));
+}
+function applyPaper(style,persist=true){
+  const paper=["ruled","grid","dots"].includes(style)?style:"plain";
+  $("#editorScroll").dataset.paper=paper;
+  paperStyle.value=paper;
+  if(persist)storageSet(PAPER_KEY,paper);
 }
 function renderThemeGrid(){
   themeGrid.innerHTML=Object.entries(TEMAS).map(([id,t])=>`
@@ -4471,11 +4732,12 @@ $("#settingsClose").addEventListener("click",closeSettings);
 settingsBackdrop.addEventListener("mousedown",e=>{if(e.target===settingsBackdrop)closeSettings()});
 themeGrid.addEventListener("click",e=>{
   const c=e.target.closest("[data-tema]");if(!c)return;
-  applyTheme(c.dataset.tema);
+  changeTheme(c.dataset.tema,c);
 });
 insetRange.addEventListener("input",e=>applyInset(e.target.value));
-$("#settingsReset").addEventListener("click",()=>{
-  applyInset(INSET_PADRAO);applyTheme("dark");setFocus(true,true);toast("Padrão restaurado");
+paperStyle.addEventListener("change",e=>applyPaper(e.target.value));
+$("#settingsReset").addEventListener("click",e=>{
+  applyInset(INSET_PADRAO);applyPaper("plain");changeTheme("dark",e.currentTarget);setFocus(true,true);toast("Padrão restaurado");
 });
 $("#importQuickBtn").addEventListener("click",e=>toggleMenu(e,"import",false));
 importMenu.addEventListener("click",e=>{
@@ -4534,13 +4796,15 @@ folderMenu.addEventListener("click",e=>{
 });
 
 /* notes */
-function openNoteOptions(id,anchor,x,y,focus=false){
+function openNoteOptions(id,{anchor=null,x,y,focus=false}){
   const note=state.notes.find(n=>n.id===id);if(!note)return;
   if(contextNoteId===id&&anchor&&popoverAnchor===anchor&&moreMenu.classList.contains("show")){hideMenus();return}
   hideMenus("more");contextNoteId=id;popoverAnchor=anchor;
-  $("[data-note-action=pin]",moreMenu).textContent=note.pinned?"Desafixar":"Fixar no topo";
+  moreButton.setAttribute("aria-expanded",String(anchor===moreButton));
+  $("[data-note-action=pin] span",moreMenu).textContent=note.pinned?"Desafixar":"Fixar no topo";
   $("[data-note-action=move]",moreMenu).disabled=state.folders.length<2;
-  positionMenu(moreMenu,x,y,!!anchor);
+  if(anchor)positionAnchoredMenu(moreMenu,anchor,5);
+  else positionMenu(moreMenu,x,y);
   if(focus)$("button",moreMenu).focus();
 }
 
@@ -4559,8 +4823,8 @@ notesList.addEventListener("click",e=>{
   const card=e.target.closest(".note-card");if(!card)return;
   const options=e.target.closest("[data-note-options]");
   if(options){
-    e.stopPropagation();const r=options.getBoundingClientRect();
-    openNoteOptions(card.dataset.noteId,options,r.right,r.bottom+4,e.detail===0);
+    e.stopPropagation();
+    openNoteOptions(card.dataset.noteId,{anchor:options,focus:e.detail===0});
   }else selectNote(card.dataset.noteId);
 });
 notesList.addEventListener("dragstart",e=>{
@@ -4573,7 +4837,7 @@ notesList.addEventListener("dragend",()=>{
 });
 notesList.addEventListener("contextmenu",e=>{
   const c=e.target.closest(".note-card");if(!c)return;e.preventDefault();
-  openNoteOptions(c.dataset.noteId,null,e.clientX,e.clientY);
+  openNoteOptions(c.dataset.noteId,{x:e.clientX,y:e.clientY});
 });
 
 /* title */
@@ -4710,7 +4974,7 @@ blockEditor.addEventListener("keydown",e=>{
   if(mod&&e.key.toLowerCase()==="y"){e.preventDefault();histApply(1);return}
   if(mod&&e.key.toLowerCase()==="b"){e.preventDefault();execFormat("bold")}
   if(mod&&e.key.toLowerCase()==="e"){e.preventDefault();toggleInlineCode()}
-  if(mod&&e.key.toLowerCase()==="i"){e.preventDefault();execFormat("italic")}
+  if(e.metaKey&&!e.ctrlKey&&e.key.toLowerCase()==="i"){e.preventDefault();execFormat("italic")}
   if(mod&&e.key.toLowerCase()==="u"){e.preventDefault();execFormat("underline")}
   if(mod&&e.key.toLowerCase()==="k"){e.preventDefault();createLinkFlow()}
   if(mod&&e.shiftKey&&e.key.toLowerCase()==="h"){e.preventDefault();toggleHighlight()}
@@ -5102,6 +5366,26 @@ document.addEventListener("copy",copiarSelecaoEntreBlocos);
 document.addEventListener("cut",copiarSelecaoEntreBlocos);
 
 /* drag blocks */
+function blockDropTarget(event){
+  let row=event.target.closest(".block-row");
+  if(!row){
+    const visible=linhasDoEditor().filter(line=>!line.classList.contains("oculto"));
+    row=visible.find(line=>event.clientY<line.getBoundingClientRect().bottom)||visible.at(-1);
+  }
+  if(!row||blockDrag.rows.includes(row))return null;
+  const bounds=row.getBoundingClientRect();
+  return {row,after:event.clientY>bounds.top+bounds.height/2};
+}
+function clearBlockDropMarker(){
+  blockDrag?.marker?.classList.remove("drop-before","drop-after");
+  if(blockDrag)blockDrag.marker=null;
+}
+function finishBlockDrag(){
+  if(!blockDrag)return;
+  clearBlockDropMarker();
+  blockDrag.rows.forEach(row=>row.classList.remove("dragging"));
+  blockDrag=null;
+}
 blockEditor.addEventListener("dragstart",e=>{
   /* com texto ja selecionado o navegador tenta arrastar o proprio texto: o alvo
      vem como no de texto (sem closest) e o gesto de selecionar varios blocos
@@ -5109,18 +5393,46 @@ blockEditor.addEventListener("dragstart",e=>{
   const alvo=e.target.nodeType===1?e.target:e.target.parentElement;
   const h=alvo&&alvo.closest?alvo.closest(".block-handle"):null;
   if(!h){e.preventDefault();return}
-  draggedBlock=h.closest(".block-row");draggedBlock.classList.add("dragging");e.dataTransfer.effectAllowed="move"
+  const row=h.closest(".block-row");
+  if(!row.classList.contains("block-selected"))limparSelecaoBlocos();
+  const rows=row.classList.contains("block-selected")?blocosSelecionados():[row];
+  blockDrag={rows,marker:null};
+  rows.forEach(line=>line.classList.add("dragging"));
+  e.dataTransfer.setData("application/x-live-notes-blocks","move");
+  e.dataTransfer.effectAllowed="move";
 });
 blockEditor.addEventListener("dragover",e=>{
-  if(!draggedBlock)return;const row=e.target.closest(".block-row");if(!row||row===draggedBlock)return;
-  e.preventDefault();$$(".drop-before",blockEditor).forEach(x=>x.classList.remove("drop-before"));row.classList.add("drop-before")
+  if(!blockDrag)return;
+  clearBlockDropMarker();
+  const target=blockDropTarget(e);
+  if(!target)return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect="move";
+  target.row.classList.add(target.after?"drop-after":"drop-before");
+  blockDrag.marker=target.row;
+});
+blockEditor.addEventListener("dragleave",e=>{
+  if(!blockEditor.contains(e.relatedTarget))clearBlockDropMarker();
 });
 blockEditor.addEventListener("drop",e=>{
-  if(!draggedBlock)return;const row=e.target.closest(".block-row");if(row&&row!==draggedBlock){e.preventDefault();histPush(true);row.before(draggedBlock);renumberLists();touchNote()}
+  if(!blockDrag)return;
+  e.preventDefault();
+  const target=blockDropTarget(e),moving=blockDrag.rows;
+  finishBlockDrag();
+  if(!target)return;
+  const current=linhasDoEditor();
+  const remaining=current.filter(row=>!moving.includes(row));
+  const index=remaining.indexOf(target.row)+(target.after?1:0);
+  const reordered=remaining.slice();
+  reordered.splice(index,0,...moving);
+  if(reordered.every((row,i)=>row===current[i]))return;
+  histPush(true);
+  const fragment=document.createDocumentFragment();
+  fragment.append(...moving);
+  blockEditor.insertBefore(fragment,remaining[index]??null);
+  renumberLists();applyToggles();touchNote();
 });
-blockEditor.addEventListener("dragend",()=>{
-  if(draggedBlock)draggedBlock.classList.remove("dragging");$$(".drop-before",blockEditor).forEach(x=>x.classList.remove("drop-before"));draggedBlock=null
-});
+blockEditor.addEventListener("dragend",finishBlockDrag);
 
 /* slash */
 slashMenu.addEventListener("mousedown",e=>e.preventDefault());
@@ -5241,10 +5553,9 @@ highlightMenu.addEventListener("click",e=>{
   if(est){setHighlightStyle(est.dataset.hlStyle);hideMenus();applyHighlight(est.dataset.hlStyle);return}
   if(e.target.closest("[data-hl-clear]")){hideMenus();clearHighlight()}
 });
-$("#moreBtn").addEventListener("click",e=>{
+moreButton.addEventListener("click",e=>{
   e.stopPropagation();
-  const r=e.currentTarget.getBoundingClientRect();
-  openNoteOptions(state.selectedNoteId,e.currentTarget,r.right,r.bottom+5,e.detail===0);
+  openNoteOptions(state.selectedNoteId,{anchor:moreButton,focus:e.detail===0});
 });
 moreMenu.addEventListener("click",e=>{
   const action=e.target.closest("[data-note-action]")?.dataset.noteAction;
@@ -5342,6 +5653,11 @@ document.addEventListener("keydown",e=>{
     if(e.key==="Escape")closeSettings();
     return;
   }
+  if(e.key.toLowerCase()==="i"&&e.ctrlKey&&!e.metaKey&&!e.altKey&&!e.shiftKey&&!e.isComposing&&!e.defaultPrevented){
+    e.preventDefault();
+    if(!e.repeat)setImmersive(!app.classList.contains("immersive"));
+    return;
+  }
   const emCampo=/^(INPUT|TEXTAREA)$/.test(document.activeElement?.tagName||"")
     ||!!document.activeElement?.classList?.contains("block-content");
   if(!e.defaultPrevented&&(e.key==="Backspace"||e.key==="Delete")&&!emCampo){
@@ -5403,6 +5719,7 @@ const initialNotes=visibleNotes();
 if(!initialNotes.some(n=>n.id===state.selectedNoteId))state.selectedNoteId=initialNotes[0]?.id??null;
 applyTheme(temaAtual());
 applyInset(insetAtual(),false);
+applyPaper(storageGet(PAPER_KEY),false);
 setHighlightStyle(hlStyle);
 setFocus(state.focusMode!==false);
 renderAll();
